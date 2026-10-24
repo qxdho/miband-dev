@@ -11,11 +11,11 @@ export default defineConfig({
   lang: 'zh-CN', // 【可改】页面语言。中文填 'zh-CN'
 
   // 【可改】浏览器标签页上的标题，每个页面会拼成「页面名 | 米环开发手册」
-  title: '米环开发手册',
+  title: 'MiBand开发手册',
 
   // 【可改】搜索引擎和分享预览里显示的介绍，建议 80-160 字
   description:
-    '小米手环 / 小米手表开发者资料库：快应用、表盘、固件研究、原生应用、BLE 协议与工具索引。只做国行，非官方。',
+    '小米手环 / 小米手表开发者资料库',
 
   // ⚠️ 不要动，指向上面的 BASE
   base: BASE,
@@ -42,7 +42,7 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#0ea5e9' }],
 
     // 【可改】作者信息
-    ['meta', { name: 'author', content: '米环开发手册 contributors' }],
+    ['meta', { name: 'author', content: '谦虚の海鸥' }],
 
     // 【可改】搜索引擎关键词，英文逗号分隔
     [
@@ -59,7 +59,7 @@ export default defineConfig({
     logo: '/logo.svg',
 
     // 【可改】图标旁的文字。删掉这行 → 只显示图标不显示字
-    siteTitle: '米环开发手册',
+    siteTitle: 'MiBand开发手册',
 
     // 【可改】顶部导航按钮。加按钮 → 复制一行改文字和地址；删按钮 → 整行删掉
     //         activeMatch 控制当前在某个板块时哪个按钮高亮，可以不要
@@ -69,11 +69,11 @@ export default defineConfig({
       { text: '快应用', link: '/quickapp/', activeMatch: '/quickapp/' },
       { text: '表盘', link: '/watchface/', activeMatch: '/watchface/' },
       { text: '固件', link: '/firmware/', activeMatch: '/firmware/' },
-      { text: '原生', link: '/native/', activeMatch: '/native/' },
+      { text: '原生应用', link: '/native/', activeMatch: '/native/' },
       {
         text: '更多',
         items: [
-          { text: 'BLE 协议', link: '/protocol/' },
+          { text: 'BLE协议', link: '/protocol/' },
           { text: '工具索引', link: '/tools/' },
           { text: '示例代码', link: '/examples/' },
           { text: '关于本站', link: '/community/about' },
