@@ -29,13 +29,21 @@ jobs:
       # 用 Node 自带的 corepack 装 pnpm，省掉 pnpm/action-setup 这一步。
       # 版本号来自 package.json 的 packageManager 字段（pnpm@11.7.0），
       # 两边不会不一致。
+      #
+      # 注意：setup-node 的 cache: pnpm 必须等 pnpm 装好之后才能用，
+      # 所以这里的顺序是「先 setup-node（不开缓存）→ 装 pnpm → 再 setup-node 开缓存」。
+      # 写成一步会在 setup-node 阶段直接报错（Unable to locate executable file: pnpm）。
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable pnpm
+        run: corepack enable && corepack install
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
-      - name: Enable pnpm
-        run: corepack enable && corepack install
 
       - name: Install
         run: pnpm install --frozen-lockfile
