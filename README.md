@@ -4,7 +4,7 @@
 
 **快应用 → 表盘 → 固件研究 → 原生应用**，外加 BLE 协议与工具索引。
 
-- 站点：<https://miband-dev.github.io/>（用户/组织主页，根路径发布）
+- 站点：<https://qxdho.github.io/miband-dev/>（GitHub Pages 项目页）
 - 定位：**资料仓库，不做真机实测**。每页标注来源与最后核对日期，拿不准就写「待验证」。
 - 范围：**只做国行**。国际版一句话带过。
 - 非官方，与小米公司无关联。
@@ -19,25 +19,24 @@ VitePress 1.x + pnpm + GitHub Actions → GitHub Pages。
 
 ```bash
 pnpm install
-pnpm docs:dev        # http://localhost:5173/
+pnpm docs:dev        # http://localhost:5173/miband-dev/
 pnpm docs:build      # 产物在 docs/.vitepress/dist
 pnpm docs:preview
 pnpm check:frontmatter
 ```
 
-> 注意：本站发布在 `miband-dev.github.io` 的**根路径**，所以 `config.mts` 里 `base: '/'`。
-> 如果以后改成项目页（`<user>.github.io/miband-dev/`），`base` 必须同步改成 `/miband-dev/`，否则样式和图片会全部 404。
+> 注意：本站发布在项目页 `https://qxdho.github.io/miband-dev/`，所以 `config.mts` 里 `base: '/miband-dev/'`。
+> 如果以后迁到 `<账号>.github.io` 的根路径，`base` 必须同步改回 `'/' `，否则样式和图片会全部 404。
 
 ## 发布
 
-目标地址是 <https://miband-dev.github.io/>，这属于 GitHub 的**用户/组织主页**，有两个硬性前提：
+目标地址是 <https://qxdho.github.io/miband-dev/>，属于 GitHub Pages 的**项目页**（不是 `<账号>.github.io` 那种根路径用户主页）：
 
-1. GitHub 账号（或组织）的用户名必须是 `miband-dev`；
-2. 仓库名必须是 `miband-dev.github.io`（精确匹配，这是 GitHub 的特殊仓库名，每个账号只能有一个）。
+1. 账号是 `qxdho`，仓库名是 `miband-dev`（普通仓库名即可，不用叫 `qxdho.github.io`）；
+2. 仓库需要是 **public**（免费账户的 Pages 只对公开仓库开放）；
+3. 推送后到仓库 **Settings → Pages → Source** 选 **GitHub Actions**，之后每次 push 到 `main` 由 `.github/workflows/deploy.yml` 自动构建发布。
 
-推送后到仓库 **Settings → Pages → Source** 选 **GitHub Actions** 即可。之后每次 push 到 `main`，`.github/workflows/deploy.yml` 自动构建并发布。
-
-> 仓库需要是 **public**（免费账户的 Pages 只对公开仓库开放）。
+> `base` 必须是 `/miband-dev/`。改仓库名的话，`base` 要跟着改。
 
 ## 目录
 

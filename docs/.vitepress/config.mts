@@ -1,9 +1,9 @@
 import { defineConfig } from 'vitepress'
 
-// 站点发布在 https://miband-dev.github.io/（用户/组织主页，根路径），所以 base 是 '/'。
-// 如果改回「项目页」形式（https://<user>.github.io/miband-dev/），这里要同步改成 '/miband-dev/'，
-// 否则 GitHub Pages 上样式和图片会全部 404——这是本项目第一号事故源。
-const BASE = '/'
+// 站点发布在 https://qxdho.github.io/miband-dev/（项目页，非根路径），所以 base 必须是 '/miband-dev/'。
+// 漏掉或写错，GitHub Pages 上样式、图片、脚本会全部 404——这是本项目第一号事故源。
+// 如果哪天迁到<账号>.github.io 的根路径，这里要同步改回 '/'。
+const BASE = '/miband-dev/'
 
 export default defineConfig({
   lang: 'zh-CN',
