@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitepress'
 
-// 重要：base 必须与仓库名一致。漏掉这行，GitHub Pages 上样式和图片会全部 404。
-const BASE = '/miband-dev/'
+// 站点发布在 https://miband-dev.github.io/（用户/组织主页，根路径），所以 base 是 '/'。
+// 如果改回「项目页」形式（https://<user>.github.io/miband-dev/），这里要同步改成 '/miband-dev/'，
+// 否则 GitHub Pages 上样式和图片会全部 404——这是本项目第一号事故源。
+const BASE = '/'
 
 export default defineConfig({
   lang: 'zh-CN',
