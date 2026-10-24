@@ -43,17 +43,28 @@ docs/
 │  ├─ config.ts            # base、nav、sidebar、搜索
 │  ├─ data/models.json      # 机型矩阵唯一数据源
 │  ├─ components/           # ModelMatrix.vue / StatusBadge.vue
-│  └─ theme/
+│  └─ theme/                # 配色变量、配色选择器
 ├─ index.md                 # 首页：矩阵、板块入口
 ├─ start/                   # 机型矩阵、术语表
-├─ quickapp/                # 环境搭建、常见问题
-├─ watchface/  firmware/  native/  protocol/
-├─ tools/  examples/
-├─ community/               # 关于本站
+├─ quickapp/                # 环境搭建、运行时与 fetch、常见问题
+├─ watchface/               # 打包格式
+├─ firmware/                # 固件包格式、系统架构
+├─ native/                  # 内核模块、Canopus、Chaos、LVGL、ARC、应用隐藏、控制中心、代码审查
+├─ protocol/                # 网络通路
+├─ tools/                   # 工具索引、逆向与复现、地址手册、参考资料
+├─ examples/
+├─ community/               # 关于本站、研究历程与误判
 └─ en/                      # 英文站，目录结构与上面一致，目前只翻了 start/
+research/                     # 站点内容的原始笔记与地址表 CSV，页面的 source 指向这里
 scripts/check-frontmatter.ts   # 校验 models.json 与全部页面 frontmatter
 .github/workflows/          # build / deploy / link-check
 ```
+
+## 内容来源
+
+每个内容页都从 `research/` 下对应编号的笔记改写而来，改写只调整结构与表述，数据以笔记为准。`research/README.md` 有编号与页面的对照表。
+
+新增或修改内容的顺序是：先改笔记，再改站点页面，最后更新 frontmatter 的 `verified`。这样正文里的地址、偏移、哈希始终能追溯到原始记录。
 
 ## 多语言
 

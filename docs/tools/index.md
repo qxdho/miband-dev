@@ -31,6 +31,14 @@ contributors: [miband-dev]
 | [atc1441 工具集](https://github.com/atc1441/MiBand10-BES2700iMP-BEST1503-Hacking) | 固件与 SoC 研究 | 固件 | 英文资料，面向 Band 10 Pro |
 | QEMU 模拟器 | 在 PC 上运行手环系统 | 固件、原生 | 仅见于论坛讨论，可行性未核实 |
 
+## 本站自带的工具页
+
+| 页面 | 内容 |
+| --- | --- |
+| [逆向与复现](/tools/reversing) | capstone、字符串与指针扫描、Thumb 字面量池、脚本清单与命令 |
+| [地址手册](/tools/addresses) | 固件 `3.101.043` 的 259 条符号地址与可做性分析 |
+| [参考资料](/tools/references) | 开源项目、官方文档、社区证据，按机型标注可信度 |
+
 ## 收录规则
 
 - 可追溯到原始出处（GitHub 仓库、官方站点或论坛原帖），不收录转载站与网盘；

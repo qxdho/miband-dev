@@ -32,8 +32,27 @@ contributors: [miband-dev]
 | **miwear_app_t / miwear_page_t** | 手环应用与页面的注册结构体，定义应用元信息与页面生命周期。 |
 | **packagemanager_api_s** | 应用管理接口，含 `install`、`recover`、`uninstall`、`unregister`、`set_hidden`、`is_hidden`。 |
 | **LVGL** | 轻量级嵌入式 GUI 库，手环 UI 的绘制层。小米手环 10 Pro 上为 v9。 |
+| **modlib** | NuttX 的可加载模块子系统，作用对应 Linux 的 `.ko`，通过 `insmod` 载入。只有 10 Pro 的固件里存在。 |
+| **贴片函数（veneer）** | 把固件函数地址硬编码进去的 `static inline` 包装。固件符号表被剥离后，模块只能这样调用固件函数。 |
+| **target pack** | Canopus 按 `firmware_sha256` 划分的目录，内含该固件版本恢复出的符号与地址。 |
+| **Canopus** | 第三方模块加载器与应用运行时，用 Lua 表盘驱动。 |
+| **Chaos** | 第三方模块框架，Rust 编写，自带渲染引擎。 |
 
-## 硬件
+## 逆向与固件
+
+| 术语 | 解释 |
+| --- | --- |
+| **vela_ap.bin** | 手环应用处理器镜像，即整个 NuttX 与快应用运行时。大部分固件分析的対象。 |
+| **JIDL** | 快应用 JS API 的接口描述层，决定哪些模块被注册进运行时。 |
+| **feature 裁剪** | 编译期由 `Kconfig` 与 Makefile 决定把哪些子系统打进 `vela_ap.bin`。 |
+| **Miwear NET** | 小米私有协议，把手机的网络通过 BLE 以 TUN 设备形式延伸到手表。 |
+| **TUN** | 虚拟网络设备，内核把 IP 包交给用户态程序，再由它转发出去。 |
+| **interconnect** | 小米的跨设备互联框架，是把手机网络延伸到手表的那条官方通路。 |
+| **Thumb 位** | Cortex-M 函数指针最低位为 1 表示按 Thumb 解码。写贴片函数时漏掉它会在跳转时触发 HardFault。 |
+| **双映射（`0x0C000000` / `0x2C000000`）** | 同一段固件在两组虚拟地址下的视图，换算时必须在同一视图内取地址。 |
+| **`.face`** | 表盘的二进制打包格式，结构与 `.bin` 不同，见[表盘打包格式](/watchface/package)。 |
+
+## 易混淆项
 
 | 术语 | 解释 |
 | --- | --- |

@@ -24,6 +24,7 @@ contributors: [miband-dev]
 
 | 页面 | 内容 | 状态 |
 | --- | --- | --- |
+| [网络通路](/protocol/network) | TCP/IP 栈、DNS、Miwear NET、TUN over BLE、手机侧代理 | 已上线 |
 | GATT 结构 | 服务与特征值的划分、读写与通知的关系 | 规划中 |
 | 认证与加密 | 握手流程、密钥来源、常见失败原因 | 规划中 |
 | 数据同步 | 通知、健康、运动数据的帧格式与分片 | 规划中 |

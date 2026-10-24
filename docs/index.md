@@ -38,13 +38,15 @@ features:
 | 板块 | 内容 | 入口 |
 | --- | --- | --- |
 | 开始 | 机型支持情况、术语 | [从这里开始](/start/) · [机型矩阵](/start/models) · [术语表](/start/glossary) |
-| 快应用 | 用 JS 编写应用并打包为 `.rpk` | [导读](/quickapp/) · [环境搭建](/quickapp/setup) · [常见问题](/quickapp/pitfalls) |
-| 表盘 | Lua 脚本与资源包 | [导读](/watchface/) |
-| 固件 | 备份、读分区、解包、刷写 | [导读](/firmware/) |
-| 原生 | 在 NuttX 上加载 C 模块 | [导读](/native/) |
-| 协议 | 手环与手机之间的 BLE 通信 | [导读](/protocol/) |
+| 快应用 | 用 JS 编写应用并打包为 `.rpk` | [导读](/quickapp/) · [环境搭建](/quickapp/setup) · [运行时与 fetch](/quickapp/runtime) · [常见问题](/quickapp/pitfalls) |
+| 表盘 | Lua 脚本与资源包 | [导读](/watchface/) · [打包格式](/watchface/package) |
+| 固件 | 备份、读分区、解包、刷写 | [导读](/firmware/) · [固件包格式](/firmware/package) · [系统架构](/firmware/architecture) |
+| 原生 | 在 NuttX 上加载 C 模块 | [导读](/native/) · [内核模块系统](/native/modules) · [Canopus](/native/canopus) · [Chaos](/native/chaos) |
+| 协议 | 手环与手机之间的 BLE 通信 | [导读](/protocol/) · [网络通路](/protocol/network) |
 
-横向板块：[工具索引](/tools/)、[示例代码](/examples/)。
+横向板块：[工具索引](/tools/) · [逆向与复现](/tools/reversing) · [地址手册](/tools/addresses) · [参考资料](/tools/references) · [示例代码](/examples/)。
+
+研究过程与误判记录在[研究历程与误判](/community/history)，原始笔记存放在仓库的 `research/` 目录。
 
 ## 声明
 

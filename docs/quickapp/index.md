@@ -39,6 +39,7 @@ contributors: [miband-dev]
 | 页面 | 内容 | 状态 |
 | --- | --- | --- |
 | [环境搭建](/quickapp/setup) | AIoT IDE 安装、最小工程、模拟器、打包 | 已上线 |
+| [运行时与 fetch](/quickapp/runtime) | JIDL、模块注册、feature 裁剪、`fetch` 的故障模式 | 已上线 |
 | [常见问题](/quickapp/pitfalls) | 社区记录到的失败案例与判断方法 | 已上线 |
 | 工程结构与 manifest | 路由、权限、屏幕配置字段 | 规划中 |
 | UI 与适配 | 不同分辨率、圆角、安全区下的布局处理 | 规划中 |

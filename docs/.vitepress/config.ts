@@ -195,41 +195,68 @@ export default defineConfig({
         items: [
           { text: '导读', link: '/quickapp/' },
           { text: '环境搭建', link: '/quickapp/setup' },
+          { text: '运行时与 fetch', link: '/quickapp/runtime' },
           { text: '常见问题', link: '/quickapp/pitfalls' },
         ],
       },
       {
         text: '表盘',
         collapsed: true,
-        items: [{ text: '导读', link: '/watchface/' }],
+        items: [
+          { text: '导读', link: '/watchface/' },
+          { text: '打包格式', link: '/watchface/package' },
+        ],
       },
       {
         text: '固件研究',
         collapsed: true,
-        items: [{ text: '导读', link: '/firmware/' }],
+        items: [
+          { text: '导读', link: '/firmware/' },
+          { text: '固件包格式', link: '/firmware/package' },
+          { text: '系统架构', link: '/firmware/architecture' },
+        ],
       },
       {
         text: '原生应用',
         collapsed: true,
-        items: [{ text: '导读', link: '/native/' }],
+        items: [
+          { text: '导读', link: '/native/' },
+          { text: '内核模块系统', link: '/native/modules' },
+          { text: 'Canopus', link: '/native/canopus' },
+          { text: 'Chaos', link: '/native/chaos' },
+          { text: 'LVGL 与界面', link: '/native/lvgl' },
+          { text: '圆环与 ARC 控件', link: '/native/arc' },
+          { text: '应用隐藏与免重启', link: '/native/app-hiding' },
+          { text: '控制中心与地址视图', link: '/native/control-center' },
+          { text: 'Chaos 代码审查', link: '/native/code-review' },
+        ],
       },
       {
         text: 'BLE 协议',
         collapsed: true,
-        items: [{ text: '导读', link: '/protocol/' }],
+        items: [
+          { text: '导读', link: '/protocol/' },
+          { text: '网络通路', link: '/protocol/network' },
+        ],
       },
       {
         text: '工具与示例',
         collapsed: true,
         items: [
           { text: '工具索引', link: '/tools/' },
+          { text: '逆向与复现', link: '/tools/reversing' },
+          { text: '地址手册', link: '/tools/addresses' },
+          { text: '参考资料', link: '/tools/references' },
           { text: '示例代码', link: '/examples/' },
         ],
       },
       {
         text: '参与',
         collapsed: true,
-        items: [{ text: '关于本站', link: '/community/about' }],
+        items: [
+          { text: '关于本站', link: '/community/about' },
+          { text: '研究历程与误判', link: '/community/history' },
+        ],
       },
     ],
 
