@@ -26,7 +26,7 @@ features:
 ---
 
 ::: info Translation status
-Only this **Start** section has an English version. The other sections are currently Chinese-only: [Quick App](/quickapp/), [Watchface](/watchface/), [Firmware](/firmware/), [Native](/native/), [Protocol](/protocol/).
+Only this **Start** section has an English version. The other sections are currently Chinese-only: [Quick App](/apps/quickapp/), [Watchface](/apps/watchface/), [Firmware](/system/firmware/), [Native](/system/native/), [Protocol](/refs/).
 
 Contributions of translated pages are welcome; see `CONTRIBUTING.md` in the repository root.
 :::
@@ -44,13 +44,13 @@ Six layers ordered by purpose. The further down, the closer to the hardware and 
 | Section | Content | Entry |
 | --- | --- | --- |
 | Start | Device support, terminology | [Overview](/en/start/) · [Device matrix](/en/start/models) · [Glossary](/en/start/glossary) |
-| Quick App | Applications written in JavaScript, packaged as `.rpk` | [Overview](/quickapp/) (Chinese) |
-| Watchface | Lua scripts and resource bundles | [Overview](/watchface/) (Chinese) |
-| Firmware | Backup, partition dump, unpacking, flashing | [Overview](/firmware/) (Chinese) |
-| Native | Loading C modules on NuttX | [Overview](/native/) (Chinese) |
-| Protocol | BLE communication between band and phone | [Overview](/protocol/) (Chinese) |
+| Quick App | Applications written in JavaScript, packaged as `.rpk` | [Overview](/apps/quickapp/) (Chinese) |
+| Watchface | Lua scripts and resource bundles | [Overview](/apps/watchface/) (Chinese) |
+| Firmware | Backup, partition dump, unpacking, flashing | [Overview](/system/firmware/) (Chinese) |
+| Native | Loading C modules on NuttX | [Overview](/system/native/) (Chinese) |
+| Protocol | BLE communication between band and phone | [Overview](/refs/) (Chinese) |
 
-Cross-cutting sections: [Tools](/tools/) and [Examples](/examples/), both Chinese-only for now.
+Cross-cutting sections: [Tools](/refs/) and [Examples](/refs/examples), both Chinese-only for now.
 
 ## Disclaimer
 

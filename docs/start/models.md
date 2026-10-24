@@ -2,7 +2,7 @@
 title: 机型能力矩阵
 models: [band9, band10, band10pro]
 firmware: "unknown"
-verified: 2026-10-24
+verified: 2026-10-25
 status: sourced
 source: "https://www.luming.cool/posts/2025/08/build-a-quick-app-for-vela-devices/"
 contributors: [miband-dev]
@@ -10,7 +10,7 @@ contributors: [miband-dev]
 
 # 机型能力矩阵
 
-<StatusBadge status="sourced" verified="2026-10-24" />
+<StatusBadge status="sourced" verified="2026-10-25" />
 
 本站不进行真机实测。矩阵中每一项均来自公开资料或社区记录，`✓` 表示有来源称该项可用，不代表作者在设备上复现过。无法确认的项填 `unknown`。
 
@@ -31,7 +31,7 @@ contributors: [miband-dev]
 | `quickapp` | 能否安装与运行快应用 | 取决于是否存在应用引擎 |
 | `watchface` | 能否安装自定义表盘 | 与表盘 bin 格式相关 |
 | `native` | 能否通过 NuttX `insmod` 加载自定义 ELF 模块 | 资料最少 |
-| `flash` | 能否备份与刷写固件 | 高风险，见[固件研究](/firmware/) |
+| `flash` | 能否备份与刷写固件 | 高风险，见[固件研究](/system/firmware/) |
 
 能力字段取值为 `true`、`false`、`"partial"`、`"unknown"` 之一。
 
@@ -47,6 +47,9 @@ contributors: [miband-dev]
 | Mi Band 10 Pro 软件：NuttX + LVGL v9；表盘由 Lua 脚本驱动，应用由 AiotJS（quickjs 衍生）执行 | 中高 | Habr |
 | 原生应用路径：Lua 表盘内通过 `os.execute()` 获得 shell，再用 `insmod /data/xxx.elf` 加载 ET_REL 模块 | 中高 | Habr |
 | 应用注册接口：`miwear_app_t`、`miwear_page_t` 与 `packagemanager_api_s`（install / recover / uninstall / unregister / set_hidden / is_hidden） | 中高 | Habr |
+| 10 Pro 屏幕为 336×480，固件 3.101.043；11 NFC 为 212×520，固件 4.100.139 | 高 | QEMU 模拟器项目 |
+| 10 Pro 外挂 SPI NAND 为 Dosilicon DS35M4GB-IB：4 Gbit、1.8V、WSON-8、544 MiB raw | 高 | 拆机实录 |
+| 第三方客户端配对手环需要从小米服务器取回 16 字节 key，Gadgetbridge 用 huami-token 完成 | 高 | huami-token / Gadgetbridge 文档 |
 
 ## 国行与国际版
 

@@ -1,7 +1,7 @@
 # Chaos-Module 项目分析
 
 > 研究日期：2026-10-16（仓库已跟进至 `d3343dc`）
-> 研究对象：[WenHuaYiYang/Chaos-Module](https://github.com/WenHuaYiYang/Chaos-Module)（本地克隆 `/dsh/workspace/chaos/repo`）
+> 研究对象：[WenHuaYiYang/Chaos-Module](https://github.com/WenHuaYiYang/Chaos-Module)（本地克隆 `/work/chaos/repo`）
 > 许可：AGPL-3.0
 > 环境限制：本环境**无 cargo / rustc / python3**，所有结论均来自**静态源码阅读**，**未经编译或真机验证**。
 >

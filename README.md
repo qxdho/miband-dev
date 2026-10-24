@@ -1,6 +1,6 @@
 # 米环开发手册
 
-面向开发者的中文小米手环与小米手表资料库，覆盖快应用、表盘、固件研究与原生应用四层，另有 BLE 协议与工具索引两个横向板块。
+面向开发者的中文小米手环与小米手表资料库，按用途分为五个板块：入门、应用与表盘、固件与原生、协议工具与参考、关于与研究。
 
 - 站点：<https://qxdho.github.io/miband-dev/>（GitHub Pages 项目页）
 - 定位：资料汇编，不进行真机实测。每页标注来源与最后核对日期，未知内容标为 `unknown` 或 `unverified`。
@@ -46,14 +46,10 @@ docs/
 │  └─ theme/                # 配色变量、配色选择器
 ├─ index.md                 # 首页：矩阵、板块入口
 ├─ start/                   # 机型矩阵、术语表
-├─ quickapp/                # 环境搭建、运行时与 fetch、常见问题
-├─ watchface/               # 打包格式
-├─ firmware/                # 固件包格式、系统架构
-├─ native/                  # 内核模块、Canopus、Chaos、LVGL、ARC、应用隐藏、控制中心、代码审查
-├─ protocol/                # 网络通路
-├─ tools/                   # 工具索引、逆向与复现、地址手册、参考资料
-├─ examples/
-├─ community/               # 关于本站、研究历程与误判
+├─ apps/                    # 应用与表盘：quickapp/、watchface/
+├─ system/                  # 固件与原生：firmware/、native/
+├─ refs/                    # 协议与工具：BLE 协议、网络通路、QEMU、逆向、资料、示例
+├─ about/                   # 关于本站、研究历程、控制中心与代码审查
 └─ en/                      # 英文站，目录结构与上面一致，目前只翻了 start/
 research/                     # 站点内容的原始笔记与地址表 CSV，页面的 source 指向这里
 scripts/check-frontmatter.ts   # 校验 models.json 与全部页面 frontmatter
@@ -62,7 +58,7 @@ scripts/check-frontmatter.ts   # 校验 models.json 与全部页面 frontmatter
 
 ## 内容来源
 
-每个内容页都从 `research/` 下对应编号的笔记改写而来，改写只调整结构与表述，数据以笔记为准。`research/README.md` 有编号与页面的对照表。
+多数内容页从 `research/` 下对应编号的笔记改写而来，改写只调整结构与表述，数据以笔记为准；`research/README.md` 有编号与页面的对照表。直接整理自外部公开资料的页面（BLE 鉴权、启动链与救砖、QEMU 模拟器）以原始 URL 作为 frontmatter 的 `source`，并在[参考资料](/refs/references)页统一列出。
 
 新增或修改内容的顺序是：先改笔记，再改站点页面，最后更新 frontmatter 的 `verified`。这样正文里的地址、偏移、哈希始终能追溯到原始记录。
 

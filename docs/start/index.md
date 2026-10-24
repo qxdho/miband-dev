@@ -18,11 +18,11 @@ contributors: [miband-dev]
 
 | 目标 | 入口 | 前置 |
 | --- | --- | --- |
-| 编写并安装应用 | [快应用](/quickapp/) | JS，了解 Vue 单文件组件 |
-| 制作表盘 | [表盘](/watchface/) | Lua，了解资源打包格式 |
-| 修改系统与固件 | [固件](/firmware/) → [原生](/native/) | Linux 基础，能承担变砖风险 |
+| 编写并安装应用 | [快应用](/apps/quickapp/) | JS，了解 Vue 单文件组件 |
+| 制作表盘 | [表盘](/apps/watchface/) | Lua，了解资源打包格式 |
+| 修改系统与固件 | [固件](/system/firmware/) → [原生](/system/native/) | Linux 基础，能承担变砖风险 |
 
-横向的两层是[协议](/protocol/)与[工具与示例](/tools/)。
+横向的两层是[协议](/refs/)与[工具与示例](/refs/)。
 
 ## 分层
 
@@ -55,16 +55,16 @@ contributors: [miband-dev]
 | 板块 | 内容 |
 | --- | --- |
 | [开始](/start/) | 机型支持情况、术语释义 |
-| [快应用](/quickapp/) | 编写 `.rpk` 并安装到设备 |
-| [表盘](/watchface/) | 表盘格式、打包与替换 |
-| [固件](/firmware/) | 备份、读取分区、解包 |
-| [原生](/native/) | 在 NuttX 上运行自编译 C 模块 |
-| [协议](/protocol/) | 手环与手机之间的 BLE 通信 |
-| [工具](/tools/) | 现有工具及其适用范围 |
-| [示例](/examples/) | 可直接构建的示例工程 |
+| [快应用](/apps/quickapp/) | 编写 `.rpk` 并安装到设备 |
+| [表盘](/apps/watchface/) | 表盘格式、打包与替换 |
+| [固件](/system/firmware/) | 备份、读取分区、解包 |
+| [原生](/system/native/) | 在 NuttX 上运行自编译 C 模块 |
+| [协议](/refs/) | 手环与手机之间的 BLE 通信 |
+| [工具](/refs/) | 现有工具及其适用范围 |
+| [示例](/refs/examples) | 可直接构建的示例工程 |
 
 ## 相关页面
 
 - 术语释义：[术语表](/start/glossary)
 - 机型支持情况：[机型能力矩阵](/start/models)
-- 内容贡献方式：[关于本站](/community/about)与仓库根目录 `CONTRIBUTING.md`
+- 内容贡献方式：[关于本站](/about/)与仓库根目录 `CONTRIBUTING.md`

@@ -18,11 +18,11 @@ Content is organised into six layers by purpose, not by file type or device mode
 
 | Goal | Entry | Prerequisites |
 | --- | --- | --- |
-| Write and install an app | [Quick App](/quickapp/) | JavaScript, single-file Vue components |
-| Build a watchface | [Watchface](/watchface/) | Lua, resource bundling format |
-| Modify the system and firmware | [Firmware](/firmware/) → [Native](/native/) | Linux fundamentals, willingness to risk a bricked device |
+| Write and install an app | [Quick App](/apps/quickapp/) | JavaScript, single-file Vue components |
+| Build a watchface | [Watchface](/apps/watchface/) | Lua, resource bundling format |
+| Modify the system and firmware | [Firmware](/system/firmware/) → [Native](/system/native/) | Linux fundamentals, willingness to risk a bricked device |
 
-The two cross-cutting sections are [Protocol](/protocol/) and [Tools and examples](/tools/).
+The two cross-cutting sections are [Protocol](/refs/) and [Tools and examples](/refs/).
 
 ## Layers
 
@@ -55,13 +55,13 @@ This site is a documentation compilation and performs no hands-on testing, so mo
 | Section | Content |
 | --- | --- |
 | [Start](/en/start/) | Device support, terminology |
-| [Quick App](/quickapp/) | Writing `.rpk` packages and installing them |
-| [Watchface](/watchface/) | Watchface format, packaging and replacement |
-| [Firmware](/firmware/) | Backup, partition reading, unpacking |
-| [Native](/native/) | Running self-compiled C modules on NuttX |
-| [Protocol](/protocol/) | BLE communication between band and phone |
-| [Tools](/tools/) | Existing tools and their scope |
-| [Examples](/examples/) | Example projects that build as-is |
+| [Quick App](/apps/quickapp/) | Writing `.rpk` packages and installing them |
+| [Watchface](/apps/watchface/) | Watchface format, packaging and replacement |
+| [Firmware](/system/firmware/) | Backup, partition reading, unpacking |
+| [Native](/system/native/) | Running self-compiled C modules on NuttX |
+| [Protocol](/refs/) | BLE communication between band and phone |
+| [Tools](/refs/) | Existing tools and their scope |
+| [Examples](/refs/examples) | Example projects that build as-is |
 
 Sections other than Start are currently Chinese-only.
 

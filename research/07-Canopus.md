@@ -36,10 +36,10 @@ Canopus 是一个第三方的手环模块加载框架。它对这个项目的价
 | `watchfaces/` | 420 KB | Lua 表盘，含安装器 |
 | `docs/` | 296 KB | 架构、符号证据、目标包编写指南 |
 | `runtime/` | — | `control` / `diagnostics` / `lifecycle` / `loader` / `module` / `resources` |
-| `modules/examples/` | — | `hello.c` + `hello_platform.h` + `build.sh` + `package.json` |
+| `modules/refs/examples` | — | `hello.c` + `hello_platform.h` + `build.sh` + `package.json` |
 | `abi/schema` | — | ABI 描述 |
 
-`modules/examples/hello.c` 就是 [06 篇](06-内核模块系统.md)里"最小验证模块"的现实版本——框架自带了一个可编译的 hello 模块。
+`modules/refs/exampleshello.c` 就是 [06 篇](06-内核模块系统.md)里"最小验证模块"的现实版本——框架自带了一个可编译的 hello 模块。
 
 ## 与本机固件的精确匹配
 
@@ -183,7 +183,7 @@ target pack 的 `target.toml` 开头自己写着：
 | `targets/xiaomi-band-10-pro-3.101.043/target.toml` | 加载器参数、重定位表 —— **写模块的规格书** |
 | `generated/canopus_veneer.h` | 55 个硬编码 veneer，含 `register_driver`、`netdev_register` |
 | `symbols/*.json` | 259 条符号记录 |
-| `modules/examples/hello.c` + `build.sh` | 最小模块模板 |
+| `modules/refs/exampleshello.c` + `build.sh` | 最小模块模板 |
 | `watchfaces/canopus-installer-prod/*/main.lua` | 交付与加载的现成脚本 |
 | `manager/` 源码 | 管理器 UI（也是 [09 篇](09-LVGL-与界面.md)分析的对象） |
 

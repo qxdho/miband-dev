@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24",
+  "updated": "2026-10-25",
   "note": "能力字段只允许 true / false / \"partial\" / \"unknown\"。不知道就填 unknown，不要猜。screen / radius 为 null 表示未核实。name 为中文机型名，nameEn 为英文机型名（英文站用）。",
   "models": [
     {
@@ -44,7 +44,10 @@
       "id": "band10pro",
       "name": "小米手环 10 Pro",
       "nameEn": "Mi Band 10 Pro",
-      "screen": null,
+      "screen": [
+        336,
+        480
+      ],
       "radius": null,
       "os": "VelaOS",
       "soc": "BES2700iMP",
@@ -53,7 +56,8 @@
       "native": true,
       "flash": true,
       "sources": [
-        "https://habr.com/en/articles/1079066/"
+        "https://habr.com/en/articles/1079066/",
+        "https://www.bandbbs.cn/threads/29834/"
       ]
     }
   ]

@@ -31,7 +31,7 @@ The data source is `docs/.vitepress/data/models.json`. Editing that file updates
 | `quickapp` | Whether Quick Apps can be installed and run | Depends on the presence of an app engine |
 | `watchface` | Whether custom watchfaces can be installed | Tied to the watchface bin format |
 | `native` | Whether custom ELF modules can be loaded via NuttX `insmod` | Least documented |
-| `flash` | Whether firmware can be backed up and flashed | High risk, see [Firmware](/firmware/) |
+| `flash` | Whether firmware can be backed up and flashed | High risk, see [Firmware](/system/firmware/) |
 
 Capability fields take one of `true`, `false`, `"partial"`, `"unknown"`.
 

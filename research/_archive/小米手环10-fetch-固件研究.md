@@ -1030,7 +1030,7 @@ permission_state_ok.cta
 
 本节推翻了 1.7.4 / 1.8 原有的"拦住它的是运行时权限授予"这一结论。所有依据都来自
 `https://github.com/open-vela/frameworks_runtimes_feature`（`dev` 分支，已 `git clone` 到
-`/dsh/workspace/chaos/oss_feature`）。
+`/work/chaos/oss_feature`）。
 
 ### A. `fetch` 的"支持/不支持"是**编译期** Kconfig，不是运行期数据表
 
@@ -1141,7 +1141,7 @@ if (strcmp(description_->name, "system.device") == 0
 
 开源 quickapp 侧的权限胶水是
 `oss_quickapp/shell/common/permission/permission_manager_impl.cpp`（已 clone 到
-`/dsh/workspace/chaos/oss_quickapp`）。它**必然**会把自己的日志格式串带进二进制，
+`/work/chaos/oss_quickapp`）。它**必然**会把自己的日志格式串带进二进制，
 且这些是 **INFO / WARN 级，不是可被 release 删掉的 DEBUG 级**：
 
 ```cpp
@@ -1214,8 +1214,8 @@ SHELL_LOG_INFO("permission: back to feature res(%d) handle(%p)", result, handle)
 | `@system.request` / `@system.request.download` / `@system.uploadtask` / `@system.prompt` / `@system.network` / `@system.interconnect` / `@system.file` | 全 **true** |
 | 不带 `@` 的同名 8 项（`system.fetch` 等） | 全 **false** |
 | `system.network.getType()` | `{type:"none"}` ← **手环当前无网络** |
-| `fetch({url:'http://qxdho.top/'})` 回调风格 `fail` | `"Couldn't resolve host name"`（**字符串**） |
-| `fetch({url:'https://qxdho.top/'})` 同上 | `"Couldn't resolve host name"` |
+| `fetch({url:'http://example.com/'})` 回调风格 `fail` | `"Couldn't resolve host name"`（**字符串**） |
+| `fetch({url:'https://example.com/'})` 同上 | `"Couldn't resolve host name"` |
 | `fetch({...})` promise 风格 `.catch` | `{code:6, data:"Couldn't resolve host name"}`（**对象**） |
 | `fetch({url:'ftp://x/y'})` 的 `fail` | `"invalid url"` |
 | `fetch({})` 缺 `url` 的 `fail` | `"invalid url"` |
@@ -1383,7 +1383,7 @@ poll events:%d status:%d
 - 而 Miwear NET 是一条 **TUN 接口**，**不在这个类型表里**；
 - ⇒ `network.getType() === "none"` **在隧道正常工作时也会返回 none**，它证明不了任何事。
 
-同理，`http://154.9.24.61/` 的 `code:7` 也不能单独作为"没有网络"的证据：
+同理，`http://203.0.113.10/` 的 `code:7` 也不能单独作为"没有网络"的证据：
 它同样可能是"隧道通了，但手机侧连不上/被拒"。
 
 **因此 §1.7.7 的结论要降级**：已经确证的只有「**权限层没拦**」（这是真的，DNS 错误发生在权限判定之后）；
@@ -1552,7 +1552,7 @@ poll events:%d status:%d
 
 # 第二部分：方法与工具
 
-本环境无标准逆向工具链，因此自建了最小可用工具集，位于 `/dsh/workspace/chaos/tools/`：
+本环境无标准逆向工具链，因此自建了最小可用工具集，位于 `/work/chaos/refs/`：
 
 | 文件 | 作用 |
 |---|---|
@@ -1767,7 +1767,7 @@ poll events:%d status:%d
 # 附录 B：复现步骤
 
 ```bash
-cd /dsh/workspace/chaos
+cd /work/chaos
 
 # 1. 解包固件 ZIP（fw.bin 是 ZIP 格式）
 #    成员：ota.sh / vela_ap.bin / vela_bl2.bin / vela_ota.bin / vela_resource.bin / META-INF/
@@ -1780,7 +1780,7 @@ for(const s of ["fetch_impl.cpp","system_fetch_onCreate","system.fetch","fetch_c
 }'
 
 # 3. 在正确基址下查找指针引用（关键步骤）
-cd /dsh/workspace/chaos && node tools/testbase.js
+cd /work/chaos && node tools/testbase.js
 
 # 4. 转储描述符表
 node tools/table.js
@@ -1797,8 +1797,8 @@ node tools/table2.js
 
 | 仓库 | 本地路径 | 用途 |
 |---|---|---|
-| `open-vela/frameworks_runtimes_feature`（`dev`） | `/dsh/workspace/chaos/oss_feature` | 固件里的 `feature_framework`（JIDL / 权限 / fetch 实现） |
-| `open-vela/frameworks_runtimes_quickapp`（`dev`） | `/dsh/workspace/chaos/oss_quickapp` | 快应用外壳；权限胶水在这里 |
+| `open-vela/frameworks_runtimes_feature`（`dev`） | `/work/chaos/oss_feature` | 固件里的 `feature_framework`（JIDL / 权限 / fetch 实现） |
+| `open-vela/frameworks_runtimes_quickapp`（`dev`） | `/work/chaos/oss_quickapp` | 快应用外壳；权限胶水在这里 |
 
 ```bash
 git clone --depth 1 -b dev https://github.com/open-vela/frameworks_runtimes_feature.git oss_feature
@@ -1811,7 +1811,7 @@ git clone --depth 1 -b dev https://github.com/open-vela/frameworks_runtimes_quic
 |---|---|
 | fetch 是 Kconfig 编译开关（默认 y），编译 `fetch_impl.cpp` + `fetch.jidl`，并加入 `FEATURELIST` | `oss_feature/modules/Kconfig:98`、`modules/Makefile:293-297`、`modules/CMakeLists.txt:287` |
 | 快应用可见的模块清单由 `FEATURELIST` 生成 | `oss_feature/modules/ajs_features_registry.cpp:15-22` |
-| 权限标注 → 生成"申请权限"桩；**返回 `false` 时直接执行真 API** | `oss_feature/tools/jidl/json_ast_source.mt:655-702`（关键在 `if (FeatureRequestPermissions(handle, &request_info)) return;` 之后**没有 return**） |
+| 权限标注 → 生成"申请权限"桩；**返回 `false` 时直接执行真 API** | `oss_feature/refs/jidl/json_ast_source.mt:655-702`（关键在 `if (FeatureRequestPermissions(handle, &request_info)) return;` 之后**没有 return**） |
 | `requestPermissions` 在无权限回调时返回 `false` | `oss_feature/src/feature_instance.cpp:128-143` |
 | `isBlackListed` 只拦 `system.device.getDeviceId` | `oss_feature/src/feature_instance.cpp:145-153` |
 | `fetch` 需要 `hapjs.permission.INTERNET` | `oss_feature/modules/jidl/fetch.jidl`、`oss_feature/include/feature_permission.h` |
@@ -1822,7 +1822,7 @@ git clone --depth 1 -b dev https://github.com/open-vela/frameworks_runtimes_quic
 **用反证式检查区分"权限系统是否接入"**（§1.7.6 D 节）：
 
 ```bash
-cd /dsh/workspace/chaos/fwx
+cd /work/chaos/fwx
 for s in "permission(%s) api(%s)" "back to feature res" "hapjs.permission." "PermissionManager" "validatePermissionName"; do
   printf '%-30s %s\n' "$s" "$(grep -aoc -- "$s" vela_ap.bin)"
 done
@@ -1842,12 +1842,12 @@ done
 | 模块引入 | `require('@system.x')` | **没有 `require`**，全部挂在 `system.*` 上 |
 | 日志 | console | console **只在内存**（64 条 / 6144 字符 / 单条 1024），退出即丢 |
 
-完整脚本见 `/dsh/workspace/chaos/fetchprobe/`（`probe-snippet.js` 与 `src/pages/index/index.ux`），
+完整脚本见 `/work/chaos/fetchprobe/`（`probe-snippet.js` 与 `src/pages/index/index.ux`），
 2026-10-17 实际在设备上跑出结果的那一版核心如下：
 
 ```js
-var FP_URL_HTTP  = 'http://qxdho.top/';
-var FP_URL_HTTPS = 'https://qxdho.top/';
+var FP_URL_HTTP  = 'http://example.com/';
+var FP_URL_HTTPS = 'https://example.com/';
 var FP_LOG = [];
 var LOG_URI = 'internal://files/js/fplog.js';   // 必须 .js —— JSLab 只列 .js 文件
 

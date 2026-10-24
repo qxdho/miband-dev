@@ -4,7 +4,7 @@ layout: home
 hero:
   name: 米环开发手册
   text: 小米手环 / 手表开发者资料库
-  tagline: 快应用 · 表盘 · 固件研究 · 原生应用。只收录国行设备，内容标注来源与核对日期。
+  tagline: 入门 · 应用与表盘 · 固件与原生 · 协议工具 · 关于研究。只收录国行设备，内容标注来源与核对日期。
   image:
     src: /logo.svg
     alt: 米环开发手册
@@ -14,7 +14,7 @@ hero:
       link: /start/models
     - theme: alt
       text: 快应用环境搭建
-      link: /quickapp/setup
+      link: /apps/quickapp/setup
 
 features:
   - title: 机型 × 能力矩阵
@@ -33,21 +33,19 @@ features:
 
 ## 板块划分
 
-按用途划分六层，越往下越靠近硬件，风险越高。
+按用途划分五个板块，越往下越靠近硬件，风险越高。
 
 | 板块 | 内容 | 入口 |
 | --- | --- | --- |
 | 开始 | 机型支持情况、术语 | [从这里开始](/start/) · [机型矩阵](/start/models) · [术语表](/start/glossary) |
-| 快应用 | 用 JS 编写应用并打包为 `.rpk` | [导读](/quickapp/) · [环境搭建](/quickapp/setup) · [运行时与 fetch](/quickapp/runtime) · [常见问题](/quickapp/pitfalls) |
-| 表盘 | Lua 脚本与资源包 | [导读](/watchface/) · [打包格式](/watchface/package) |
-| 固件 | 备份、读分区、解包、刷写 | [导读](/firmware/) · [固件包格式](/firmware/package) · [系统架构](/firmware/architecture) |
-| 原生 | 在 NuttX 上加载 C 模块 | [导读](/native/) · [内核模块系统](/native/modules) · [Canopus](/native/canopus) · [Chaos](/native/chaos) |
-| 协议 | 手环与手机之间的 BLE 通信 | [导读](/protocol/) · [网络通路](/protocol/network) |
+| 应用与表盘 | 用 JS 编写 `.rpk`，用 Lua 与资源包制作表盘 | [应用与表盘](/apps/) · [快应用](/apps/quickapp/) · [表盘](/apps/watchface/) |
+| 固件与原生 | 固件解包、刷写，以及在 NuttX 上加载 C 模块 | [固件与原生](/system/) · [固件](/system/firmware/) · [原生](/system/native/) |
+| 协议、工具与参考 | BLE 通信、逆向工具、外部资料、示例代码 | [协议、工具与参考](/refs/) · [网络通路](/refs/network) · [逆向与复现](/refs/reversing) · [参考资料](/refs/references) · [示例代码](/refs/examples) |
+| 关于与研究 | 站点说明、研究历程、封存的地址视图与代码审查 | [关于本站](/about/) · [研究历程与误判](/about/history) |
 
-横向板块：[工具索引](/tools/) · [逆向与复现](/tools/reversing) · [地址手册](/tools/addresses) · [参考资料](/tools/references) · [示例代码](/examples/)。
+研究过程与被推翻的结论集中记录在[研究历程与误判](/about/history)，封存的地址视图与代码审查见[控制中心与地址视图](/about/control-center)和[Chaos 代码审查](/about/code-review)。原始笔记存放在仓库的 `research/` 目录。
 
-研究过程与误判记录在[研究历程与误判](/community/history)，原始笔记存放在仓库的 `research/` 目录。
 
 ## 声明
 
-本站为社区资料汇编，非官方项目，与小米公司无关联。不提供官方固件或资源包下载，不提供一键刷机工具。文档按 CC BY-SA 4.0 授权，代码按 MIT 授权。详见[关于本站](/community/about)。
+本站为社区资料汇编，非官方项目，与小米公司无关联。不提供官方固件或资源包下载，不提供一键刷机工具。文档按 CC BY-SA 4.0 授权，代码按 MIT 授权。详见[关于本站](/about/)。

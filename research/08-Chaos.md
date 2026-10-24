@@ -13,7 +13,7 @@ Chaos 是另一个第三方手环框架，Rust 写的。和 Canopus 相比，它
 | 仓库 | `github.com/WenHuaYiYang/Chaos-Module` |
 | 许可 | AGPL-3.0 |
 | 语言 | Rust（`supervisor/src` 约 13,944 行），36 个 `.rs` 文件 |
-| 本地路径 | `/dsh/workspace/chaos/projects/chaos/` |
+| 本地路径 | `/work/chaos/projects/chaos/` |
 | 目录 | `supervisor/`、`module/`、`installer/`、`tools/` |
 | 目标固件 | `3.101.043`（同一版本） |
 

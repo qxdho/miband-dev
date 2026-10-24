@@ -125,11 +125,11 @@ fetch.fetch({
 
 | 探针 | URL | 回调结果 | Promise 结果 | 耗时 |
 |---|---|---|---|---|
-| P1 | `http://154.9.24.61/` | `Couldn't connect to server` | `{code: 7}` | ~59 ms |
-| P1+H | `http://154.9.24.61/` + `Host: qxdho.top` | 同上 | `{code: 7}` | ~60 ms |
-| P2 | `http://qxdho.top/` | `Couldn't resolve host name` | `{code: 6}` | 快 |
-| P3 | `https://qxdho.top/` | `Couldn't resolve host name` | `{code: 6}` | 快 |
-| P4 | `https://154.9.24.61/` | `Couldn't connect to server` | `{code: 7}` | ~163 ms |
+| P1 | `http://203.0.113.10/` | `Couldn't connect to server` | `{code: 7}` | ~59 ms |
+| P1+H | `http://203.0.113.10/` + `Host: example.com` | 同上 | `{code: 7}` | ~60 ms |
+| P2 | `http://example.com/` | `Couldn't resolve host name` | `{code: 6}` | 快 |
+| P3 | `https://example.com/` | `Couldn't resolve host name` | `{code: 6}` | 快 |
+| P4 | `https://203.0.113.10/` | `Couldn't connect to server` | `{code: 7}` | ~163 ms |
 | P5 | `ftp://...` | `invalid url` | — | 立即 |
 | P6 | 空 URL | `invalid url` | — | 立即 |
 
@@ -202,12 +202,12 @@ function probe(tag, url, hostHeader) {
 console.log('canUse @ =', canIUse('@system.fetch'))
 console.log('canUse bare =', canIUse('fetch'))
 console.log('netType =', require('@system.network').getType())
-probe('P1', 'http://154.9.24.61/')
-probe('P2', 'http://qxdho.top/')
-probe('P3', 'https://qxdho.top/')
+probe('P1', 'http://203.0.113.10/')
+probe('P2', 'http://example.com/')
+probe('P3', 'https://example.com/')
 ```
 
-完整版探针脚本见 `/dsh/workspace/chaos/probe/resolve-probe.js`（含 shim 安装/卸载逻辑，虽然后来证明 shim 不解决问题，但代码保留了 IPv4 直连 + `Host` 头的对照实验）。
+完整版探针脚本见 `/work/chaos/probe/resolve-probe.js`（含 shim 安装/卸载逻辑，虽然后来证明 shim 不解决问题，但代码保留了 IPv4 直连 + `Host` 头的对照实验）。
 
 ## 未决问题
 

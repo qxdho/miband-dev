@@ -50,7 +50,7 @@ contributors: [miband-dev]
 | **interconnect** | 小米的跨设备互联框架，是把手机网络延伸到手表的那条官方通路。 |
 | **Thumb 位** | Cortex-M 函数指针最低位为 1 表示按 Thumb 解码。写贴片函数时漏掉它会在跳转时触发 HardFault。 |
 | **双映射（`0x0C000000` / `0x2C000000`）** | 同一段固件在两组虚拟地址下的视图，换算时必须在同一视图内取地址。 |
-| **`.face`** | 表盘的二进制打包格式，结构与 `.bin` 不同，见[表盘打包格式](/watchface/package)。 |
+| **`.face`** | 表盘的二进制打包格式，结构与 `.bin` 不同，见[表盘打包格式](/apps/watchface/package)。 |
 
 ## 易混淆项
 

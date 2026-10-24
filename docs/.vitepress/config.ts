@@ -136,7 +136,7 @@ export default defineConfig({
     ],
 
     // 【可改】作者信息
-    ['meta', { name: 'author', content: '谦虚の海鸥' }],
+    ['meta', { name: 'author', content: 'miband-dev contributors' }],
 
     // 【可改】搜索引擎关键词，英文逗号分隔
     [
@@ -160,19 +160,10 @@ export default defineConfig({
     //         items 是下拉菜单，「更多」展开后显示里面的子项
     nav: [
       { text: '开始', link: '/start/', activeMatch: '/start/' },
-      { text: '快应用', link: '/quickapp/', activeMatch: '/quickapp/' },
-      { text: '表盘', link: '/watchface/', activeMatch: '/watchface/' },
-      { text: '固件', link: '/firmware/', activeMatch: '/firmware/' },
-      { text: '原生应用', link: '/native/', activeMatch: '/native/' },
-      {
-        text: '更多',
-        items: [
-          { text: 'BLE协议', link: '/protocol/' },
-          { text: '工具索引', link: '/tools/' },
-          { text: '示例代码', link: '/examples/' },
-          { text: '关于本站', link: '/community/about' },
-        ],
-      },
+      { text: '应用与表盘', link: '/apps/', activeMatch: '/apps/' },
+      { text: '固件与原生', link: '/system/', activeMatch: '/system/' },
+      { text: '协议与工具', link: '/refs/', activeMatch: '/refs/' },
+      { text: '关于', link: '/about/', activeMatch: '/about/' },
     ],
 
     // 【可改】导航栏右侧的社交图标，点开是仓库地址。加图标 → 复制一行换 icon 和 link
@@ -188,7 +179,7 @@ export default defineConfig({
     sidebar: [
       {
         text: '开始',
-        collapsed: true,
+        collapsed: false,
         items: [
           { text: '从这里开始', link: '/start/' },
           { text: '机型能力矩阵', link: '/start/models' },
@@ -196,72 +187,82 @@ export default defineConfig({
         ],
       },
       {
-        text: '快应用',
+        text: '应用与表盘',
         collapsed: true,
         items: [
-          { text: '导读', link: '/quickapp/' },
-          { text: '环境搭建', link: '/quickapp/setup' },
-          { text: '运行时与 fetch', link: '/quickapp/runtime' },
-          { text: '常见问题', link: '/quickapp/pitfalls' },
+          { text: '导读', link: '/apps/' },
+          {
+            text: '快应用',
+            collapsed: true,
+            items: [
+              { text: '导读', link: '/apps/quickapp/' },
+              { text: '环境搭建', link: '/apps/quickapp/setup' },
+              { text: '运行时与 fetch', link: '/apps/quickapp/runtime' },
+              { text: '常见问题', link: '/apps/quickapp/pitfalls' },
+            ],
+          },
+          {
+            text: '表盘',
+            collapsed: true,
+            items: [
+              { text: '导读', link: '/apps/watchface/' },
+              { text: '打包格式', link: '/apps/watchface/package' },
+            ],
+          },
         ],
       },
       {
-        text: '表盘',
+        text: '固件与原生',
         collapsed: true,
         items: [
-          { text: '导读', link: '/watchface/' },
-          { text: '打包格式', link: '/watchface/package' },
+          { text: '导读', link: '/system/' },
+          {
+            text: '固件',
+            collapsed: true,
+            items: [
+              { text: '导读', link: '/system/firmware/' },
+              { text: '固件包格式', link: '/system/firmware/package' },
+              { text: '系统架构', link: '/system/firmware/architecture' },
+              { text: '启动链与救砖', link: '/system/firmware/recovery' },
+            ],
+          },
+          {
+            text: '原生应用',
+            collapsed: true,
+            items: [
+              { text: '导读', link: '/system/native/' },
+              { text: '内核模块系统', link: '/system/native/modules' },
+              { text: 'Canopus', link: '/system/native/canopus' },
+              { text: 'Chaos', link: '/system/native/chaos' },
+              { text: 'LVGL 与界面', link: '/system/native/lvgl' },
+              { text: '圆环与 ARC 控件', link: '/system/native/arc' },
+              { text: '应用隐藏与免重启', link: '/system/native/app-hiding' },
+              { text: 'Canopus 地址手册', link: '/system/native/addresses' },
+            ],
+          },
         ],
       },
       {
-        text: '固件研究',
+        text: '协议、工具与参考',
         collapsed: true,
         items: [
-          { text: '导读', link: '/firmware/' },
-          { text: '固件包格式', link: '/firmware/package' },
-          { text: '系统架构', link: '/firmware/architecture' },
+          { text: '导读', link: '/refs/' },
+          { text: 'BLE 协议与鉴权', link: '/refs/ble' },
+          { text: '网络通路', link: '/refs/network' },
+          { text: 'QEMU 模拟器', link: '/refs/emulator' },
+          { text: '逆向与复现', link: '/refs/reversing' },
+          { text: '参考资料', link: '/refs/references' },
+          { text: '示例代码', link: '/refs/examples' },
         ],
       },
       {
-        text: '原生应用',
+        text: '关于与研究',
         collapsed: true,
         items: [
-          { text: '导读', link: '/native/' },
-          { text: '内核模块系统', link: '/native/modules' },
-          { text: 'Canopus', link: '/native/canopus' },
-          { text: 'Chaos', link: '/native/chaos' },
-          { text: 'LVGL 与界面', link: '/native/lvgl' },
-          { text: '圆环与 ARC 控件', link: '/native/arc' },
-          { text: '应用隐藏与免重启', link: '/native/app-hiding' },
-          { text: '控制中心与地址视图', link: '/native/control-center' },
-          { text: 'Chaos 代码审查', link: '/native/code-review' },
-        ],
-      },
-      {
-        text: 'BLE 协议',
-        collapsed: true,
-        items: [
-          { text: '导读', link: '/protocol/' },
-          { text: '网络通路', link: '/protocol/network' },
-        ],
-      },
-      {
-        text: '工具与示例',
-        collapsed: true,
-        items: [
-          { text: '工具索引', link: '/tools/' },
-          { text: '逆向与复现', link: '/tools/reversing' },
-          { text: '地址手册', link: '/tools/addresses' },
-          { text: '参考资料', link: '/tools/references' },
-          { text: '示例代码', link: '/examples/' },
-        ],
-      },
-      {
-        text: '参与',
-        collapsed: true,
-        items: [
-          { text: '关于本站', link: '/community/about' },
-          { text: '研究历程与误判', link: '/community/history' },
+          { text: '关于本站', link: '/about/' },
+          { text: '研究历程与误判', link: '/about/history' },
+          { text: '控制中心与地址视图', link: '/about/control-center' },
+          { text: 'Chaos 代码审查', link: '/about/code-review' },
         ],
       },
     ],
