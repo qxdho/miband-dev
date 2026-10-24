@@ -26,6 +26,86 @@ export default defineConfig({
   // 【可改】每个页面底部是否显示「最后更新」日期。false = 不显示
   lastUpdated: true,
 
+  // ─── 多语言 ──────────────────────────────────────────────
+  // root 是默认语言（中文，在 docs/ 下）。
+  // en 是英文（在 docs/en/ 下），link 指向它的首页。
+  //
+  // 加一门语言 = 在这里加一项（如 ja），再建 docs/ja/ 目录放译文。
+  // 译文不会自动生成，必须有人写。
+  //
+  // 想暂时关掉英文：把 en 这一整块删掉，顶部导航的语言菜单会自动消失，
+  // 英文页面留在仓库里不影响构建。
+  locales: {
+    root: {
+      label: '简体中文', // 语言菜单里显示的名字
+      lang: 'zh-CN',
+    },
+    en: {
+      label: 'English',
+      lang: 'en',
+      link: '/en/',
+      title: 'Mi Band Developer Handbook',
+      description:
+        'Developer resources for Xiaomi Mi Band / Smart Band: Quick Apps, watchfaces, firmware research, native apps, BLE protocol and tools. China-region devices only. Unofficial.',
+
+      // 英文站的导航和目录。链接必须带 /en/ 前缀。
+      themeConfig: {
+        nav: [
+          { text: 'Start', link: '/en/start/', activeMatch: '/en/start/' },
+          { text: 'Chinese docs', link: '/' },
+        ],
+
+        sidebar: [
+          {
+            text: 'Start',
+            collapsed: false,
+            items: [
+              { text: 'Overview', link: '/en/start/' },
+              { text: 'Device matrix', link: '/en/start/models' },
+              { text: 'Glossary', link: '/en/start/glossary' },
+            ],
+          },
+          {
+            text: 'Not translated yet',
+            collapsed: true,
+            items: [{ text: 'Chinese site', link: '/' }],
+          },
+        ],
+
+        outline: { label: 'On this page', level: [2, 3] },
+        docFooter: { prev: 'Previous', next: 'Next' },
+        lastUpdatedText: 'Last updated',
+        returnToTopLabel: 'Return to top',
+        sidebarMenuLabel: 'Menu',
+        darkModeSwitchLabel: 'Appearance',
+        langMenuLabel: 'Language',
+
+        search: {
+          options: {
+            translations: {
+              button: { buttonText: 'Search', buttonAriaLabel: 'Search' },
+              modal: {
+                noResultsText: 'No results found',
+                resetButtonTitle: 'Clear query',
+                footer: {
+                  selectText: 'Select',
+                  navigateText: 'Navigate',
+                  closeText: 'Close',
+                },
+              },
+            },
+          },
+        },
+
+        footer: {
+          message:
+            'Unofficial project, not affiliated with Xiaomi. Docs under CC BY-SA 4.0, code under MIT.',
+          copyright: 'Copyright © 2026 Mi Band Developer Handbook contributors',
+        },
+      },
+    },
+  },
+
   head: [
     // 浏览器标签栏上的小图标（favicon）。文件在 docs/public/。
     //

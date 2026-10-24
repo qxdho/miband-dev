@@ -1,11 +1,15 @@
 {
   "updated": "2026-10-24",
-  "note": "能力字段只允许 true / false / \"partial\" / \"unknown\"。不知道就填 unknown，不要猜。screen / radius 为 null 表示未核实。",
+  "note": "能力字段只允许 true / false / \"partial\" / \"unknown\"。不知道就填 unknown，不要猜。screen / radius 为 null 表示未核实。name 为中文机型名，nameEn 为英文机型名（英文站用）。",
   "models": [
     {
       "id": "band9",
       "name": "小米手环 9",
-      "screen": [192, 490],
+      "nameEn": "Mi Band 9",
+      "screen": [
+        192,
+        490
+      ],
       "radius": 999,
       "os": "VelaOS",
       "soc": "unknown",
@@ -20,7 +24,11 @@
     {
       "id": "band10",
       "name": "小米手环 10",
-      "screen": [212, 520],
+      "nameEn": "Mi Band 10",
+      "screen": [
+        212,
+        520
+      ],
       "radius": 999,
       "os": "VelaOS",
       "soc": "unknown",
@@ -35,6 +43,7 @@
     {
       "id": "band10pro",
       "name": "小米手环 10 Pro",
+      "nameEn": "Mi Band 10 Pro",
       "screen": null,
       "radius": null,
       "os": "VelaOS",
@@ -43,7 +52,9 @@
       "watchface": true,
       "native": true,
       "flash": true,
-      "sources": ["https://habr.com/en/articles/1079066/"]
+      "sources": [
+        "https://habr.com/en/articles/1079066/"
+      ]
     }
   ]
 }

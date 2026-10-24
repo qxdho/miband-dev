@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useData } from 'vitepress'
 import data from '../data/models.json'
 
 type Cap = boolean | 'partial' | 'unknown'
 
+const { lang } = useData()
+const isEn = computed(() => lang.value.startsWith('en'))
+
 const models = data.models as Array<{
   id: string
   name: string
+  nameEn?: string
   screen: [number, number] | null
   radius: number | null
   os: string
@@ -16,6 +22,54 @@ const models = data.models as Array<{
   flash: Cap
   sources?: string[]
 }>
+
+const t = computed(() =>
+  isEn.value
+    ? {
+        model: 'Device',
+        screen: 'Screen',
+        radius: 'Radius',
+        os: 'OS',
+        soc: 'SoC',
+        quickapp: 'Quick App',
+        watchface: 'Watchface',
+        native: 'Native',
+        flash: 'Flash',
+        source: 'Source',
+        ok: 'Reported working, not tested',
+        partial: 'Partially available',
+        no: 'Unavailable',
+        unknown: 'Not verified',
+        legendOk: 'reported working',
+        legendPartial: 'partial / conditional',
+        legendNo: 'unavailable',
+        legendUnknown: 'unverified',
+      }
+    : {
+        model: '机型',
+        screen: '屏幕',
+        radius: '圆角',
+        os: '系统',
+        soc: 'SoC',
+        quickapp: '快应用',
+        watchface: '表盘',
+        native: '原生模块',
+        flash: '刷固件',
+        source: '来源',
+        ok: '据来源可用，尚未亲测',
+        partial: '部分可用 / 有条件',
+        no: '不可用',
+        unknown: '待验证',
+        legendOk: '据来源可用',
+        legendPartial: '部分/有条件',
+        legendNo: '不可用',
+        legendUnknown: '待验证',
+      },
+)
+
+function nameOf(m: (typeof models)[number]): string {
+  return isEn.value && m.nameEn ? m.nameEn : m.name
+}
 
 function capText(v: Cap | undefined): string {
   if (v === true) return '✓'
@@ -32,10 +86,10 @@ function capClass(v: Cap | undefined): string {
 }
 
 function capTitle(v: Cap | undefined): string {
-  if (v === true) return '据来源可用，尚未亲测'
-  if (v === 'partial') return '部分可用 / 有条件'
-  if (v === false) return '不可用'
-  return '待验证'
+  if (v === true) return t.value.ok
+  if (v === 'partial') return t.value.partial
+  if (v === false) return t.value.no
+  return t.value.unknown
 }
 
 function screenText(s: [number, number] | null): string {
@@ -52,22 +106,22 @@ function radiusText(r: number | null): string {
     <table class="model-matrix">
       <thead>
         <tr>
-          <th>机型</th>
-          <th>屏幕</th>
-          <th>圆角</th>
-          <th>系统</th>
-          <th>SoC</th>
-          <th>快应用</th>
-          <th>表盘</th>
-          <th>原生模块</th>
-          <th>刷固件</th>
-          <th>来源</th>
+          <th>{{ t.model }}</th>
+          <th>{{ t.screen }}</th>
+          <th>{{ t.radius }}</th>
+          <th>{{ t.os }}</th>
+          <th>{{ t.soc }}</th>
+          <th>{{ t.quickapp }}</th>
+          <th>{{ t.watchface }}</th>
+          <th>{{ t.native }}</th>
+          <th>{{ t.flash }}</th>
+          <th>{{ t.source }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="m in models" :key="m.id">
           <td class="model-name">
-            <strong>{{ m.name }}</strong>
+            <strong>{{ nameOf(m) }}</strong>
             <code>{{ m.id }}</code>
           </td>
           <td>{{ screenText(m.screen) }}</td>
@@ -84,7 +138,7 @@ function radiusText(r: number | null): string {
               :href="m.sources[0]"
               target="_blank"
               rel="noreferrer"
-            >来源</a>
+            >{{ t.source }}</a>
             <span v-else>—</span>
           </td>
         </tr>
@@ -93,9 +147,9 @@ function radiusText(r: number | null): string {
   </div>
 
   <p class="matrix-legend">
-    <span class="cap cap-ok">✓</span> 据来源可用 ·
-    <span class="cap cap-partial">◐</span> 部分/有条件 ·
-    <span class="cap cap-no">✕</span> 不可用 ·
-    <span class="cap cap-unknown">❓</span> 待验证
+    <span class="cap cap-ok">✓</span> {{ t.legendOk }} ·
+    <span class="cap cap-partial">◐</span> {{ t.legendPartial }} ·
+    <span class="cap cap-no">✕</span> {{ t.legendNo }} ·
+    <span class="cap cap-unknown">❓</span> {{ t.legendUnknown }}
   </p>
 </template>

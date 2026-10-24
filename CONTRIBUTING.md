@@ -88,7 +88,16 @@ pnpm check:frontmatter
 pnpm docs:build
 ```
 
-## 4. 写作约定
+## 4. 多语言页面
+
+英文站位于 `docs/en/`，目录结构与 `docs/` 一致。当前只翻译了 `start/`。
+
+- 新增或修改中文页面后，对应英文页不会自动更新，需要手动同步；
+- 英文页的 frontmatter 字段与中文页相同，`source` 指向同一来源；
+- 英文页内部的链接必须带 `/en/` 前缀，例如 `/en/start/models`；
+- 新增语言在 `docs/.vitepress/config.ts` 的 `locales` 中声明，并在该 locale 的 `themeConfig` 里单独写 nav 与 sidebar。
+
+## 5. 写作约定
 
 本站内容参照官方文档的写法，具体要求：
 
@@ -97,7 +106,7 @@ pnpm docs:build
 - 不用破折号补充说明，不用反问句；
 - 结论附具体参数、字段名、错误码或版本号。
 
-## 5. 红线
+## 6. 红线
 
 - 不提供官方固件与资源包的下载，只记录版本号、校验和与获取途径；
 - 不提供一键刷机工具，不提供绕过付费或 DRM 的方法；

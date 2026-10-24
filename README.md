@@ -49,10 +49,24 @@ docs/
 ├─ quickapp/                # 环境搭建、常见问题
 ├─ watchface/  firmware/  native/  protocol/
 ├─ tools/  examples/
-└─ community/               # 关于本站
-scripts/check-frontmatter.ts
+├─ community/               # 关于本站
+└─ en/                      # 英文站，目录结构与上面一致，目前只翻了 start/
+scripts/check-frontmatter.ts   # 校验 models.json 与全部页面 frontmatter
 .github/workflows/          # build / deploy / link-check
 ```
+
+## 多语言
+
+站点有两门语言：
+
+| 语言 | 目录 | 首页 | 状态 |
+| --- | --- | --- | --- |
+| 简体中文（默认） | `docs/` | `/miband-dev/` | 全站 |
+| English | `docs/en/` | `/miband-dev/en/` | 仅 `start/` |
+
+VitePress 只提供语言切换界面，**不翻译内容**——`docs/en/` 下的每一页都要有人写。增删语言在 `docs/.vitepress/config.ts` 的 `locales` 里改，导航和侧边栏也要在该 locale 的 `themeConfig` 里另写一份，链接必须带 `/en/` 前缀。
+
+英文页面的 frontmatter 字段与中文页完全一样，`source` 指向同一来源。
 
 ## 内容规则
 
