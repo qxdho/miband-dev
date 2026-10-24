@@ -214,7 +214,7 @@ probe('P2', 'http://qxdho.top/')
 probe('P3', 'https://qxdho.top/')
 ```
 
-完整探针脚本位于 `/dsh/workspace/chaos/probe/resolve-probe.js`，含 shim 安装与卸载逻辑，以及 IPv4 直连与 `Host` 头的对照实验。shim 后来被证明不能解决问题，代码仍保留。
+完整探针脚本位于 `研究环境/probe/resolve-probe.js`，含 shim 安装与卸载逻辑，以及 IPv4 直连与 `Host` 头的对照实验。shim 后来被证明不能解决问题，代码仍保留。
 
 ## 未决问题
 

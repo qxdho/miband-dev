@@ -18,7 +18,7 @@ Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中�
 
 | 项 | 内容 |
 | --- | --- |
-| 审查对象 | `/dsh/workspace/chaos/projects/chaos`，commit `94eb407`，工作区干净 |
+| 审查对象 | `研究环境/projects/chaos`，commit `94eb407`，工作区干净 |
 | 代码量 | Rust 16,794 行、39 个文件；Lua 3 个共约 1,300 行；`module/` 57 行 |
 | 类型检查 | `cargo check --target thumbv8m.main-none-eabi`，离线、vendored nightly、去除 `build.rs`，通过，24 条 warning |
 | 未做 | 真机运行、动态插桩、CI 实跑、`.ko` 重链接；宿主无 `cc` 与 libc |

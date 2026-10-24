@@ -201,7 +201,7 @@ roundtrip OK: 99124 B, 0 byte diff
 复现命令：
 
 ```bash
-cd /dsh/workspace/chaos
+cd <研究环境>
 node tools/facebuild.js roundtrip                     # 期望: roundtrip OK: 99124 B, 0 byte diff
 node tools/facebuild.js build \
   projects/canopus/watchfaces/tunprobe-installer/xiaomi-band-10-pro/spec.json \

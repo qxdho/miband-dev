@@ -181,7 +181,7 @@ $ readelf -h vela_ap.bin
 
 ```bash
 # 解包
-cd /dsh/workspace/chaos
+cd <研究环境>
 unzip -o firmware/10pro/fw.bin -d firmware/10pro/fwx/
 
 # 核对完整性
@@ -211,8 +211,8 @@ console.log("string@0x"+off.toString(16)+" ref@"+b.indexOf(p).toString(16));
 | 文件名 | `miwear.watch.n67cn_v3.1.190_full_77174e6a.bin` |
 | 来源 | `github.com/hrk666666/firmware-archives-public` 的 release `firmware-miwear.watch.n67cn-v3.1.190-5a75fc0d` |
 | 大小 | 50,330,500 字节 |
-| 本地路径 | `/dsh/workspace/chaos/firmware/9pro/fw9pro.bin` |
-| 解出物 | `/dsh/workspace/chaos/firmware/9pro/fwx9/`，258 个文件 |
+| 本地路径 | `研究环境/firmware/9pro/fw9pro.bin` |
+| 解出物 | `研究环境/firmware/9pro/fwx9/`，258 个文件 |
 
 该仓库只有 4 个 `n67cn` 发布版本：`v3.1.171`、`v3.1.175`、`v3.1.187`、`v3.1.190`，全部约 50.3 MB，全部是 `full` 包。用 HTTP Range 只读前 16 字节确认，四个版本的文件头完全同构，不存在某个版本碰巧是 ZIP 的情况。
 
@@ -309,7 +309,7 @@ PK\x03\x04  + 版本(2) + 标志(2) + 压缩方法(2) + 时间(2) + 日期(2)
 ## 复现 9 Pro
 
 ```bash
-cd /dsh/workspace/chaos
+cd <研究环境>
 node tools/unpack9.js firmware/9pro/fw9pro.bin firmware/9pro/fwx9/     # 局部文件头扫描 + inflateRaw
 ls fwx9 | wc -l                            # 223
 ```

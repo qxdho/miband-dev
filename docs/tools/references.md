@@ -38,7 +38,7 @@ contributors: [miband-dev]
 | 仓库 | https://github.com/AstralSightStudios/Canopus | 已证实 |
 | 许可 | AGPL-3.0 | 已证实 |
 | 规模 | 2646 文件 / ~17 MB | 已证实 |
-| 本地 | `/dsh/workspace/chaos/canopus/`（`--depth 1`） | 已证实 |
+| 本地 | `研究环境/canopus/`（`--depth 1`） | 已证实 |
 | 官方文档 | https://abox.run/docs/usage/canopus | 已证实 |
 
 文档站的表述可归纳为：Canopus 是面向 Xiaomi Vela 穿戴设备的内核模块开发框架，通过 Lua 表盘调用 NuttX Shell，再用 `insmod` 载入编译好的内核模块。系统接口依赖每台设备、每个固件版本内的不同函数地址，同一模块与加载器都需要按设备和版本适配。以上属于第三方声明，可信度为推断，未在本机复现。
@@ -58,7 +58,7 @@ contributors: [miband-dev]
 | 仓库 | https://github.com/WenHuaYiYang/Chaos-Module | 已证实 |
 | 许可 | AGPL-3.0 | 已证实 |
 | 规模 | 36 个 `.rs`，`supervisor/src` 约 13,944 行 | 已证实 |
-| 本地 | `/dsh/workspace/chaos/projects/chaos/` | 已证实 |
+| 本地 | `研究环境/projects/chaos/` | 已证实 |
 
 ### 固件归档
 
@@ -108,9 +108,9 @@ contributors: [miband-dev]
 
 | 来源 | 路径 | 说明 | 可信度 |
 | --- | --- | --- | --- |
-| 手机日志 | `/dsh/workspace/chaos/logs/mifitlog/` | 小米运动健康 3.59.1，含 `XiaomiFit.main.log` 等 6 个文件，8 KB 轮转 | 已证实 |
-| 手环日志 | `/dsh/workspace/chaos/logs/bandlog/` | `log1.gz` 至 `log6.gz`（各约 2 MB 解压）加 `tmp.log`，来自 `/data/offlinelog/` | 已证实 |
-| 原始包 | `/dsh/attachments/.../1792237243016log.zip` | 2,795,808 字节 | 已证实 |
+| 手机日志 | `logs/mifitlog/` | 小米运动健康 3.59.1，含 `XiaomiFit.main.log` 等 6 个文件，8 KB 轮转 | 已证实 |
+| 手环日志 | `logs/bandlog/` | `log1.gz` 至 `log6.gz`（各约 2 MB 解压）加 `tmp.log`，来自 `/data/offlinelog/` | 已证实 |
+| 原始包 | `1792237243016log.zip`（用户提供的日志归档） | 2,795,808 字节 | 已证实 |
 
 时区差异已证实：手机日志使用 UTC+8，手环日志使用 UTC。对照两侧时间戳时需要把手机日志减 8 小时，否则同一事件会错位。
 

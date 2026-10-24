@@ -23,7 +23,7 @@ Chaos 的功能面比 Canopus 窄，但在界面重建上做对了四件事，�
 | 仓库 | `github.com/WenHuaYiYang/Chaos-Module` |
 | 许可 | AGPL-3.0 |
 | 语言 | Rust，`supervisor/src` 约 13,944 行，36 个 `.rs` 文件 |
-| 本地路径 | `/dsh/workspace/chaos/projects/chaos/` |
+| 本地路径 | `研究环境/projects/chaos/` |
 | 目录 | `supervisor/`、`module/`、`installer/`、`tools/` |
 | 目标固件 | `3.101.043` |
 
