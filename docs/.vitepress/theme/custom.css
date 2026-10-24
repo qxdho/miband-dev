@@ -130,3 +130,164 @@ table.model-matrix td.model-name code {
 .status-meta {
   color: var(--vp-c-text-3);
 }
+
+/* ---------- 可选配色 ----------
+ * 导航栏右上角的圆点可以换配色，选择存在 localStorage 的 miband-hue。
+ * 默认（小米橙）就是上面的 :root / html.dark，所以这里不用重复写。
+ * 每种配色的变量顺序：brand-1 链接 / brand-2 hover / brand-3 按钮底色。
+ * 所有取值都过了对比度：浅色链接 ≥4.5:1，按钮白字 ≥4.5:1，暗色链接 ≥4.5:1。
+ */
+html[data-hue='blue'] {
+  --vp-c-brand-1: #1d4ed8;
+  --vp-c-brand-2: #1e40af;
+  --vp-c-brand-3: #1e3a8a;
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.12);
+}
+html.dark[data-hue='blue'] {
+  --vp-c-brand-1: #60a5fa;
+  --vp-c-brand-2: #2563eb;
+  --vp-c-brand-3: #1d4ed8;
+  --vp-c-brand-soft: rgba(96, 165, 250, 0.16);
+}
+
+html[data-hue='green'] {
+  --vp-c-brand-1: #15803d;
+  --vp-c-brand-2: #166534;
+  --vp-c-brand-3: #14532d;
+  --vp-c-brand-soft: rgba(22, 163, 74, 0.12);
+}
+html.dark[data-hue='green'] {
+  --vp-c-brand-1: #4ade80;
+  --vp-c-brand-2: #16a34a;
+  --vp-c-brand-3: #15803d;
+  --vp-c-brand-soft: rgba(74, 222, 128, 0.16);
+}
+
+html[data-hue='purple'] {
+  --vp-c-brand-1: #6d28d9;
+  --vp-c-brand-2: #5b21b6;
+  --vp-c-brand-3: #4c1d95;
+  --vp-c-brand-soft: rgba(124, 58, 237, 0.12);
+}
+html.dark[data-hue='purple'] {
+  --vp-c-brand-1: #a78bfa;
+  --vp-c-brand-2: #7c3aed;
+  --vp-c-brand-3: #6d28d9;
+  --vp-c-brand-soft: rgba(167, 139, 250, 0.16);
+}
+
+html[data-hue='teal'] {
+  --vp-c-brand-1: #0f766e;
+  --vp-c-brand-2: #115e59;
+  --vp-c-brand-3: #134e4a;
+  --vp-c-brand-soft: rgba(13, 148, 136, 0.12);
+}
+html.dark[data-hue='teal'] {
+  --vp-c-brand-1: #2dd4bf;
+  --vp-c-brand-2: #14b8a6;
+  --vp-c-brand-3: #0f766e;
+  --vp-c-brand-soft: rgba(45, 212, 191, 0.16);
+}
+
+html[data-hue='pink'] {
+  --vp-c-brand-1: #be185d;
+  --vp-c-brand-2: #9d174d;
+  --vp-c-brand-3: #831843;
+  --vp-c-brand-soft: rgba(219, 39, 119, 0.12);
+}
+html.dark[data-hue='pink'] {
+  --vp-c-brand-1: #f472b6;
+  --vp-c-brand-2: #db2777;
+  --vp-c-brand-3: #be185d;
+  --vp-c-brand-soft: rgba(244, 114, 182, 0.16);
+}
+
+/* ---------- 配色选择器 ---------- */
+.hue-picker--nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.hue-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.hue-btn:hover {
+  background: var(--vp-c-bg-soft);
+}
+
+.hue-dot {
+  display: block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.hue-panel {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  gap: 4px;
+  padding: 7px;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  box-shadow: var(--vp-shadow-3);
+}
+
+.hue-item {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.hue-item:hover {
+  background: var(--vp-c-bg-soft);
+}
+
+.hue-item.is-active {
+  border-color: var(--vp-c-text-2);
+}
+
+.hue-picker--screen {
+  padding: 12px 24px 4px;
+}
+
+.hue-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.hue-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 导航栏的按钮只在桌面端出现，移动端用折叠菜单里那一份 */
+@media (max-width: 767px) {
+  .hue-picker--nav {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .hue-picker--screen {
+    display: none;
+  }
+}

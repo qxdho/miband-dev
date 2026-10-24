@@ -127,6 +127,14 @@ export default defineConfig({
     // 【可改】手机浏览器地址栏颜色，取值见 theme/custom.css 的 --vp-c-brand-3
     ['meta', { name: 'theme-color', content: '#c2410c' }],
 
+    // 首屏渲染前套用读者上次选的配色（存在 localStorage 的 miband-hue），
+    // 否则会先闪一下默认橙色再变色。可选值见 theme/custom.css 的 html[data-hue=...]。
+    [
+      'script',
+      {},
+      "try{var h=localStorage.getItem('miband-hue');if(h)document.documentElement.setAttribute('data-hue',h)}catch(e){}",
+    ],
+
     // 【可改】作者信息
     ['meta', { name: 'author', content: '谦虚の海鸥' }],
 

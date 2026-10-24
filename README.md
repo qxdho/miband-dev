@@ -68,6 +68,25 @@ VitePress 只提供语言切换界面，**不翻译内容**——`docs/en/` 下�
 
 英文页面的 frontmatter 字段与中文页完全一样，`source` 指向同一来源。
 
+## 配色
+
+读者可以在右上角的圆点里换主题色，选择存在浏览器的 `localStorage`（键名 `miband-hue`），只影响自己。
+
+配色定义在 `docs/.vitepress/theme/custom.css` 顶部，每种配色两组变量（浅色 + 暗色）：
+
+```css
+html[data-hue='blue'] {
+  --vp-c-brand-1: #1d4ed8;   /* 链接、强调 */
+  --vp-c-brand-2: #1e40af;   /* hover */
+  --vp-c-brand-3: #1e3a8a;   /* 实心按钮底色，上面压白字 */
+}
+html.dark[data-hue='blue'] { /* 同样四项，整体提亮 */ }
+```
+
+加一种配色：`theme/hues.ts` 的 `HUES` 里加一项，再到 `custom.css` 补两组变量。色板的圆点直接读 `HUES`，不用改组件。
+
+取值必须满足：浅色链接对白底 ≥4.5:1，按钮白字对 `brand-3` ≥4.5:1，暗色链接对 `#1b1b1f` ≥4.5:1。
+
 ## 内容规则
 
 每个内容页必须有 frontmatter：
