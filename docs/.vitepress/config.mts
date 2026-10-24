@@ -30,37 +30,76 @@ export default defineConfig({
     siteTitle: '米环开发手册',
 
     nav: [
-      { text: '开始', link: '/start/models', activeMatch: '/start/' },
-      { text: '快应用', link: '/quickapp/setup', activeMatch: '/quickapp/' },
-      { text: '关于', link: '/community/about', activeMatch: '/community/' },
+      { text: '开始', link: '/start/', activeMatch: '/start/' },
+      { text: '快应用', link: '/quickapp/', activeMatch: '/quickapp/' },
+      { text: '表盘', link: '/watchface/', activeMatch: '/watchface/' },
+      { text: '固件', link: '/firmware/', activeMatch: '/firmware/' },
+      { text: '原生', link: '/native/', activeMatch: '/native/' },
+      {
+        text: '更多',
+        items: [
+          { text: 'BLE 协议', link: '/protocol/' },
+          { text: '工具索引', link: '/tools/' },
+          { text: '示例代码', link: '/examples/' },
+          { text: '关于本站', link: '/community/about' },
+        ],
+      },
     ],
 
-    sidebar: {
-      '/start/': [
-        {
-          text: '开始',
-          items: [
-            { text: '机型能力矩阵', link: '/start/models' },
-            { text: '术语表', link: '/start/glossary' },
-          ],
-        },
-      ],
-      '/quickapp/': [
-        {
-          text: '快应用',
-          items: [
-            { text: '环境搭建', link: '/quickapp/setup' },
-            { text: '十大坑', link: '/quickapp/pitfalls' },
-          ],
-        },
-      ],
-      '/community/': [
-        {
-          text: '社区',
-          items: [{ text: '关于本站', link: '/community/about' }],
-        },
-      ],
-    },
+    // 全局侧边栏：分类即导航。新增页面只往对应分组里加一项。
+    sidebar: [
+      {
+        text: '开始',
+        collapsed: true,
+        items: [
+          { text: '从这里开始', link: '/start/' },
+          { text: '机型能力矩阵', link: '/start/models' },
+          { text: '术语表', link: '/start/glossary' },
+        ],
+      },
+      {
+        text: '快应用',
+        collapsed: true,
+        items: [
+          { text: '导读', link: '/quickapp/' },
+          { text: '环境搭建', link: '/quickapp/setup' },
+          { text: '十大坑', link: '/quickapp/pitfalls' },
+        ],
+      },
+      {
+        text: '表盘',
+        collapsed: true,
+        items: [{ text: '导读', link: '/watchface/' }],
+      },
+      {
+        text: '固件研究',
+        collapsed: true,
+        items: [{ text: '导读', link: '/firmware/' }],
+      },
+      {
+        text: '原生应用',
+        collapsed: true,
+        items: [{ text: '导读', link: '/native/' }],
+      },
+      {
+        text: 'BLE 协议',
+        collapsed: true,
+        items: [{ text: '导读', link: '/protocol/' }],
+      },
+      {
+        text: '工具与示例',
+        collapsed: true,
+        items: [
+          { text: '工具索引', link: '/tools/' },
+          { text: '示例代码', link: '/examples/' },
+        ],
+      },
+      {
+        text: '参与',
+        collapsed: true,
+        items: [{ text: '关于本站', link: '/community/about' }],
+      },
+    ],
 
     search: {
       provider: 'local',
