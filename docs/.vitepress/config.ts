@@ -175,6 +175,12 @@ export default defineConfig({
       },
     ],
 
+    // 【可改】导航栏右侧的社交图标，点开是仓库地址。加图标 → 复制一行换 icon 和 link
+    //         icon 只认内置名：github / gitlab / x / discord / youtube 等
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/qxdho/miband-dev', ariaLabel: 'GitHub 仓库' },
+    ],
+
     // 【可改】左侧目录。加页面 → 在对应 items 里加 { text: '标题', link: '/路径' }
     //         link 不写 .html、不写 docs/
     //         collapsed: true 默认折叠 / false 默认展开
