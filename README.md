@@ -23,7 +23,7 @@ pnpm docs:preview
 pnpm check:frontmatter
 ```
 
-站点发布在项目页 `https://qxdho.github.io/miband-dev/`，因此 `config.mts` 中 `base: '/miband-dev/'`。若迁移到 `<账号>.github.io` 根路径，`base` 需同步改为 `'/'`，否则静态资源与图片会返回 404。
+站点发布在项目页 `https://qxdho.github.io/miband-dev/`，因此 `config.ts` 中 `base: '/miband-dev/'`。若迁移到 `<账号>.github.io` 根路径，`base` 需同步改为 `'/'`，否则静态资源与图片会返回 404。
 
 ## 发布
 
@@ -40,7 +40,7 @@ pnpm check:frontmatter
 ```text
 docs/
 ├─ .vitepress/
-│  ├─ config.mts            # base、nav、sidebar、搜索
+│  ├─ config.ts            # base、nav、sidebar、搜索
 │  ├─ data/models.json      # 机型矩阵唯一数据源
 │  ├─ components/           # ModelMatrix.vue / StatusBadge.vue
 │  └─ theme/

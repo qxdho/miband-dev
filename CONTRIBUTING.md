@@ -29,7 +29,7 @@
 
 - 目录与文件名使用小写英文与短横线：`api-health.md`、`module-hello.md`；
 - 文件名即 URL（`cleanUrls: true`），不使用中文、空格或下划线；
-- 不加数字前缀（`01-xxx.md`）。页面顺序由 `config.mts` 的 sidebar 控制，加前缀后插入新页需要批量改名。
+- 不加数字前缀（`01-xxx.md`）。页面顺序由 `config.ts` 的 sidebar 控制，加前缀后插入新页需要批量改名。
 
 ### 板块内部顺序
 
