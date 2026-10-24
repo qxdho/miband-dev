@@ -27,16 +27,22 @@ export default defineConfig({
   lastUpdated: true,
 
   head: [
-    // 浏览器标签栏上的小图标（favicon）。
-    // 文件在 docs/public/，写 '/xxx.svg'，不要带 /miband-dev/。
+    // 浏览器标签栏上的小图标（favicon）。文件在 docs/public/。
+    //
+    // ⚠️ 这里【必须】写成 base + 文件名，即 ${BASE}favicon.svg。
+    //    写成 '/favicon.svg' 会去请求 https://qxdho.github.io/favicon.svg，
+    //    少了 /miband-dev/ 这一层，得到 404，标签栏一直是空白。
+    //    （导航栏的 logo 不一样，那个 VitePress 会自动补 base，写 '/logo.svg' 就对。）
+    //
     // 想换图标：把 docs/public/favicon.svg 换成你自己的文件即可，这行不用动。
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    // 换仓库名时（见第 8 行的 BASE），下面三行会跟着变，不用动。
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${BASE}favicon.svg` }],
 
     // 老浏览器不认 SVG 图标，用 PNG 兜底。没有这个文件就删掉本行。
-    ['link', { rel: 'alternate icon', type: 'image/png', href: '/favicon.png' }],
+    ['link', { rel: 'alternate icon', type: 'image/png', href: `${BASE}favicon.png` }],
 
     // 苹果设备「添加到主屏幕」用的图标（180x180）。没有就删掉本行。
-    ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
+    ['link', { rel: 'apple-touch-icon', href: `${BASE}apple-touch-icon.png` }],
 
     // 【可改】手机浏览器地址栏颜色，如 '#0ea5e9'（蓝）'#22c55e'（绿）
     ['meta', { name: 'theme-color', content: '#0ea5e9' }],
