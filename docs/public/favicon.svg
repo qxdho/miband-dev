@@ -1,6 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect x="18" y="8" width="28" height="48" rx="12" fill="none" stroke="#0ea5e9" stroke-width="4"/>
-  <rect x="22" y="16" width="20" height="26" rx="6" fill="#0ea5e9" opacity="0.16"/>
-  <path d="M27 46h10" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/>
-  <path d="M32 20v14M26 27h12" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="米环开发手册">
+  <!-- 表带（上下两段，半透明） -->
+  <rect x="25" y="0"  width="14" height="12" rx="6" fill="#0ea5e9" opacity="0.45"/>
+  <rect x="25" y="52" width="14" height="12" rx="6" fill="#0ea5e9" opacity="0.45"/>
+  <!-- 机身 -->
+  <rect x="13" y="3" width="38" height="58" rx="19" fill="#0ea5e9"/>
+  <!-- 屏幕上的心率折线 -->
+  <path d="M20 32h6l5-12 6 24 5-12h5" fill="none" stroke="#ffffff" stroke-width="4"
+        stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
