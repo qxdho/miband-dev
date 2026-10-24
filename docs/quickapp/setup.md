@@ -12,60 +12,60 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-24" />
 
-> **先读这段**：从 Hello World 到打包 `.rpk` 的完整流程，官方文档和[路明笔记](https://www.luming.cool/posts/2025/08/build-a-quick-app-for-vela-devices/)已经写得很好了。本站**不重复造轮子**，只补三件事：机型差异、可检索的索引、别人没写的坑。
+本章从安装开发工具开始，到生成可安装的 `.rpk` 结束。机型差异、索引与失败案例是本页的补充内容；从 Hello World 到打包的基础流程以官方文档为准。
 
-## 你需要什么
+## 环境要求
 
 | 项 | 说明 |
 | --- | --- |
-| 操作系统 | **Windows** 最省事（AIoT IDE 官方主要面向 Windows）。macOS/Linux 需要自己折腾，非官方支持。 |
-| AIoT IDE | 小米官方快应用 IDE，含模拟器。官网：<https://iot.mi.com/vela/quickapp/> |
-| 一台真机 | 可选但强烈建议。没有真机，所有结论只能标「据来源」。 |
-| 一台安卓手机 | 安装/调试第三方快应用通常会用到手机端工具，具体方式随固件版本变化。 |
+| 操作系统 | Windows。AIoT IDE 官方主要面向 Windows，macOS 与 Linux 需自行配置，不受官方支持 |
+| AIoT IDE | 小米官方快应用 IDE，含模拟器。下载地址：<https://iot.mi.com/vela/quickapp/> |
+| 真机 | 可选，建议准备。没有真机时相关结论只能标为 `sourced` |
+| 安卓手机 | 安装与调试第三方快应用通常需要手机端工具，具体方式随固件版本变化 |
 
-## 最短路径
+## 操作步骤
 
-1. **装 AIoT IDE**：从 <https://iot.mi.com/vela/quickapp/> 下载安装。当前版本约 v1.7.0，自带模拟器。
-2. **新建工程**：选快应用模板，填包名（注意反向域名格式）。
-3. **写页面**：`manifest.json` 配路由和权限，页面用类 Vue 的 `template` / `style` / `script`。
-4. **模拟器预览**：先在 IDE 自带模拟器里把布局跑通。**注意**模拟器分辨率不一定等于你的手环。
+1. **安装 AIoT IDE**：从 <https://iot.mi.com/vela/quickapp/> 下载并安装，自带模拟器。
+2. **新建工程**：选择快应用模板，填写包名，采用反向域名格式。
+3. **编写页面**：在 `manifest.json` 中配置路由与权限，页面使用 `template` / `style` / `script` 结构。
+4. **模拟器预览**：在 IDE 自带模拟器中调通布局。模拟器分辨率不一定等于目标机型分辨率。
 5. **打包**：生成 `.rpk`。
-6. **装真机**：按机型/固件版本的方式安装。具体步骤随固件版本变化，后续单独成页。
+6. **安装到真机**：安装方式随机型与固件版本变化，后续单独成页。
 
-## 工程结构（最小认知）
+## 工程结构
 
 ```text
 my-quickapp/
 ├─ manifest.json      # 应用名、包名、版本、路由、权限、屏幕配置
 ├─ src/
-│  ├─ app.ux          # 应用入口、全局生命周期
+│  ├─ app.ux          # 应用入口与全局生命周期
 │  └─ pages/
 │     └─ index/
 │        └─ index.ux  # 页面：template + style + script
 └─ package.json
 ```
 
-`manifest.json` 里最常改的几项：
+`manifest.json` 中常用的字段：
 
-- `package`：包名，全局唯一，反向域名写法。
-- `versionName` / `versionCode`：版本号，安装时会校验。
-- `router.pages`：页面路径与入口页。
-- `display`：屏幕适配相关（不同机型分辨率不同，见[矩阵](/start/models)）。
-- `permissions` / `features`：要用 `@service.health` 等能力时必须声明。
+| 字段 | 作用 |
+| --- | --- |
+| `package` | 包名，全局唯一，反向域名写法 |
+| `versionName` / `versionCode` | 版本号，安装时校验 |
+| `router.pages` | 页面路径与入口页 |
+| `display` | 屏幕适配相关配置，各机型分辨率不同，见[机型能力矩阵](/start/models) |
+| `permissions` / `features` | 使用 `@service.health` 等能力时必须声明 |
 
-## 屏幕适配先看矩阵
+## 屏幕适配
 
-手环屏幕差异极大：192×490、212×520、480×336……圆角从 48px 到接近胶囊形都有。**不要写死像素**，先用相对单位和安全区把布局撑住，再去真机上调。
+各机型屏幕参数差异明显：192×490、212×520、480×336，圆角从 48px 到接近胶囊形。布局使用相对单位并预留安全区，避免写死像素；适配目标以[机型能力矩阵](/start/models)中的 `screen` 与 `radius` 字段为准。
 
-见 [机型能力矩阵](/start/models)。
-
-## 官方与社区资料
+## 参考资料
 
 - 官方 API 参考：<https://iot.mi.com/vela/quickapp/>
-- openvela 文档（通用 Vela、模拟器、VelaJS MCP）：<https://github.com/open-vela/docs>
-- 路明笔记：从零写一个 Vela 快应用（含分辨率/圆角表）：<https://www.luming.cool/posts/2025/08/build-a-quick-app-for-vela-devices/>
+- openvela 文档（Vela 通用部分、模拟器）：<https://github.com/open-vela/docs>
+- 从零编写 Vela 快应用，含分辨率与圆角表：<https://www.luming.cool/posts/2025/08/build-a-quick-app-for-vela-devices/>
 
-## 下一步
+## 相关页面
 
-- 装不上、跑不起来？看 [快应用十大坑](/quickapp/pitfalls)。
-- 不确定你的机型支不支持？看 [机型能力矩阵](/start/models)。
+- 安装或运行失败：[常见问题](/quickapp/pitfalls)
+- 机型支持情况：[机型能力矩阵](/start/models)

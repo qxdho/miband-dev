@@ -1,13 +1,11 @@
 # 米环开发手册
 
-中文的小米手环 / 小米手表**开发者资料库**，覆盖四层：
-
-**快应用 → 表盘 → 固件研究 → 原生应用**，外加 BLE 协议与工具索引。
+面向开发者的中文小米手环与小米手表资料库，覆盖快应用、表盘、固件研究与原生应用四层，另有 BLE 协议与工具索引两个横向板块。
 
 - 站点：<https://qxdho.github.io/miband-dev/>（GitHub Pages 项目页）
-- 定位：**资料仓库，不做真机实测**。每页标注来源与最后核对日期，拿不准就写「待验证」。
-- 范围：**只做国行**。国际版一句话带过。
-- 非官方，与小米公司无关联。
+- 定位：资料汇编，不进行真机实测。每页标注来源与最后核对日期，未知内容标为 `unknown` 或 `unverified`。
+- 范围：只收录国行设备，国际版不展开。
+- 非官方项目，与小米公司无关联。
 
 ## 技术栈
 
@@ -25,18 +23,17 @@ pnpm docs:preview
 pnpm check:frontmatter
 ```
 
-> 注意：本站发布在项目页 `https://qxdho.github.io/miband-dev/`，所以 `config.mts` 里 `base: '/miband-dev/'`。
-> 如果以后迁到 `<账号>.github.io` 的根路径，`base` 必须同步改回 `'/' `，否则样式和图片会全部 404。
+站点发布在项目页 `https://qxdho.github.io/miband-dev/`，因此 `config.mts` 中 `base: '/miband-dev/'`。若迁移到 `<账号>.github.io` 根路径，`base` 需同步改为 `'/'`，否则静态资源与图片会返回 404。
 
 ## 发布
 
-目标地址是 <https://qxdho.github.io/miband-dev/>，属于 GitHub Pages 的**项目页**（不是 `<账号>.github.io` 那种根路径用户主页）：
+目标地址 <https://qxdho.github.io/miband-dev/> 属于 GitHub Pages 的项目页，不是 `<账号>.github.io` 根路径用户主页。
 
-1. 账号是 `qxdho`，仓库名是 `miband-dev`（普通仓库名即可，不用叫 `qxdho.github.io`）；
-2. 仓库需要是 **public**（免费账户的 Pages 只对公开仓库开放）；
-3. 推送后到仓库 **Settings → Pages → Source** 选 **GitHub Actions**，之后每次 push 到 `main` 由 `.github/workflows/deploy.yml` 自动构建发布。
+1. 账号为 `qxdho`，仓库名 `miband-dev`，不要求仓库名为 `qxdho.github.io`；
+2. 仓库须为 **public**，免费账户的 Pages 只对公开仓库开放；
+3. 在仓库 **Settings → Pages → Source** 中选择 **GitHub Actions**。此后每次推送到 `main`，由 `.github/workflows/deploy.yml` 自动构建并发布。
 
-> `base` 必须是 `/miband-dev/`。改仓库名的话，`base` 要跟着改。
+`base` 必须为 `/miband-dev/`，修改仓库名时需同步修改。
 
 ## 目录
 
@@ -47,15 +44,17 @@ docs/
 │  ├─ data/models.json      # 机型矩阵唯一数据源
 │  ├─ components/           # ModelMatrix.vue / StatusBadge.vue
 │  └─ theme/
-├─ index.md                 # 首页：矩阵 + 入口
+├─ index.md                 # 首页：矩阵、板块入口
 ├─ start/                   # 机型矩阵、术语表
-├─ quickapp/                # 环境搭建、十大坑
+├─ quickapp/                # 环境搭建、常见问题
+├─ watchface/  firmware/  native/  protocol/
+├─ tools/  examples/
 └─ community/               # 关于本站
 scripts/check-frontmatter.ts
 .github/workflows/          # build / deploy / link-check
 ```
 
-## 内容规则（CI 强校验）
+## 内容规则
 
 每个内容页必须有 frontmatter：
 
@@ -63,17 +62,17 @@ scripts/check-frontmatter.ts
 ---
 title: 页面标题
 models: [band9, band10, band10pro]   # 取值见 models.json
-firmware: ">=3.2.0"                  # 不知道就写 "unknown"
+firmware: ">=3.2.0"                  # 未知时写 "unknown"
 verified: 2026-10-24                 # 最后核对来源的日期
 status: sourced                      # tested | sourced | unverified
-source: "https://..."                # status != tested 时必填
+source: "https://..."                # status 非 tested 时必填
 contributors: [yourname]
 ---
 ```
 
-- `status: tested` 才表示真机验证过；本站默认不产生 `tested`。
-- `verified` 超过 12 个月会在 CI 里给 warning，但不阻断。
-- 不搬运未授权内容；转载/翻译必须拿到授权并注明来源。
+- `status: tested` 表示已在真机验证；本站默认不产生 `tested`。
+- `verified` 超过 12 个月时 CI 输出 warning，不阻断构建。
+- 不搬运未授权内容，转载与翻译须取得授权并注明来源。
 
 详见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
@@ -84,4 +83,4 @@ contributors: [yourname]
 
 ## 免责声明
 
-固件研究、刷机、解锁有变砖、丢数据、失去保修的风险，后果自负。本站只做资料索引，不提供官方固件/资源包下载，不提供一键刷机工具。
+固件研究与刷机存在变砖、数据丢失与保修失效的风险，后果自负。本站只做资料索引，不提供官方固件或资源包下载，不提供一键刷机工具。

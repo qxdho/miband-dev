@@ -63,7 +63,7 @@ export default defineConfig({
         items: [
           { text: '导读', link: '/quickapp/' },
           { text: '环境搭建', link: '/quickapp/setup' },
-          { text: '十大坑', link: '/quickapp/pitfalls' },
+          { text: '常见问题', link: '/quickapp/pitfalls' },
         ],
       },
       {
