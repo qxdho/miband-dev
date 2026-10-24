@@ -1,0 +1,19 @@
+# 文档许可证
+
+除特别注明外，本仓库 `docs/` 下的文档内容采用
+**知识共享 署名-相同方式共享 4.0 国际许可协议（CC BY-SA 4.0）** 授权。
+
+- 许可证全文：https://creativecommons.org/licenses/by-sa/4.0/legalcode
+- 许可证摘要：https://creativecommons.org/licenses/by-sa/4.0/deed.zh
+
+你可以自由地共享（复制、发行）和演绎（修改、转换、基于本作品创作），
+但必须：
+
+1. **署名**：注明原作者与来源链接；
+2. **相同方式共享**：基于本作品的演绎作品必须以相同许可证分发；
+3. 不得附加额外限制。
+
+第三方内容（转载、翻译）的版权归原作者所有，使用时须取得授权并注明来源。
+
+代码部分（`scripts/`、`docs/.vitepress/` 下的程序代码等）采用 MIT 许可证，
+见 [LICENSE-CODE](./LICENSE-CODE)。
