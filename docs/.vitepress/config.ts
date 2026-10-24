@@ -27,6 +27,17 @@ export default defineConfig({
   lastUpdated: true,
 
   head: [
+    // 浏览器标签栏上的小图标（favicon）。
+    // 文件在 docs/public/，写 '/xxx.svg'，不要带 /miband-dev/。
+    // 想换图标：把 docs/public/favicon.svg 换成你自己的文件即可，这行不用动。
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+
+    // 老浏览器不认 SVG 图标，用 PNG 兜底。没有这个文件就删掉本行。
+    ['link', { rel: 'alternate icon', type: 'image/png', href: '/favicon.png' }],
+
+    // 苹果设备「添加到主屏幕」用的图标（180x180）。没有就删掉本行。
+    ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
+
     // 【可改】手机浏览器地址栏颜色，如 '#0ea5e9'（蓝）'#22c55e'（绿）
     ['meta', { name: 'theme-color', content: '#0ea5e9' }],
 

@@ -14,18 +14,28 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# 只有一个 job。
+# build 和 deploy 拆成两个 job 时，第二个 job 要重新排队、重新启动环境，
+# 在白拿的固定开销面前，构建本身只要 5 秒。
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
+      # 用 Node 自带的 corepack 装 pnpm，省掉 pnpm/action-setup 这一步。
+      # 版本号来自 package.json 的 packageManager 字段（pnpm@11.7.0），
+      # 两边不会不一致。
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+
+      - name: Enable pnpm
+        run: corepack enable && corepack install
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -42,12 +52,5 @@ jobs:
         with:
           path: docs/.vitepress/dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
