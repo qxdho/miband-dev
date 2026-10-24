@@ -124,8 +124,8 @@ export default defineConfig({
     // 苹果设备「添加到主屏幕」用的图标（180x180）。没有就删掉本行。
     ['link', { rel: 'apple-touch-icon', href: `${BASE}apple-touch-icon.png` }],
 
-    // 【可改】手机浏览器地址栏颜色，如 '#0ea5e9'（蓝）'#22c55e'（绿）
-    ['meta', { name: 'theme-color', content: '#0ea5e9' }],
+    // 【可改】手机浏览器地址栏颜色，取值见 theme/custom.css 的 --vp-c-brand-3
+    ['meta', { name: 'theme-color', content: '#c2410c' }],
 
     // 【可改】作者信息
     ['meta', { name: 'author', content: '谦虚の海鸥' }],
