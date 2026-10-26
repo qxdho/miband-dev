@@ -21,6 +21,7 @@ source: "https://wiki.bandbbs.cn/"contributors: [miband-dev]
 | [网络通路](/refs/network) | TCP/IP over BLE、TUN、手机侧代理与 `fetch` 的实测故障模式 |
 | [QEMU 模拟器](/refs/emulator) | 在 PC 上运行 10 Pro / 11 NFC 原厂固件 |
 | [逆向与复现](/refs/reversing) | capstone、字符串与指针扫描、Thumb 字面量池、脚本清单与命令 |
+| [原生开发模式](/refs/patterns) | 三条渲染路径、控件树生命周期、硬编码地址风险、开发检查清单 |
 | [参考资料](/refs/references) | 开源项目、官方文档、社区证据，按机型标注可信度 |
 | [示例代码](/refs/examples) | 可构建的最小工程、社区项目与约定 |
 

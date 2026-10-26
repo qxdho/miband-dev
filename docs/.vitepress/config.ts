@@ -252,6 +252,7 @@ export default defineConfig({
           { text: '网络通路', link: '/refs/network' },
           { text: 'QEMU 模拟器', link: '/refs/emulator' },
           { text: '逆向与复现', link: '/refs/reversing' },
+              { text: '原生开发模式', link: '/refs/patterns' },
           { text: '参考资料', link: '/refs/references' },
           { text: '示例代码', link: '/refs/examples' },
         ],
