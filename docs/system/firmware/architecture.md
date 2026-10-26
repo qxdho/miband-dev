@@ -173,12 +173,16 @@ NSH 命令表中有 `nslookup`，但 DNS 客户端库看起来没有编入。可
 
 | 路径 | 内容 |
 | --- | --- |
-| `/data/` | 用户数据：`apps.json`、已装快应用、日志 |
-| `/data/offlinelog/` | 离线日志 `log1.gz` 至 `log6.gz`，每个解压后 2 MB |
+| `/resource/` | 只读资源分区：内置应用 `.bin`、表盘、字体、马达波形、NFC/GPS/触摸固件 |
+| `/data/` | 用户数据：`apps.json`、已装快应用、日志、`canopus` / `chaos` 等自定义模块 |
+| `/data/app/` | 已安装快应用（`manifest.json` + `app.jsc`）与安装数据库 |
+| `/data/app/watchface/` | 表盘数据库、市场目录与内置息屏资源 |
+| `/data/offlinelog/` | 离线日志 `log1.gz` 至 `log8.gz` |
 | `/data/dfx/note/` | 诊断事件 `*.ev.gz` |
-| `/system/` | 系统资源：`watchface/<id>/resource.bin` |
-| `/ota/` | 升级包暂存 |
+| `/data/vela_ota.bin` | OTA 暂存镜像 |
 | `/dev/` | 设备节点 |
+
+10 Pro 实机的完整目录、各应用资源数量与启动脚本位置见[设备文件系统](/system/firmware/filesystem)。
 
 `/data/apps.json` 是快应用的注册表，字段包括 `names`、`minAPILevel`、`minPlatformVersion`、`standalone`、`needNetwork`、`installedTimestamp`，序列化代码在 `package.cpp`。
 

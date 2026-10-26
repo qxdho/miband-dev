@@ -223,6 +223,7 @@ export default defineConfig({
               { text: '导读', link: '/system/firmware/' },
               { text: '固件包格式', link: '/system/firmware/package' },
               { text: '系统架构', link: '/system/firmware/architecture' },
+              { text: '设备文件系统', link: '/system/firmware/filesystem' },
               { text: '启动链与救砖', link: '/system/firmware/recovery' },
             ],
           },

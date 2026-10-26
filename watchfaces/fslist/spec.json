@@ -1,0 +1,13 @@
+{
+  "name": "文件清单",
+  "id": "990000000002",
+  "preview": "preview.block",
+  "styleName": "样式1",
+  "entryIndex": 0,
+  "files": [
+    {
+      "name": "_lua/xiaomi-band-10-pro/main.lua",
+      "path": "main.lua"
+    }
+  ]
+}

@@ -36,6 +36,7 @@ contributors: [miband-dev]
 | --- | --- | --- |
 | [固件包格式](/system/firmware/package) | 10 Pro 与 9 Pro 的容器结构、分区布局、镜像格式、地址换算 | 固件字节 |
 | [系统架构](/system/firmware/architecture) | NuttX 内核、启动链、`modlib` 位置、NSH、文件系统布局 | 固件字节 |
+| [设备文件系统](/system/firmware/filesystem) | 10 Pro 实机目录清单：1,053 个目录、9,562 个文件的实际布局 | 实机清单 |
 | [启动链与救砖](/system/firmware/recovery) | BL/BL2/AP 三级启动、恢复模式、恢复死循环、SPI NAND 拆机读取 | 社区实录 + 拆机实录 |
 
 ## 已知硬件信息
