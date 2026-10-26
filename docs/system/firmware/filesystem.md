@@ -112,7 +112,7 @@ contributors: [miband-dev]
 | --- | --- |
 | `/data/app/system/` | `system.db`、`install_info_v1.db`、`uninstall_app.db`——安装/卸载记录 |
 | `/data/app/watchface/` | `watchface.db`、`watchface_list.json`（含 `.bak`）、`market/` 19 个表盘目录、`builtin/aod/` 6 套 |
-| `/data/quickapp/system/` | 37 个包名目录，每个一个 `usr.db`，是快应用的键值存储；包含已卸载应用留下的库 |
+| `/data/quickapp/system/` | 37 个包名目录，其中 35 个各有一个 `usr.db`（快应用键值存储），2 个为空；包含已卸载应用留下的库 |
 | `/data/files/` | 8 个包名目录，130 个文件——应用沙箱文件 |
 | `/data/mass/` | 9 个包名目录，基本为空，另有 `tmp/`——大文件/批量存储区 |
 | `/data/cache/` | 4 个包名目录 |
