@@ -1,6 +1,6 @@
-# 米环开发手册
+# 米环开发文档
 
-面向开发者的中文小米手环与小米手表资料库，按用途分为五个板块：入门、应用与表盘、固件与原生、协议工具与参考、关于与研究。
+面向开发者的中文小米手环与小米手表资料库。站点按应用形态分为表盘、快应用、原生应用三个主板块，另设平台资料与关于；入口与阅读顺序见[开始](/start/)。
 
 - 站点：<https://qxdho.github.io/miband-dev/>（GitHub Pages 项目页）
 - 定位：资料汇编，不进行真机实测。每页标注来源与最后核对日期，未知内容标为 `unknown` 或 `unverified`。
@@ -44,21 +44,24 @@ docs/
 │  ├─ data/models.json      # 机型矩阵唯一数据源
 │  ├─ components/           # ModelMatrix.vue / StatusBadge.vue
 │  └─ theme/                # 配色变量、配色选择器
-├─ index.md                 # 首页：矩阵、板块入口
-├─ start/                   # 机型矩阵、术语表
-├─ apps/                    # 应用与表盘：quickapp/、watchface/
-├─ system/                  # 固件与原生：firmware/、native/
-├─ refs/                    # 协议与工具：BLE 协议、网络通路、QEMU、逆向、资料、示例
-├─ about/                   # 关于本站、研究历程、控制中心与代码审查
-└─ en/                      # 英文站，目录结构与上面一致，目前只翻了 start/
-research/                     # 站点内容的原始笔记与地址表 CSV，页面的 source 指向这里
-scripts/check-frontmatter.ts   # 校验 models.json 与全部页面 frontmatter
-.github/workflows/          # build / deploy / link-check
+├─ index.md                 # 首页：三条路与板块入口
+├─ start/                   # 开始：三条路怎么选、机型矩阵、术语表
+├─ watchface/               # 表盘：普通表盘、Lua 表盘、格式与安装
+├─ quickapp/                # 快应用：结构、能力、运行时、打包、排错
+├─ native/                  # 原生应用：设备、加载、能力、开发、界面、框架、进阶
+├─ platform/                # 平台资料：固件、协议、工具、参考资料
+├─ about/                   # 关于本站、研究历程
+└─ en/                      # 英文站，目前只翻了 start/
+installer/                     # 随 Lua 表盘分发的原生模块安装器
+probe/                         # 最小模块与设备探针
+research/                      # 站点内容的原始笔记与地址表 CSV，页面的 source 指向这里
+scripts/check-frontmatter.ts    # 校验 models.json 与全部页面 frontmatter
+.github/workflows/             # build / deploy / link-check
 ```
 
 ## 内容来源
 
-多数内容页从 `research/` 下对应编号的笔记改写而来，改写只调整结构与表述，数据以笔记为准；`research/README.md` 有编号与页面的对照表。直接整理自外部公开资料的页面（BLE 鉴权、启动链与救砖、QEMU 模拟器）以原始 URL 作为 frontmatter 的 `source`，并在[参考资料](/refs/references)页统一列出。
+多数内容页从 `research/` 下对应编号的笔记改写而来，改写只调整结构与表述，数据以笔记为准；`research/README.md` 有编号与页面的对照表。直接整理自外部公开资料的页面（BLE 鉴权、启动链与救砖、QEMU 模拟器）以原始 URL 作为 frontmatter 的 `source`，并在[参考资料](/platform/reference/references)页统一列出。
 
 新增或修改内容的顺序是：先改笔记，再改站点页面，最后更新 frontmatter 的 `verified`。这样正文里的地址、偏移、哈希始终能追溯到原始记录。
 

@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: Mi Band Developer Handbook
+  name: Mi Band Developer Docs
   text: Developer resources for Xiaomi Mi Band / Smart Band
-  tagline: Quick Apps · Watchfaces · Firmware research · Native apps. China-region devices only. Every page records its sources and review date.
+  tagline: Every bit of Vela's potential — watchfaces, Quick Apps, native apps and platform material. China-region devices only. Every page records its sources and review date.
   image:
     src: /logo.svg
     alt: Mi Band Developer Handbook
@@ -26,7 +26,7 @@ features:
 ---
 
 ::: info Translation status
-Only this **Start** section has an English version. The other sections are currently Chinese-only: [Quick App](/apps/quickapp/), [Watchface](/apps/watchface/), [Firmware](/system/firmware/), [Native](/system/native/), [Protocol](/refs/).
+Only this **Start** section has an English version. The other sections are currently Chinese-only: [Watchfaces](/watchface/), [Quick Apps](/quickapp/), [Native apps](/native/), [Platform & tools](/platform/).
 
 Contributions of translated pages are welcome; see `CONTRIBUTING.md` in the repository root.
 :::
@@ -39,18 +39,13 @@ Field definitions and sources are listed on the [device matrix](/en/start/models
 
 ## Sections
 
-Six layers ordered by purpose. The further down, the closer to the hardware and the higher the risk.
-
 | Section | Content | Entry |
 | --- | --- | --- |
-| Start | Device support, terminology | [Overview](/en/start/) · [Device matrix](/en/start/models) · [Glossary](/en/start/glossary) |
-| Quick App | Applications written in JavaScript, packaged as `.rpk` | [Overview](/apps/quickapp/) (Chinese) |
-| Watchface | Lua scripts and resource bundles | [Overview](/apps/watchface/) (Chinese) |
-| Firmware | Backup, partition dump, unpacking, flashing | [Overview](/system/firmware/) (Chinese) |
-| Native | Loading C modules on NuttX | [Overview](/system/native/) (Chinese) |
-| Protocol | BLE communication between band and phone | [Overview](/refs/) (Chinese) |
-
-Cross-cutting sections: [Tools](/refs/) and [Examples](/refs/examples), both Chinese-only for now.
+| Start | Three routes, device support, terminology | [Overview](/en/start/) · [Device matrix](/en/start/models) · [Glossary](/en/start/glossary) |
+| Watchfaces | Regular and Lua watchfaces, container format, installation | [Overview](/watchface/) (Chinese) |
+| Quick Apps | JavaScript applications packaged as `.rpk` | [Overview](/quickapp/) (Chinese) |
+| Native apps | Concept, supported devices, loading, capabilities | [Overview](/native/) (Chinese) |
+| Platform & tools | Firmware, BLE, tools, references and examples | [Overview](/platform/) (Chinese) |
 
 ## Disclaimer
 

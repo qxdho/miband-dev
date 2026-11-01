@@ -12,24 +12,24 @@
 
 | 文件 | 内容 | 站点页面 |
 | --- | --- | --- |
-| `01-固件研究-10Pro.md`、`02-固件研究-9Pro.md` | 固件包结构、分区、镜像格式 | `/system/firmware/package` |
-| `03-系统架构.md` | NuttX、启动链、文件系统布局 | `/system/firmware/architecture` |
-| `04-快应用运行时与-fetch.md` | quickapp 框架、JIDL、fetch 故障模式 | `/apps/quickapp/runtime` |
-| `05-网络通路.md` | TCP/IP、TUN over BLE、手机侧代理 | `/refs/network` |
-| `06-内核模块系统.md` | modlib、重定位、贴片函数 | `/system/native/modules` |
-| `07-Canopus.md` | 安装器、target pack | `/system/native/canopus` |
-| `08-Chaos.md` | 架构与结构性设计 | `/system/native/chaos` |
-| `09-LVGL-与界面.md` | 控件树、事件派发、UI 缺陷 | `/system/native/lvgl` |
-| `10-工具链与复现.md` | capstone、扫描脚本、复现命令 | `/refs/reversing` |
-| `11-参考资料.md` | 开源项目、官方文档、社区证据 | `/refs/references` |
-| `12-Canopus-地址手册.md` | 259 条符号地址 | `/system/native/addresses` |
-| `13-表盘打包格式.md` | `.face` 二进制结构 | `/apps/watchface/package` |
-| `14-应用隐藏与免重启模式.md` | 隐藏状态与重启行为 | `/system/native/app-hiding` |
-| `15-圆环与ARC控件.md` | `lv_arc` 字段与绘制 | `/system/native/arc` |
-| `16-逆向交接-控制中心与LVGL地址.md`、`17-控制中心磁贴点击-逆向进展.md` | 地址视图、磁贴回调 | `/about/control-center` |
-| `18-代码审查报告.md` | Chaos 代码审查 | `/about/code-review` |
+| `01-固件研究-10Pro.md`、`02-固件研究-9Pro.md` | 固件包结构、分区、镜像格式 | `/platform/firmware/package` |
+| `03-系统架构.md` | NuttX、启动链、文件系统布局 | `/platform/firmware/architecture` |
+| `04-快应用运行时与-fetch.md` | quickapp 框架、JIDL、fetch 故障模式 | `/quickapp/runtime` |
+| `05-网络通路.md` | TCP/IP、TUN over BLE、手机侧代理 | `/platform/protocol/network` |
+| `06-内核模块系统.md` | modlib、重定位、贴片函数 | `/native/develop/modules` |
+| `07-Canopus.md` | 安装器、target pack | `/native/frameworks/canopus` |
+| `08-Chaos.md` | 架构与结构性设计 | `/native/frameworks/chaos` |
+| `09-LVGL-与界面.md` | 控件树、事件派发、UI 缺陷 | `/native/ui/lvgl` |
+| `10-工具链与复现.md` | capstone、扫描脚本、复现命令 | `/platform/tools/reversing` |
+| `11-参考资料.md` | 开源项目、官方文档、社区证据 | `/platform/reference/references` |
+| `12-Canopus-地址手册.md` | 259 条符号地址 | `/native/advanced/addresses` |
+| `13-表盘打包格式.md` | `.face` 二进制结构 | `/watchface/format` |
+| `14-应用隐藏与免重启模式.md` | 隐藏状态与重启行为 | `/native/advanced/app-hiding` |
+| `15-圆环与ARC控件.md` | `lv_arc` 字段与绘制 | `/native/ui/arc` |
+| `16-逆向交接-控制中心与LVGL地址.md`、`17-控制中心磁贴点击-逆向进展.md` | 地址视图、磁贴回调 | `/native/advanced/control-center` |
+| `18-代码审查报告.md` | Chaos 代码审查 | `/native/frameworks/chaos-review` |
 | `附录-研究历程与误判.md` | 时间线与九条误判 | `/about/history` |
-| `地址表.csv` | 259 条符号的机器可读版本 | `/system/native/addresses` |
+| `地址表.csv` | 259 条符号的机器可读版本 | `/native/advanced/addresses` |
 | `原文索引.md` | 笔记作者写的总索引，含结论速查表与术语表 | |
 
 ## `_archive/`

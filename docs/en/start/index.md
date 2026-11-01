@@ -12,31 +12,30 @@ contributors: [miband-dev]
 
 <StatusBadge status="unverified" verified="2026-10-24" />
 
-Content is organised into six layers by purpose, not by file type or device model.
+Content is organised around three application forms — watchfaces, Quick Apps and native apps — plus a platform layer.
 
 ## Typical paths
 
 | Goal | Entry | Prerequisites |
 | --- | --- | --- |
-| Write and install an app | [Quick App](/apps/quickapp/) | JavaScript, single-file Vue components |
-| Build a watchface | [Watchface](/apps/watchface/) | Lua, resource bundling format |
-| Modify the system and firmware | [Firmware](/system/firmware/) → [Native](/system/native/) | Linux fundamentals, willingness to risk a bricked device |
+| Write and install an app | [Quick App](/quickapp/) | JavaScript, single-file Vue components |
+| Build a watchface | [Watchface](/watchface/) | Lua, resource bundling format |
+| Load a native module | [Native apps](/native/) | Supported device, Lua watchface as installer, C toolchain |
+| Modify the system and firmware | [Firmware](/platform/firmware/) | Linux fundamentals, willingness to risk a bricked device |
 
-The two cross-cutting sections are [Protocol](/refs/) and [Tools and examples](/refs/).
+The platform layer covers [firmware](/platform/firmware/), [BLE](/platform/protocol/ble), [tools](/platform/tools/) and [references](/platform/reference/references).
 
-## Layers
+## Three routes
 
 ```text
+Watchface   Lua script + resource bundle, or a regular tool-made watchface
 Quick App   JavaScript runtime, officially supported
-  ↓
-Watchface   Lua scripts + resource bundle
-  ↓
-Firmware    partitions, dump, unpack, flash
-  ↓
-Native      NuttX loadable modules
+Native app  ELF module loaded via insmod, only on supported firmware
+     ↓
+Platform    firmware, BLE, tools — shared by all three
 ```
 
-Each step down is closer to the hardware, has less public documentation, and carries more operational risk. Problems solvable at an upper layer do not require going lower.
+Native apps have no standalone installer: they are shipped inside a Lua watchface, which unpacks and loads the module.
 
 ## Frontmatter fields
 
@@ -54,14 +53,11 @@ This site is a documentation compilation and performs no hands-on testing, so mo
 
 | Section | Content |
 | --- | --- |
-| [Start](/en/start/) | Device support, terminology |
-| [Quick App](/apps/quickapp/) | Writing `.rpk` packages and installing them |
-| [Watchface](/apps/watchface/) | Watchface format, packaging and replacement |
-| [Firmware](/system/firmware/) | Backup, partition reading, unpacking |
-| [Native](/system/native/) | Running self-compiled C modules on NuttX |
-| [Protocol](/refs/) | BLE communication between band and phone |
-| [Tools](/refs/) | Existing tools and their scope |
-| [Examples](/refs/examples) | Example projects that build as-is |
+| [Start](/en/start/) | Three routes, device support, terminology |
+| [Watchfaces](/watchface/) | Regular vs Lua watchfaces, format, installation |
+| [Quick Apps](/quickapp/) | Writing `.rpk` packages and installing them |
+| [Native apps](/native/) | Concept, supported devices, loading, capabilities |
+| [Platform & tools](/platform/) | Firmware, BLE, tools, references, examples |
 
 Sections other than Start are currently Chinese-only.
 

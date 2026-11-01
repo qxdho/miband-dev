@@ -31,7 +31,7 @@ contributors: [miband-dev]
 | `quickapp` | 能否安装与运行快应用 | 取决于是否存在应用引擎 |
 | `watchface` | 能否安装自定义表盘 | 与表盘 bin 格式相关 |
 | `native` | 能否通过 NuttX `insmod` 加载自定义 ELF 模块 | 资料最少 |
-| `flash` | 能否备份与刷写固件 | 高风险，见[固件研究](/system/firmware/) |
+| `flash` | 能否备份与刷写固件 | 高风险，见[固件研究](/platform/firmware/) |
 
 能力字段取值为 `true`、`false`、`"partial"`、`"unknown"` 之一。
 

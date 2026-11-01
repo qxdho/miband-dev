@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import { LEGACY_REDIRECTS } from './legacy-redirects'
 
 /**
  * ⚠️ 不要改。这个值必须和 GitHub 仓库名一致。
@@ -10,12 +11,12 @@ const BASE = '/miband-dev/'
 export default defineConfig({
   lang: 'zh-CN', // 【可改】页面语言。中文填 'zh-CN'
 
-  // 【可改】浏览器标签页上的标题，每个页面会拼成「页面名 | 米环开发手册」
-  title: 'MiBand开发手册',
+  // 【可改】浏览器标签页上的标题，每个页面会拼成「页面名 | 米环开发文档」
+  title: '米环开发文档',
 
   // 【可改】搜索引擎和分享预览里显示的介绍，建议 80-160 字
   description:
-    '小米手环 / 小米手表开发者资料库',
+    '小米手环 / 小米手表 Vela 开发文档：表盘、快应用、原生应用与平台资料。',
 
   // ⚠️ 不要动，指向上面的 BASE
   base: BASE,
@@ -135,6 +136,13 @@ export default defineConfig({
       "try{var h=localStorage.getItem('miband-hue');if(h)document.documentElement.setAttribute('data-hue',h)}catch(e){}",
     ],
 
+    // 旧 IA 的 404 跳转。脚本只在路径命中映射时执行，正常页面不受影响。
+    [
+      'script',
+      {},
+      `(function(){var base=${JSON.stringify(BASE)};var map=${JSON.stringify(LEGACY_REDIRECTS)};var p=location.pathname;if(p.indexOf(base)===0){p=p.slice(base.length-1)}else if(p.charAt(0)!=='/'){p='/'+p}if(p.slice(-5)==='.html'){p=p.slice(0,-5)}if(p.length>1&&p.slice(-1)==='/'){p=p.slice(0,-1)}var to=map[p];if(to){location.replace(base+(to.charAt(0)==='/'?to.slice(1):to))}})()`,
+    ],
+
     // 【可改】作者信息
     ['meta', { name: 'author', content: 'miband-dev contributors' }],
 
@@ -153,16 +161,17 @@ export default defineConfig({
     logo: '/logo.svg',
 
     // 【可改】图标旁的文字。删掉这行 → 只显示图标不显示字
-    siteTitle: 'MiBand开发手册',
+    siteTitle: '米环开发文档',
 
     // 【可改】顶部导航按钮。加按钮 → 复制一行改文字和地址；删按钮 → 整行删掉
     //         activeMatch 控制当前在某个板块时哪个按钮高亮，可以不要
     //         items 是下拉菜单，「更多」展开后显示里面的子项
     nav: [
       { text: '开始', link: '/start/', activeMatch: '/start/' },
-      { text: '应用与表盘', link: '/apps/', activeMatch: '/apps/' },
-      { text: '固件与原生', link: '/system/', activeMatch: '/system/' },
-      { text: '协议与工具', link: '/refs/', activeMatch: '/refs/' },
+      { text: '表盘', link: '/watchface/', activeMatch: '/watchface/' },
+      { text: '快应用', link: '/quickapp/', activeMatch: '/quickapp/' },
+      { text: '原生应用', link: '/native/', activeMatch: '/native/' },
+      { text: '平台与工具', link: '/platform/', activeMatch: '/platform/' },
       { text: '关于', link: '/about/', activeMatch: '/about/' },
     ],
 
@@ -172,102 +181,176 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/qxdho/miband-dev', ariaLabel: 'GitHub 仓库' },
     ],
 
-    // 【可改】左侧目录。加页面 → 在对应 items 里加 { text: '标题', link: '/路径' }
-    //         link 不写 .html、不写 docs/
-    //         collapsed: true 默认折叠 / false 默认展开
-    //         text 是分组标题，不能点
-    sidebar: [
-      {
-        text: '开始',
-        collapsed: false,
-        items: [
-          { text: '从这里开始', link: '/start/' },
-          { text: '机型能力矩阵', link: '/start/models' },
-          { text: '术语表', link: '/start/glossary' },
-        ],
-      },
-      {
-        text: '应用与表盘',
-        collapsed: true,
-        items: [
-          { text: '导读', link: '/apps/' },
-          {
-            text: '快应用',
-            collapsed: true,
-            items: [
-              { text: '导读', link: '/apps/quickapp/' },
-              { text: '环境搭建', link: '/apps/quickapp/setup' },
-              { text: '运行时与 fetch', link: '/apps/quickapp/runtime' },
-              { text: '常见问题', link: '/apps/quickapp/pitfalls' },
-            ],
-          },
-          {
-            text: '表盘',
-            collapsed: true,
-            items: [
-              { text: '导读', link: '/apps/watchface/' },
-              { text: '打包格式', link: '/apps/watchface/package' },
-            ],
-          },
-        ],
-      },
-      {
-        text: '固件与原生',
-        collapsed: true,
-        items: [
-          { text: '导读', link: '/system/' },
-          {
-            text: '固件',
-            collapsed: true,
-            items: [
-              { text: '导读', link: '/system/firmware/' },
-              { text: '固件包格式', link: '/system/firmware/package' },
-              { text: '系统架构', link: '/system/firmware/architecture' },
-              { text: '设备文件系统', link: '/system/firmware/filesystem' },
-              { text: '启动链与救砖', link: '/system/firmware/recovery' },
-            ],
-          },
-          {
-            text: '原生应用',
-            collapsed: true,
-            items: [
-              { text: '导读', link: '/system/native/' },
-              { text: '内核模块系统', link: '/system/native/modules' },
-              { text: 'Canopus', link: '/system/native/canopus' },
-              { text: 'Chaos', link: '/system/native/chaos' },
-              { text: 'LVGL 与界面', link: '/system/native/lvgl' },
-              { text: '圆环与 ARC 控件', link: '/system/native/arc' },
-              { text: '应用隐藏与免重启', link: '/system/native/app-hiding' },
-              { text: 'Canopus 地址手册', link: '/system/native/addresses' },
-            ],
-          },
-        ],
-      },
-      {
-        text: '协议、工具与参考',
-        collapsed: true,
-        items: [
-          { text: '导读', link: '/refs/' },
-          { text: 'BLE 协议与鉴权', link: '/refs/ble' },
-          { text: '网络通路', link: '/refs/network' },
-          { text: 'QEMU 模拟器', link: '/refs/emulator' },
-          { text: '逆向与复现', link: '/refs/reversing' },
-              { text: '原生开发模式', link: '/refs/patterns' },
-          { text: '参考资料', link: '/refs/references' },
-          { text: '示例代码', link: '/refs/examples' },
-        ],
-      },
-      {
-        text: '关于与研究',
-        collapsed: true,
-        items: [
-          { text: '关于本站', link: '/about/' },
-          { text: '研究历程与误判', link: '/about/history' },
-          { text: '控制中心与地址视图', link: '/about/control-center' },
-          { text: 'Chaos 代码审查', link: '/about/code-review' },
-        ],
-      },
-    ],
+    // 【可改】左侧目录。按板块拆成多组，进入哪个板块就显示对应的目录。
+    //         link 不写 .html、不写 docs/；collapsed 控制默认是否折叠。
+    sidebar: {
+      '/start/': [
+        {
+          text: '开始',
+          collapsed: false,
+          items: [
+            { text: '从这里开始', link: '/start/' },
+            { text: '三条路怎么选', link: '/start/choose-path' },
+            { text: '机型能力矩阵', link: '/start/models' },
+            { text: '术语表', link: '/start/glossary' },
+          ],
+        },
+      ],
+      '/watchface/': [
+        {
+          text: '表盘',
+          collapsed: false,
+          items: [{ text: '表盘总览', link: '/watchface/' }],
+        },
+        {
+          text: '普通表盘',
+          collapsed: false,
+          items: [
+            { text: '介绍', link: '/watchface/normal/' },
+            { text: '打包方式', link: '/watchface/normal/package' },
+          ],
+        },
+        {
+          text: 'Lua 表盘',
+          collapsed: false,
+          items: [
+            { text: '介绍', link: '/watchface/lua/' },
+            { text: '能力', link: '/watchface/lua/capabilities' },
+            { text: '打包方式', link: '/watchface/lua/package' },
+            { text: '开发与调试', link: '/watchface/lua/develop' },
+            { text: '示例', link: '/watchface/lua/examples' },
+          ],
+        },
+        {
+          text: '格式与安装',
+          collapsed: true,
+          items: [
+            { text: '表盘包格式', link: '/watchface/format' },
+            { text: '安装表盘', link: '/watchface/install' },
+          ],
+        },
+      ],
+      '/quickapp/': [
+        {
+          text: '快应用',
+          collapsed: false,
+          items: [
+            { text: '介绍', link: '/quickapp/' },
+            { text: '环境搭建', link: '/quickapp/setup' },
+            { text: '工程结构', link: '/quickapp/structure' },
+            { text: '能力', link: '/quickapp/capabilities' },
+            { text: '运行时与 fetch', link: '/quickapp/runtime' },
+            { text: '打包方式', link: '/quickapp/package' },
+            { text: '常见问题', link: '/quickapp/pitfalls' },
+          ],
+        },
+      ],
+      '/native/': [
+        {
+          text: '原生应用',
+          collapsed: false,
+          items: [
+            { text: '介绍', link: '/native/' },
+            { text: '支持的设备', link: '/native/devices' },
+            { text: '加载方式', link: '/native/loading' },
+            { text: '能力', link: '/native/capabilities' },
+          ],
+        },
+        {
+          text: '开发',
+          collapsed: true,
+          items: [
+            { text: '内核模块系统', link: '/native/develop/modules' },
+            { text: '最小模块', link: '/native/develop/hello' },
+          ],
+        },
+        {
+          text: '界面',
+          collapsed: true,
+          items: [
+            { text: 'LVGL 与界面', link: '/native/ui/lvgl' },
+            { text: '圆环与 ARC 控件', link: '/native/ui/arc' },
+            { text: '原生开发模式', link: '/native/ui/patterns' },
+          ],
+        },
+        {
+          text: '框架',
+          collapsed: true,
+          items: [
+            { text: 'Canopus', link: '/native/frameworks/canopus' },
+            { text: 'Chaos', link: '/native/frameworks/chaos' },
+            { text: 'Chaos 代码审查', link: '/native/frameworks/chaos-review' },
+          ],
+        },
+        {
+          text: '进阶',
+          collapsed: true,
+          items: [
+            { text: 'Canopus 地址手册', link: '/native/advanced/addresses' },
+            { text: '应用隐藏与免重启', link: '/native/advanced/app-hiding' },
+            { text: '控制中心与地址视图', link: '/native/advanced/control-center' },
+          ],
+        },
+        {
+          text: '示例',
+          collapsed: true,
+          items: [{ text: '原生示例', link: '/native/examples' }],
+        },
+      ],
+      '/platform/': [
+        {
+          text: '平台与工具',
+          collapsed: false,
+          items: [{ text: '平台总览', link: '/platform/' }],
+        },
+        {
+          text: '固件',
+          collapsed: false,
+          items: [
+            { text: '固件研究', link: '/platform/firmware/' },
+            { text: '固件包格式', link: '/platform/firmware/package' },
+            { text: '系统架构', link: '/platform/firmware/architecture' },
+            { text: '设备文件系统', link: '/platform/firmware/filesystem' },
+            { text: '启动链与救砖', link: '/platform/firmware/recovery' },
+          ],
+        },
+        {
+          text: '协议',
+          collapsed: true,
+          items: [
+            { text: 'BLE 协议与鉴权', link: '/platform/protocol/ble' },
+            { text: '网络通路', link: '/platform/protocol/network' },
+          ],
+        },
+        {
+          text: '工具',
+          collapsed: true,
+          items: [
+            { text: '工具索引', link: '/platform/tools/' },
+            { text: 'QEMU 模拟器', link: '/platform/tools/emulator' },
+            { text: '逆向与复现', link: '/platform/tools/reversing' },
+          ],
+        },
+        {
+          text: '参考',
+          collapsed: true,
+          items: [
+            { text: '参考资料', link: '/platform/reference/references' },
+            { text: '示例代码', link: '/platform/reference/examples' },
+          ],
+        },
+      ],
+      '/about/': [
+        {
+          text: '关于',
+          collapsed: false,
+          items: [
+            { text: '关于本站', link: '/about/' },
+            { text: '研究历程与误判', link: '/about/history' },
+          ],
+        },
+      ],
+    },
 
     // ⚠️ provider 不要改。'local' = 免费本地搜索，改了要付费注册服务
     search: {
@@ -309,7 +392,7 @@ export default defineConfig({
     footer: {
       message:
         '非官方项目，与小米公司无关联。文档采用 CC BY-SA 4.0，代码采用 MIT。',
-      copyright: 'Copyright © 2026 米环开发手册 contributors',
+      copyright: 'Copyright © 2026 米环开发文档 contributors',
     },
   },
 })

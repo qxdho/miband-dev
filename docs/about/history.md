@@ -260,7 +260,7 @@ bool needNetwork;   // APP是否依赖网络 默认false
 
 ## 相关页面
 
-- 模块机制与 tun 驱动的实现路径：[内核模块系统](/system/native/modules)
-- 从日志到 `/dev/tun` 的完整通路：[网络通路](/refs/network)
-- 符号地址与证据强度：[地址手册](/system/native/addresses)
-- 分析脚本与复现命令：[逆向工具与复现](/refs/reversing)
+- 模块机制与 tun 驱动的实现路径：[内核模块系统](/native/develop/modules)
+- 从日志到 `/dev/tun` 的完整通路：[网络通路](/platform/protocol/network)
+- 符号地址与证据强度：[地址手册](/native/advanced/addresses)
+- 分析脚本与复现命令：[逆向工具与复现](/platform/tools/reversing)
