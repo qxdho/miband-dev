@@ -59,7 +59,7 @@ export default defineConfig({
         sidebar: [
           {
             text: 'Start',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: 'Overview', link: '/en/start/' },
               { text: 'Device matrix', link: '/en/start/models' },
@@ -186,7 +186,7 @@ export default defineConfig({
     sidebar: [
       {
         text: '开始',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '从这里开始', link: '/start/' },
           { text: '三条路怎么选', link: '/start/choose-path' },
@@ -196,12 +196,12 @@ export default defineConfig({
       },
       {
         text: '表盘',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '表盘总览', link: '/watchface/' },
           {
             text: '普通表盘',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '介绍', link: '/watchface/normal/' },
               { text: '打包方式', link: '/watchface/normal/package' },
@@ -209,7 +209,7 @@ export default defineConfig({
           },
           {
             text: 'Lua 表盘',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '介绍', link: '/watchface/lua/' },
               { text: '能力', link: '/watchface/lua/capabilities' },
@@ -220,7 +220,7 @@ export default defineConfig({
           },
           {
             text: '格式与安装',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '表盘包格式', link: '/watchface/format' },
               { text: '安装表盘', link: '/watchface/install' },
@@ -230,12 +230,12 @@ export default defineConfig({
       },
       {
         text: '快应用',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '介绍', link: '/quickapp/' },
           {
             text: '入门',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '环境搭建', link: '/quickapp/setup' },
               { text: '工程结构', link: '/quickapp/structure' },
@@ -243,7 +243,7 @@ export default defineConfig({
           },
           {
             text: '能力与运行',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '能力', link: '/quickapp/capabilities' },
               { text: '运行时与 fetch', link: '/quickapp/runtime' },
@@ -251,7 +251,7 @@ export default defineConfig({
           },
           {
             text: '打包与排错',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '打包方式', link: '/quickapp/package' },
               { text: '常见问题', link: '/quickapp/pitfalls' },
@@ -261,12 +261,12 @@ export default defineConfig({
       },
       {
         text: '原生应用',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '介绍', link: '/native/' },
           {
             text: '入门',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '支持的设备', link: '/native/devices' },
               { text: '加载方式', link: '/native/loading' },
@@ -275,7 +275,7 @@ export default defineConfig({
           },
           {
             text: '开发',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '内核模块系统', link: '/native/develop/modules' },
               { text: '最小模块', link: '/native/develop/hello' },
@@ -283,7 +283,7 @@ export default defineConfig({
           },
           {
             text: '界面',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: 'LVGL 与界面', link: '/native/ui/lvgl' },
               { text: '圆环与 ARC 控件', link: '/native/ui/arc' },
@@ -292,7 +292,7 @@ export default defineConfig({
           },
           {
             text: '框架',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: 'Canopus', link: '/native/frameworks/canopus' },
               { text: 'Chaos', link: '/native/frameworks/chaos' },
@@ -301,7 +301,7 @@ export default defineConfig({
           },
           {
             text: '进阶',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: 'Canopus 地址手册', link: '/native/advanced/addresses' },
               { text: '应用隐藏与免重启', link: '/native/advanced/app-hiding' },
@@ -313,12 +313,12 @@ export default defineConfig({
       },
       {
         text: '平台与工具',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '平台总览', link: '/platform/' },
           {
             text: '固件',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '固件研究', link: '/platform/firmware/' },
               { text: '固件包格式', link: '/platform/firmware/package' },
@@ -329,7 +329,7 @@ export default defineConfig({
           },
           {
             text: '协议',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: 'BLE 协议与鉴权', link: '/platform/protocol/ble' },
               { text: '网络通路', link: '/platform/protocol/network' },
@@ -337,7 +337,7 @@ export default defineConfig({
           },
           {
             text: '工具',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '工具索引', link: '/platform/tools/' },
               { text: 'QEMU 模拟器', link: '/platform/tools/emulator' },
@@ -346,7 +346,7 @@ export default defineConfig({
           },
           {
             text: '参考',
-            collapsed: false,
+            collapsed: true,
             items: [
               { text: '参考资料', link: '/platform/reference/references' },
               { text: '示例代码', link: '/platform/reference/examples' },
@@ -356,7 +356,7 @@ export default defineConfig({
       },
       {
         text: '关于',
-        collapsed: false,
+        collapsed: true,
         items: [
           { text: '关于本站', link: '/about/' },
           { text: '研究历程与误判', link: '/about/history' },
