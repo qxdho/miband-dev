@@ -181,8 +181,8 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/qxdho/miband-dev', ariaLabel: 'GitHub 仓库' },
     ],
 
-    // 【可改】左侧目录。按板块拆成多组，进入哪个板块就显示对应的目录。
-    //         link 不写 .html、不写 docs/；collapsed 控制默认是否折叠。
+    // 【可改】左侧目录。每个大板块只保留一个分组，组内列出该板块全部页面。
+    //         进入哪个板块就显示对应的分组；link 不写 .html、不写 docs/。
     sidebar: {
       '/start/': [
         {
@@ -200,31 +200,15 @@ export default defineConfig({
         {
           text: '表盘',
           collapsed: false,
-          items: [{ text: '表盘总览', link: '/watchface/' }],
-        },
-        {
-          text: '普通表盘',
-          collapsed: false,
           items: [
-            { text: '介绍', link: '/watchface/normal/' },
-            { text: '打包方式', link: '/watchface/normal/package' },
-          ],
-        },
-        {
-          text: 'Lua 表盘',
-          collapsed: false,
-          items: [
-            { text: '介绍', link: '/watchface/lua/' },
-            { text: '能力', link: '/watchface/lua/capabilities' },
-            { text: '打包方式', link: '/watchface/lua/package' },
-            { text: '开发与调试', link: '/watchface/lua/develop' },
-            { text: '示例', link: '/watchface/lua/examples' },
-          ],
-        },
-        {
-          text: '格式与安装',
-          collapsed: true,
-          items: [
+            { text: '表盘总览', link: '/watchface/' },
+            { text: '普通表盘', link: '/watchface/normal/' },
+            { text: '普通表盘打包', link: '/watchface/normal/package' },
+            { text: 'Lua 表盘', link: '/watchface/lua/' },
+            { text: 'Lua 表盘能力', link: '/watchface/lua/capabilities' },
+            { text: 'Lua 表盘打包', link: '/watchface/lua/package' },
+            { text: 'Lua 表盘开发', link: '/watchface/lua/develop' },
+            { text: 'Lua 表盘示例', link: '/watchface/lua/examples' },
             { text: '表盘包格式', link: '/watchface/format' },
             { text: '安装表盘', link: '/watchface/install' },
           ],
@@ -254,87 +238,37 @@ export default defineConfig({
             { text: '支持的设备', link: '/native/devices' },
             { text: '加载方式', link: '/native/loading' },
             { text: '能力', link: '/native/capabilities' },
-          ],
-        },
-        {
-          text: '开发',
-          collapsed: true,
-          items: [
             { text: '内核模块系统', link: '/native/develop/modules' },
             { text: '最小模块', link: '/native/develop/hello' },
-          ],
-        },
-        {
-          text: '界面',
-          collapsed: true,
-          items: [
             { text: 'LVGL 与界面', link: '/native/ui/lvgl' },
             { text: '圆环与 ARC 控件', link: '/native/ui/arc' },
             { text: '原生开发模式', link: '/native/ui/patterns' },
-          ],
-        },
-        {
-          text: '框架',
-          collapsed: true,
-          items: [
             { text: 'Canopus', link: '/native/frameworks/canopus' },
             { text: 'Chaos', link: '/native/frameworks/chaos' },
             { text: 'Chaos 代码审查', link: '/native/frameworks/chaos-review' },
-          ],
-        },
-        {
-          text: '进阶',
-          collapsed: true,
-          items: [
             { text: 'Canopus 地址手册', link: '/native/advanced/addresses' },
             { text: '应用隐藏与免重启', link: '/native/advanced/app-hiding' },
             { text: '控制中心与地址视图', link: '/native/advanced/control-center' },
+            { text: '原生示例', link: '/native/examples' },
           ],
-        },
-        {
-          text: '示例',
-          collapsed: true,
-          items: [{ text: '原生示例', link: '/native/examples' }],
         },
       ],
       '/platform/': [
         {
           text: '平台与工具',
           collapsed: false,
-          items: [{ text: '平台总览', link: '/platform/' }],
-        },
-        {
-          text: '固件',
-          collapsed: false,
           items: [
+            { text: '平台总览', link: '/platform/' },
             { text: '固件研究', link: '/platform/firmware/' },
             { text: '固件包格式', link: '/platform/firmware/package' },
             { text: '系统架构', link: '/platform/firmware/architecture' },
             { text: '设备文件系统', link: '/platform/firmware/filesystem' },
             { text: '启动链与救砖', link: '/platform/firmware/recovery' },
-          ],
-        },
-        {
-          text: '协议',
-          collapsed: true,
-          items: [
             { text: 'BLE 协议与鉴权', link: '/platform/protocol/ble' },
             { text: '网络通路', link: '/platform/protocol/network' },
-          ],
-        },
-        {
-          text: '工具',
-          collapsed: true,
-          items: [
             { text: '工具索引', link: '/platform/tools/' },
             { text: 'QEMU 模拟器', link: '/platform/tools/emulator' },
             { text: '逆向与复现', link: '/platform/tools/reversing' },
-          ],
-        },
-        {
-          text: '参考',
-          collapsed: true,
-          items: [
             { text: '参考资料', link: '/platform/reference/references' },
             { text: '示例代码', link: '/platform/reference/examples' },
           ],
