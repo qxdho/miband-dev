@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-每个示例是一个可构建的最小工程，目标是跑通并可见效果，不追求功能完整。
+每个示例均为可构建的最小工程，目标是完成构建并产生可见效果，不追求功能完整。
 
 ## 计划中的示例
 
@@ -24,7 +24,7 @@ contributors: [miband-dev]
 
 ## 社区可复用的工程
 
-以下项目都公开发布了源码，可直接读实现。本站不托管它们的二进制产物。
+以下项目均公开发布源码，可直接阅读实现。本站不托管其二进制产物。
 
 | 项目 | 方向 | 说明 | 来源 |
 | --- | --- | --- | --- |
@@ -34,14 +34,14 @@ contributors: [miband-dev]
 | [Miband10pro-firmware-extraction](https://github.com/DDlhy/Miband10pro-firmware-extraction) | 固件 | 10 Pro SPI NAND 整片读取与 YAFFS2/ROMFS 还原脚本 | [救砖路径](/platform/firmware/recovery) |
 | [atc1441 工具集](https://github.com/atc1441/MiBand10-BES2700iMP-BEST1503-Hacking) | 固件、SoC | BES2700iMP/BEST1503 的研究资料 | GitHub |
 
-JSLab 的价值在于把「快应用能调用哪些接口」变成可交互的试验台；Schedule-Vela 则展示了页面路由、本地存储与打包发布的完整写法。两者的目录规范与[快应用养成](/quickapp/)一致。
+JSLab 将「快应用可调用哪些接口」转化为可交互的试验环境；Schedule-Vela 展示了页面路由、本地存储与打包发布的完整实现。两者的目录规范与[快应用](/quickapp/)一致。
 
 ## 约定
 
-- 每个示例自带 `README.md`，写明依赖、目标机型、已知限制与验证状态；
+- 每个示例均包含 `README.md`，说明依赖、目标机型、已知限制与验证状态；
 - 代码使用 MIT 许可，文档使用 CC BY-SA 4.0，与站点一致；
 - 示例不包含二进制文件与固件，只保留源码与构建脚本；
-- 只在已跑通的机型上标注可用；未跑通的标为 `unverified`。
+- 仅在已验证可运行的机型上标注可用；尚未验证的示例标记为 `unverified`。
 
 ## 与文档的关系
 

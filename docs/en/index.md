@@ -4,10 +4,10 @@ layout: home
 hero:
   name: Mi Band Developer Docs
   text: Developer resources for Xiaomi Mi Band / Smart Band
-  tagline: Every bit of Vela's potential — watchfaces, Quick Apps, native apps and platform material. China-region devices only. Every page records its sources and review date.
+  tagline: "Every bit of Vela's potential: watchfaces, Quick Apps, native apps and platform material. China-region devices only. Every page records its sources and review date."
   image:
     src: /logo.svg
-    alt: Mi Band Developer Handbook
+    alt: Mi Band Developer Docs
   actions:
     - theme: brand
       text: Device capability matrix
@@ -26,16 +26,16 @@ features:
 ---
 
 ::: info Translation status
-Only this **Start** section has an English version. The other sections are currently Chinese-only: [Watchfaces](/watchface/), [Quick Apps](/quickapp/), [Native apps](/native/), [Platform & tools](/platform/).
+Only the Start section is available in English. The other sections are currently Chinese-only: [Watchfaces](/watchface/), [Quick Apps](/quickapp/), [Native apps](/native/), [Platform & tools](/platform/).
 
-Contributions of translated pages are welcome; see `CONTRIBUTING.md` in the repository root.
+Translated pages are welcome as contributions; see `CONTRIBUTING.md` in the repository root.
 :::
 
 ## Device capability matrix
 
 <ModelMatrix />
 
-Field definitions and sources are listed on the [device matrix](/en/start/models) page. This site performs no hands-on testing; every entry is `sourced` or `unverified`.
+Field definitions and sources are listed on the [device matrix](/en/start/models) page. This site performs no hands-on testing, so every entry is marked `sourced` or `unverified`.
 
 ## Sections
 

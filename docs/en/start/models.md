@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-24" />
 
-This site performs no hands-on testing. Every entry comes from public documentation or community reports. `✓` means a source claims the capability works; it does not mean the author reproduced it on a device. Entries that cannot be confirmed are filled with `unknown`.
+This site performs no hands-on testing. Every entry comes from public documentation or community reports. `✓` means a source claims the capability works; it does not mean the author reproduced it on a device. Entries that cannot be confirmed are marked `unknown`.
 
 ## Matrix
 
@@ -54,4 +54,4 @@ This site covers China-region devices only. International firmware differs in ap
 
 ## How to update
 
-Edit the corresponding field in `docs/.vitepress/data/models.json`, attach evidence in the pull request description (screenshot, log or source link), and update the "Known facts and sources" table above. Fields that cannot be confirmed stay `unknown`.
+To update the matrix, edit the corresponding field in `docs/.vitepress/data/models.json`, attach evidence in the pull request description (screenshot, log or source link), and update the "Known facts and sources" table above. Fields that cannot be confirmed remain `unknown`.

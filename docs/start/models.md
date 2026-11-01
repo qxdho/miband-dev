@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-本站不进行真机实测。矩阵中每一项均来自公开资料或社区记录，`✓` 表示有来源称该项可用，不代表作者在设备上复现过。无法确认的项填 `unknown`。
+本站不进行真机实测。矩阵中每一项均来自公开资料或社区记录，`✓` 表示有来源称该项可用，不代表作者在设备上复现过。无法确认的项记为 `unknown`。
 
 ## 矩阵
 
@@ -27,7 +27,7 @@ contributors: [miband-dev]
 | `screen` | 屏幕分辨率，宽×高，单位 px | 影响快应用适配 |
 | `radius` | 屏幕圆角半径，单位 px；`999` 表示接近胶囊或圆形 | 影响安全区与布局 |
 | `os` | 操作系统 | 目前国行手环均为 VelaOS |
-| `soc` | 主控芯片 | 未核实的填 `unknown` |
+| `soc` | 主控芯片 | 未核实的记为 `unknown` |
 | `quickapp` | 能否安装与运行快应用 | 取决于是否存在应用引擎 |
 | `watchface` | 能否安装自定义表盘 | 与表盘 bin 格式相关 |
 | `native` | 能否通过 NuttX `insmod` 加载自定义 ELF 模块 | 资料最少 |
@@ -57,4 +57,4 @@ contributors: [miband-dev]
 
 ## 修订方式
 
-修改 `docs/.vitepress/data/models.json` 中对应字段，在 PR 描述中附证据（截图、日志或来源链接），并同步更新上方「已知事实与来源」表。无法确认的字段保持 `unknown`。
+修订时需修改 `docs/.vitepress/data/models.json` 中对应字段，并在 PR 描述中附证据（截图、日志或来源链接），同时更新上方「已知事实与来源」表；无法确认的字段保持 `unknown`。

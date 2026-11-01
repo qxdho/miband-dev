@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-结论：通路在设计上是完整的，手机侧代理已经成功启动，断点在手环侧的一个设备节点。`/dev/tun` 不存在，隧道客户端 `net_tun_open()` 以 `errno 2`（`ENOENT`）失败。这不是配置问题，是驱动没有编进固件。
+本节的核心结论是：该通路在设计上是完整的，手机侧代理已成功启动，断点位于手环侧的一个设备节点。`/dev/tun` 不存在，隧道客户端 `net_tun_open()` 以 `errno 2`（`ENOENT`）失败。该问题并非配置错误，而是驱动未编入固件。
 
 ## 完整链路
 
@@ -42,7 +42,7 @@ contributors: [miband-dev]
 └───────────────────────────────────────────────────────┘
 ```
 
-链路两端都有代码，中间的网卡注册在 10 Pro 上不存在。
+链路两端均有代码，而中间的网卡注册在 10 Pro 上不存在。
 
 ## 逐层证据
 
@@ -115,7 +115,7 @@ Can't open socket: %d
 | `app_net_connect_state_update` | 连接状态回调 |
 | `remote_net_state_switch` | 手机侧下发的开关，10 Pro 独有 |
 
-这是一份写完整的 TUN-over-BLE 客户端。唯一前提是 `/dev/tun` 存在。
+这是一套完整的 TUN-over-BLE 客户端实现，唯一前提是 `/dev/tun` 存在。
 
 ### 手机侧代理已启动
 
@@ -135,9 +135,9 @@ DeviceBasicStatusDataHandler|addHandler ... NetProxyComponent$upstreamHandleData
 | `net proxy did = 2239055857` | 只对 10 Pro 建立，对 9 Pro 从未建立 |
 | `upstreamHandleData` | 上行数据通道已注册 |
 
-手机侧没有发现问题。
+手机侧未发现异常。
 
-#### 第一次 `start()` 是空转
+#### 第一次 `start()` 未实际启动
 
 ```
 19:08:58.492  NetProxyManager|start() called, jniContext = 0, started = false
@@ -146,11 +146,11 @@ DeviceBasicStatusDataHandler|addHandler ... NetProxyComponent$upstreamHandleData
 19:09:53.938  onDeviceLost
 ```
 
-第一次 `start()` 携带 `jniContext = 0`，为空转；第二次才拿到真实上下文。探针恰好执行在两次之间，那一轮实测的失败不能完全归因于驱动缺失。代理启动后的探针仍返回 `code 7`，结论不变。
+第一次 `start()` 携带 `jniContext = 0`，未实际启动；第二次才获取真实上下文。探针恰好在两次调用之间执行，因此该轮实测失败不能完全归因于驱动缺失。代理启动后的探针仍返回 `code 7`，结论不变。
 
 真实代理启动后 7.9 秒，BLE 连接断开。重连时 `errorCode = 2011/2012`。该现象在整份日志中反复出现，属另一个独立问题。
 
-### 手环侧的决定性日志
+### 手环侧的关键日志
 
 `/data/offlinelog/log*.gz` 中，从 10/16 15:36 到 10/17 11:44 共 26 次，无一例外：
 
@@ -168,15 +168,15 @@ DeviceBasicStatusDataHandler|addHandler ... NetProxyComponent$upstreamHandleData
 | ioctl 失败 | `ioctl TUNSETIFF failed` | 不是 |
 | 节点不存在 | `ENOENT = 2` | 是 |
 
-失败发生在 `app_net_connect_state_update` 中，即连接状态更新回调。时序为手机连上、手环收到通知、手环尝试打开 tun、失败。链路前半段是通的。
+失败发生在 `app_net_connect_state_update` 中，即连接状态更新回调。时序为：手机连接、手环收到通知、手环尝试打开 tun、失败。链路前半段是通的。
 
 日志时间戳为 UTC，手机日志为 UTC+8，对齐时需减 8 小时。
 
 ## `remote_net_state_switch` 的归属
 
-该符号 10 Pro 有、9 Pro 没有。字符串位于文件偏移 `0xc8b638`，对应数据地址 `0x2cd4b638`。
+该符号在 10 Pro 中存在，在 9 Pro 中不存在。字符串位于文件偏移 `0xc8b638`，对应数据地址 `0x2cd4b638`。
 
-按地址换算规则搜索引用：
+按地址换算规则搜索引用，结果如下：
 
 | 搜索基准 | 命中 |
 | --- | --- |
@@ -198,17 +198,17 @@ DeviceBasicStatusDataHandler|addHandler ... NetProxyComponent$upstreamHandleData
 "netif_switch", "net_tun_open", "bt-net", "net_get_tun_packet_size"
 ```
 
-### 推论
+### 推断
 
-1. 两个池中的字符串只是日志元数据，用作模块名与函数名标签，不是调度表。
+1. 两个池中的字符串仅作为日志元数据，用于模块名与函数名标签，并非调度表。
 2. 整个固件中没有任何代码通过 `remote_net_state_switch` 做分派，没有 PC 相对的加载器，也没有跳转表。
 3. 真正的 topic id 在别处，可能是数字常量，字符串仅用于打日志。
 
-开关的决定权在手机侧，手环侧没有找到本地触发点。这与协议设计一致：手环不判断自己该不该上网，由手机下发。该结论为推断，实际 message handler 未定位到。若要自行发送该 topic，需先在手机 App 中抓包确认 topic id 与 payload 格式，payload 形态推断为 `"up"` 与 `"down"`。
+开关由手机侧决定，手环侧未找到本地触发点。这与协议设计一致：手环不判断自身是否应联网，而由手机下发。该结论为推断，实际 message handler 尚未定位。若要自行发送该 topic，需先在手机 App 中抓包确认 topic id 与 payload 格式；payload 形态推断为 `"up"` 与 `"down"`。
 
-## `getType` 不能当判据
+## `getType` 不能作为判断依据
 
-`system.network.getType()` 实测返回 `"none"`，容易被误读为设备没有网络。
+`system.network.getType()` 实测返回 `"none"`，容易被误读为设备未接入网络。
 
 实现对应的日志串：
 
@@ -224,25 +224,25 @@ wifi  wlan0  wlan1  cellsurf  cellular  bt-pan  bt-net  tun0  tun  eth0  etherne
 
 `getType()` 的行为是遍历已注册的网络设备，把名字映射到表中的类型，一个都没有匹配上时返回 `none`。
 
-| 观察值 | 真实含义 |
+| 观察值 | 含义 |
 | --- | --- |
 | `getType() === 'none'` | 内核里没有已注册的网络设备 |
 | 存在 tun 设备时的返回值 | 表中有 `tun0` 与 `tun`，返回 `"tun"`，此条为推断 |
 
-`tun` 就在这张表里。早期「TUN 不在类型表中，所以 `getType` 永远为 `none`」的说法不准确已被推翻。真正的原因是设备根本没有注册，表里有什么都不影响结果。
+`tun` 已包含在该表中。早期「TUN 不在类型表中，因此 `getType` 永远为 `none`」的说法不准确，已被推翻。实际原因是设备未注册，类型表的内容不影响结果。
 
-`getType` 不是独立证据，它只是「设备未注册」的投影，只能说明没有网卡，不能说明没有网络。
+`getType` 并非独立证据，只是「设备未注册」的反映，只能说明没有网卡，不能说明没有网络。
 
-## 裸 IP 也连不上的原因
+## 裸 IP 无法连接的原因
 
 实测 `http://203.0.113.10/` 返回 `code 7`，耗时 59 ms。
 
-`connect()` 的流程是查路由表、找出口设备、发包。没有已注册设备时路由表为空，`connect()` 立即返回 `ENETUNREACH` 或 `EHOSTUNREACH`，由绑定层翻译成 `code 7`。
+`connect()` 的流程为查询路由表、查找出口设备、发送数据包。没有已注册设备时路由表为空，`connect()` 立即返回 `ENETUNREACH` 或 `EHOSTUNREACH`，由绑定层转换为 `code 7`。
 
-- 59 ms 说明没有发生真实网络交互，不是超时；
-- 加 `Host: example.com` 头不改变结果，P1 与 P1+H 完全一致，请求没有出网卡。
+- 59 ms 表明未发生真实网络交互，并非超时；
+- 添加 `Host: example.com` 头不改变结果，P1 与 P1+H 完全一致，请求未经过网卡。
 
-用 JS shim 把域名换成 IP 的方案不成立，换成 IP 同样连不上。该方案在早期被提出，后被 P1 探针否掉。
+使用 JS shim 将域名替换为 IP 的方案不成立，替换为 IP 后同样无法连接。该方案在早期被提出，后被 P1 探针否定。
 
 ## interconnect 的位置
 
@@ -255,9 +255,9 @@ wifi  wlan0  wlan1  cellsurf  cellular  bt-pan  bt-net  tun0  tun  eth0  etherne
 | 手环侧接收者 | interconnect 服务 | `app_net.c` |
 | 前置条件 | 无需驱动 | 需要 `/dev/tun` |
 
-两者共用同一条 BLE 链路，上层协议不同。Miwear NET 由官方 App 自带，形态符合需求，缺的是驱动。
+两者共用同一条 BLE 链路，但上层协议不同。Miwear NET 由官方 App 提供，形态符合需求，缺少的是驱动。
 
-## 一次失败连接的完整时间线
+## 失败连接的完整时间线
 
 ```
 T+0.000  手机 BLE 连上手环
@@ -271,15 +271,15 @@ T+48.2   日志：tun open fail
 T+56     BLE 掉线，errorCode 2011/2012
 ```
 
-断点在 `T+48.1`。
+断点位于 `T+48.1`。
 
-## 未决问题
+## 待定问题
 
 | 问题 | 状态 |
 | --- | --- |
-| 真实代理启动后 7 至 8 秒 BLE 必掉的原因 | 待定，可能为功耗策略或协议不兼容，补驱动后需重测 |
+| 真实代理启动后 7 至 8 秒 BLE 必然断开的原因 | 待定，可能为功耗策略或协议不兼容，补齐驱动后需重新测试 |
 | `remote_net_state_switch` 的 topic id 与 payload 格式 | 推断，payload 为 `"up"` 与 `"down"`，id 未知 |
-| 补上 `/dev/tun` 后手机是否自动开闸 | 待定，决定项目成败的关键项 |
+| 补上 `/dev/tun` 后手机是否自动放行 | 待定，决定方案可行性的关键项 |
 | `errorCode 2011/2012` 的确切含义 | 待定，未在小米文档中找到 |
 | 26 次 ENOENT 是否全部发生在代理启动之后 | 待定，未逐条对齐时间戳，两侧时区不同 |
 | 10 Pro 固件中不存在创建 `/dev/tun` 的代码 | 已证实 |
@@ -287,5 +287,5 @@ T+56     BLE 掉线，errorCode 2011/2012
 ## 相关页面
 
 - `fetch` 的三类失败模式：[快应用运行时](/quickapp/runtime)
-- 补 `/dev/tun` 的模块实现路径：[内核模块系统](/native/develop/modules)
+- 补齐 `/dev/tun` 的模块实现路径：[内核模块系统](/native/develop/modules)
 - 手环与手机之间的 BLE 通信：[BLE 协议与配对鉴权](/platform/protocol/ble)

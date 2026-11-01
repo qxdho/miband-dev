@@ -14,7 +14,7 @@ contributors: [miband-dev]
 
 Canopus 的目标包记录的固件哈希与手环 10 Pro 的 `vela_ap.bin` 逐字节一致，包内地址因此可直接用于本机镜像。
 
-结论：Canopus 支持 `3.101.043`，加载器参数、259 条符号记录、55 个 veneer 都是现成的。证据质量不均，模块加载链路扎实，网络符号缺少证据文件，依赖前需要自行验证。
+Canopus 对 `3.101.043` 的支持已由加载器参数、259 条符号记录与 55 个 veneer 证实。证据质量并不均衡：模块加载链路较为完整，网络符号缺少证据文件，在依赖相关符号之前需要自行验证。
 
 ## 概况
 
@@ -43,7 +43,7 @@ Canopus 的目标包记录的固件哈希与手环 10 Pro 的 `vela_ap.bin` 逐�
 | `modules/platform/reference/examples` | 未标注 | `hello.c`、`hello_platform.h`、`build.sh`、`package.json` |
 | `abi/schema` | 未标注 | ABI 描述 |
 
-`modules/platform/reference/exampleshello.c` 是框架自带的可编译最小模块，对应[内核模块系统](/native/develop/modules)中的最小验证模块。
+`modules/platform/reference/examples/hello.c` 是框架自带的可编译最小模块，对应[内核模块系统](/native/develop/modules)中的最小验证模块。
 
 ## target pack 与固件匹配
 
@@ -65,9 +65,9 @@ firmware_version = "3.101.043"
 firmware_build   = "CONBINE_LTALM078_T3.101.043_08041658"
 ```
 
-本机 `firmware/10pro/fwx/vela_ap.bin` 的哈希为同一串 `519307675665e4866d722a8119a98589c397b614ac3294cb87bfc86de45756ec`，逐字节一致，target pack 中的地址直接适用。
+本机 `firmware/10pro/fwx/vela_ap.bin` 的哈希为同一串 `519307675665e4866d722a8119a98589c397b614ac3294cb87bfc86de45756ec`，两者逐字节一致，因此 target pack 中的地址可直接适用。
 
-地址按固件哈希分组，换版本换一整套符号，不假设地址跨版本稳定。
+地址按固件哈希分组，更换版本即需更换整套符号，不应假设地址在不同版本之间保持稳定。
 
 ## target pack 的内容
 
@@ -92,7 +92,7 @@ capabilities = [
 ]
 ```
 
-`char-device.register`、`char-device.unregister` 正是创建 `/dev/tun` 所需的能力，框架将其作为一等能力单列。
+`char-device.register`、`char-device.unregister` 正是创建 `/dev/tun` 所需的能力，框架将其作为一项独立能力单列。
 
 ## 安装器
 
@@ -122,20 +122,20 @@ local inserted = run(string.format("insmod %s %s", shell_quote(MODULE_PATH), MOD
 
 | 事实 | 意义 |
 | --- | --- |
-| `os.execute` 可用 | Lua 能执行 shell 命令，这是整条链路的支点 |
+| `os.execute` 可用 | Lua 能执行 shell 命令，这是整条链路的关键环节 |
 | `getprop` 可读固件版本 | 安装器能按版本选择模块 |
 | 模块带 `CPS1` 魔数头 | 模块不是裸 ELF，外层还有一层容器 |
 | 尺寸范围 512 B 至 256 KB | 驱动 10 至 20 KB 落在范围内 |
 | `insmod <path> <name>` | 与 `target.toml` 的 `load_command` 一致 |
 | 写入 `/dev/canopus` | 自定义字符设备，由 supervisor 模块提供 |
 
-`CPS1` 头说明模块文件由 `CPS1` 容器与 ELF32 ET_REL 两部分组成。自行编写驱动时需要按该格式打包，不能直接放入 `.ko`。
+`CPS1` 头说明模块文件由 `CPS1` 容器与 ELF32 ET_REL 两部分组成。自行编写驱动时需要按该格式打包，不能直接以 `.ko` 文件的形式放入。
 
 ## 证据质量
 
 `target.toml` 开头注明 `# Static exact-IDB recovery; device gates remain pending.`，即所有结论均来自静态逆向，没有真机验证记录。
 
-### 扎实的部分
+### 可采信的证据
 
 `evidence/EVID-MODLIB-1043-001.json` 直接定位了 `insmod` 的实现：
 
@@ -147,9 +147,9 @@ local inserted = run(string.format("insmod %s %s", shell_quote(MODULE_PATH), MOD
 | 调用点 | `sub_C23EC54` 取 path 与 name，失败时用 errno 格式化 `insmod` 诊断 |
 | 推翻旧候选 | `sub_C1C5F34` 实际是 `fs_munmap` 的包装，与模块加载无关 |
 
-这条证据同时确认了 modlib 存在于固件、`insmod` 入口位置、重定位与构造函数确实被执行。
+这条证据同时确认了三点：固件中存在 modlib，`insmod` 入口的位置已经定位，重定位与构造函数确实被执行。
 
-### 断裂的部分
+### 证据链断裂的部分
 
 网络相关符号（`netdev_register`、`netdev_input`、`ipv4_input`、`socket` 等）全部引用同一个证据 ID：
 
@@ -166,7 +166,7 @@ local inserted = run(string.format("insmod %s %s", shell_quote(MODULE_PATH), MOD
 | UI / LVGL（`EVID-UI-*`，6 条） | 已证实，有专门证据 |
 | 网络（`EVID-NET-001`） | 待定，证据文件缺失 |
 
-加载机制可以直接使用；网络符号必须先反汇编函数体，确认出现预期的系统调用或数据结构访问后再依赖。
+加载机制可以直接使用；网络符号则需要先反汇编函数体，在确认出现预期的系统调用或数据结构访问之后再予依赖。
 
 ## 可直接使用的产物
 
@@ -175,7 +175,7 @@ local inserted = run(string.format("insmod %s %s", shell_quote(MODULE_PATH), MOD
 | `targets/xiaomi-band-10-pro-3.101.043/target.toml` | 加载器参数与重定位表，是编写模块的规格书 |
 | `generated/canopus_veneer.h` | 55 个硬编码 veneer，含 `register_driver`、`netdev_register` |
 | `symbols/*.json` | 259 条符号记录 |
-| `modules/platform/reference/exampleshello.c`、`build.sh` | 最小模块模板 |
+| `modules/platform/reference/examples/hello.c`、`build.sh` | 最小模块模板 |
 | `watchfaces/canopus-installer-prod/*/main.lua` | 交付与加载的现成脚本 |
 | `manager/` 源码 | 管理器界面实现 |
 

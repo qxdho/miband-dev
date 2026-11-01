@@ -18,7 +18,7 @@ contributors: [miband-dev]
 
 | 页面 | 内容 |
 | --- | --- |
-| [BLE 协议与配对鉴权](/platform/protocol/ble) | GATT 链路、服务端托管 key、huami-token 与 Gadgetbridge 配对 |
+| [BLE 协议与配对鉴权](/platform/protocol/ble) | GATT 链路、服务端托管密钥、huami-token 与 Gadgetbridge 配对 |
 | [网络通路](/platform/protocol/network) | TCP/IP over BLE、TUN、手机侧代理与 `fetch` 的实测故障模式 |
 | [QEMU 模拟器](/platform/tools/emulator) | 在 PC 上运行 10 Pro / 11 NFC 原厂固件 |
 | [逆向与复现](/platform/tools/reversing) | capstone、字符串与指针扫描、Thumb 字面量池、脚本清单与命令 |
@@ -39,7 +39,7 @@ contributors: [miband-dev]
 | [快应用示例](https://iot.mi.com/vela/quickapp/zh/samples/) | 官方示例工程 |
 | [澎湃 OS 快应用平台](https://dev.mi.com/xiaomihyperos/quickapp-develop) | 小米快应用的分发与平台信息 |
 
-表盘侧没有找到同等性质的公开开发文档；官方链路是表盘制作工具 → 小米运动健康 / 表盘市场，具体入口待补。
+表盘侧尚未发现同等性质的公开开发文档；官方流程为表盘制作工具、小米运动健康与表盘市场，具体入口待补充。
 
 ## 工具索引
 
@@ -53,7 +53,7 @@ contributors: [miband-dev]
 | AstroBox / OronBox / BandBurg | 第三方应用安装与管理 | 应用 | 兼容性随固件版本变化 |
 | [Mi8WfBinTool](https://github.com/zhy8388608/Mi8WfBinTool) | 表盘 `.bin` 打包与解包 | 表盘 | 第 8 代工具，9/10 兼容性需核实 |
 | [atc1441 工具集](https://github.com/atc1441/MiBand10-BES2700iMP-BEST1503-Hacking) | 固件与 SoC 研究 | 固件 | 英文资料，面向 Band 10 Pro |
-| [huami-token](https://codeberg.org/argrento/huami-token) | 从小米/Zepp 服务器取 BLE 配对 key | 协议 | 需要账号密码，MIT 许可 |
+| [huami-token](https://codeberg.org/argrento/huami-token) | 从服务器获取 BLE 配对密钥 | 协议 | 需要账号与密码，MIT 许可 |
 | [Gadgetbridge](https://gadgetbridge.org/) | 开源替代客户端，含配对与同步实现 | 协议、应用 | 支持的型号与功能随版本变化 |
 | [QEMU 模拟器](https://github.com/DDlhy/Miband-qemu-simulator) | 在 PC 上运行手环原厂固件 | 固件、原生 | 10 Pro / 11 NFC，图形与 NFC 不完整 |
 
@@ -62,4 +62,4 @@ contributors: [miband-dev]
 - 可追溯到原始出处（GitHub 仓库、官方站点或论坛原帖），不收录转载站与网盘；
 - 注明最后核对日期与对应固件版本；
 - 涉及刷机或解锁的工具必须附带风险提示，不收录一键封装工具；
-- 新增工具时在表格中增加一行，并更新 frontmatter 的 `verified`。
+- 新增工具时，应在表格中增加一行，并更新 frontmatter 的 `verified`。

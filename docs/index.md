@@ -29,11 +29,11 @@ features:
 
 <ModelMatrix />
 
-数据来源与字段说明见[机型能力矩阵](/start/models)。矩阵中无法确认的项填 `unknown`。
+数据来源与字段说明见[机型能力矩阵](/start/models)。无法确认的项目以 `unknown` 表示。
 
 ## 板块划分
 
-站点按应用形态分为三大板块，平台资料单独成层：
+站点按应用形态划分为三个主要板块，平台资料单独设为一层。
 
 | 板块 | 内容 | 入口 |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ features:
 | 平台与工具 | 固件、BLE 协议、逆向工具、外部资料与示例 | [平台与工具](/platform/) · [固件](/platform/firmware/) · [BLE](/platform/protocol/ble) · [工具索引](/platform/tools/) |
 | 关于 | 站点说明、研究历程与误判 | [关于本站](/about/) · [研究历程与误判](/about/history) |
 
-研究过程与被推翻的结论集中记录在[研究历程与误判](/about/history)。封存的地址视图与代码审查已迁入原生应用板块，见[控制中心与地址视图](/native/advanced/control-center)和[Chaos 代码审查](/native/frameworks/chaos-review)。
+研究过程与被推翻的结论集中记录于[研究历程与误判](/about/history)。封存的地址视图与代码审查已迁入原生应用板块，见[控制中心与地址视图](/native/advanced/control-center)和[Chaos 代码审查](/native/frameworks/chaos-review)。
 
 ## 声明
 

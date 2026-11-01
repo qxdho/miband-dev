@@ -12,11 +12,11 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号记录逐条给出名称、入口地址、可调用地址与 C 原型。模块能调用的固件函数全部来自这份清单。
+Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号记录逐条给出名称、入口地址、可调用地址与 C 原型。模块可调用的固件函数全部来自该清单。
 
-固件符号表已被剥离，模块加载器禁止导入符号（`symbol_imports = none`），调用只能依靠硬编码地址。259 条记录中有 55 条已封装为贴片函数。贴片函数的生成方式见[内核模块系统](/native/develop/modules)。
+固件符号表已被剥离，模块加载器禁止导入符号（`symbol_imports = none`），因此调用只能依靠硬编码地址。259 条记录中有 55 条已封装为贴片函数。贴片函数的生成方式见[内核模块系统](/native/develop/modules)。
 
-## 表的范围
+## 地址表的适用范围
 
 | 项 | 值 |
 | --- | --- |
@@ -31,7 +31,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | 已推翻 | 8 |
 | 禁止调用 | 17 |
 
-地址只对同一个 `firmware_sha256` 有效。更换固件版本后需要重新恢复整套地址，target pack 按 `firmware_sha256` 分目录存放即为此。
+地址仅对同一 `firmware_sha256` 有效。更换固件版本后需要重新恢复整套地址，target pack 按 `firmware_sha256` 分目录存放，原因即在于此。
 
 ## 状态与调用约定
 
@@ -42,22 +42,22 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `WITHDRAWN` | 已推翻 | 8 | 曾经收录，后因证据不足或地址被证伪而撤回 |
 | `FORBIDDEN` | 禁止调用 | 17 | target pack 明确禁止调用 |
 
-「禁止调用」是调用策略，不表示地址没有恢复。表中保留这些条目，用于说明哪些入口不可使用。
+「禁止调用」属于调用策略，并不表示地址尚未恢复。表中保留这些条目，用于说明哪些入口不可使用。
 
 | 字段 | 含义 |
 | --- | --- |
 | `entry_address` | 函数真实入口，末位为 0 |
 | `callable_address` | 实际写入函数指针的地址，等于 `entry_address` 按位或 1 |
-| `prototype` | 从 IDA 恢复的 C 原型，参数为 `void *` 者多为未细究的句柄 |
+| `prototype` | 从 IDA 恢复的 C 原型，参数为 `void *` 者多为尚未进一步辨明的句柄 |
 | `policy` | `native-full-trust`、`restricted`、`forbidden` 等调用策略 |
 
-`callable_address` 末位为 1 是 Thumb 位。`netdev_register` 的入口为 `0xc1fc214`，表中记录 `0xc1fc215`。Cortex-M33 只执行 Thumb 指令，函数指针最低位为 1 时按 Thumb 解码，漏掉这一位会以 ARM 模式跳转并触发 HardFault。详细原理见[内核模块系统](/native/develop/modules)。
+`callable_address` 末位为 1 是 Thumb 位。`netdev_register` 的入口为 `0xc1fc214`，表中记录 `0xc1fc215`。Cortex-M33 只执行 Thumb 指令，函数指针最低位为 1 时按 Thumb 解码；若遗漏这一位，处理器会以 ARM 模式跳转并触发 HardFault。详细原理见[内核模块系统](/native/develop/modules)。
 
 符号名前缀是 Canopus 的分类：`nuttx.` 为内核自带函数，`private_abi.` 为小米私有实现，`ui.` 为界面封装层。
 
 ## 符号表
 
-259 条记录按 target pack 的 13 个分组列出。地址列使用 `callable_address`，原型照 `prototype` 原样抄录。状态为「已推翻」的条目地址记为 `—`，原型记为 `withdrawn`，与 target pack 保持一致。
+259 条记录按 target pack 的 13 个分组列出。地址列采用 `callable_address`，原型按 `prototype` 原文录入。状态为「已推翻」的条目地址记为 `—`，原型记为 `withdrawn`，与 target pack 保持一致。
 
 ### 01 内存 · 锁 · 时间（9 条）
 
@@ -88,7 +88,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc1d0a29` | `open` | 打开文件或设备 | `int(const char *, int, ...)` | 推断 |
 | `0xc1d129d` | `read` | 读文件或设备 | `int32(int, void *, uint32_t)` | 推断 |
 | `0xc1affd9` | `register_blockdriver` | 注册块设备 | `int(const char *, const void *, uint32_t, void *)` | 已证实 |
-| `0xc1aff61` | `register_driver` | 注册字符设备（造一个 /dev 节点） | `int(const char *, const void *, uint32_t, void *)` | 推断 |
+| `0xc1aff61` | `register_driver` | 注册字符设备（创建一个 /dev 节点） | `int(const char *, const void *, uint32_t, void *)` | 推断 |
 | `0xc1d12e9` | `rename` | 重命名文件 | `int(const char *, const char *)` | 推断 |
 | `0xc1d2355` | `unlink` | 删除文件 | `int(const char *)` | 推断 |
 | `0xc1b009d` | `unregister_blockdriver` | 注销块设备 | `int(const char *)` | 已证实 |
@@ -117,17 +117,17 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 
 | 地址 | 符号 | 作用 | 原型 | 状态 |
 | --- | --- | --- | --- | --- |
-| `0xc71132d` | `app_net.connect_state_update` | 通知上层：网络隧道连接状态变了 | `int(int, int)` | 推断 |
+| `0xc71132d` | `app_net.connect_state_update` | 通知上层网络隧道连接状态发生变化 | `int(int, int)` | 推断 |
 | `0xc2e8759` | `interconnect_close` | 关闭跨设备连接 | `int(void *)` | 推断 |
 | `0xc2e85f5` | `interconnect_connect` | 建立跨设备连接（官方消息通道） | `int(void *, void *, const char *, canopus_interconnect_recv_cb)` | 推断 |
 | `—` | `interconnect_loop` | 跨设备事件循环（地址已撤） | `void *` | 已推翻 |
 | `0xc2e8685` | `interconnect_send` | 发一条跨设备消息 | `int(void *, const char *, const canopus_interconnect_message *, canopus_interconnect_send_done, void *)` | 推断 |
 | `0xc1f9689` | `nuttx.devif_poll` | 轮询网卡发送队列（NuttX 网络层） | `int(void *, void *)` | 推断 |
 | `0xc1e8e65` | `nuttx.gethostbyname_r` | DNS 域名解析（可重入版） | `int(const char *, void *, char *, size_t, int *, int)` | 推断 |
-| `0xc1f95c9` | `nuttx.ipv4_input` | 往 TCP/IP 栈里投一个 IPv4 包（收方向） | `int(void *)` | 推断 |
+| `0xc1f95c9` | `nuttx.ipv4_input` | 向 TCP/IP 栈注入一个 IPv4 包（接收方向） | `int(void *)` | 推断 |
 | `0xc201b41` | `nuttx.net_lock` | 加网络栈全局锁 | `int(void)` | 推断 |
-| `0xc201b51` | `nuttx.net_unlock` | 解网络栈全局锁 | `void(int)` | 推断 |
-| `0xc1fc9f5` | `nuttx.netdev_input` | 往网卡投一个收到的包 | `int(void *, void *, int)` | 推断 |
+| `0xc201b51` | `nuttx.net_unlock` | 释放网络栈全局锁 | `void(int)` | 推断 |
+| `0xc1fc9f5` | `nuttx.netdev_input` | 向网卡注入一个接收到的包 | `int(void *, void *, int)` | 推断 |
 | `0xc1fc215` | `nuttx.netdev_register` | 注册一个网卡（网络设备） | `int(void *, int)` | 推断 |
 | `0xc1d0b45` | `nuttx.poll_notify` | 唤醒正在 poll 等待的线程 | `void(void *, int, unsigned int)` | 推断 |
 | `0xc1fd571` | `nuttx.recvfrom` | 收 UDP 包 / 读 socket 数据 | `int32_t(int, void *, uint32_t, int, void *, uint32_t *)` | 推断 |
@@ -152,7 +152,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc179f01` | `lv_image_create` | 创建图片控件 | `void *(void *)` | 已证实 |
 | `0x0c143799` | `lv_image_decoder_get_info` | 取图片解码信息（宽高/格式） | `int(const void *src, void *header)` | 推断 |
 | `0xc17a2f5` | `lv_image_set_src` | 设置图片源 | `void(void *, const void *)` | 已证实 |
-| `0xc5883f1` | `lv_obj_add_event_cb` | 给控件绑事件回调 | `void(void *, canopus_lvx_event_cb, uint32_t, void *)` | 推断 |
+| `0xc5883f1` | `lv_obj_add_event_cb` | 为控件绑定事件回调 | `void(void *, canopus_lvx_event_cb, uint32_t, void *)` | 推断 |
 | `0xc588ef1` | `lv_obj_align_to` | 相对另一个控件对齐 | `void(void *, void *, uint32_t, int32_t, int32_t)` | 推断 |
 | `0x0c1068a9` | `lv_obj_get_style_prop` | 读控件的样式属性 | `uint32_t(void *obj, uint32_t part, uint32_t prop)` | 推断 |
 | `0xc589551` | `lv_obj_move_to_index` | 调整控件在父级里的层序 | `void (void *, int32_t)` | 已证实 |
@@ -169,16 +169,16 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | 地址 | 符号 | 作用 | 原型 | 状态 |
 | --- | --- | --- | --- | --- |
 | `0xca6a30d` | `app_install` | 安装一个原生应用到应用列表 | `int(const launcher_app_descriptor *, const firmware_page_descriptor *const *, uint32_t)` | 推断 |
-| `0xc513a45` | `app_launcher_add` | 往桌面（启动器）添加一个图标 | `int(uint16_t app_id)` | 推断 |
+| `0xc513a45` | `app_launcher_add` | 向桌面（启动器）添加一个图标 | `int(uint16_t app_id)` | 推断 |
 | `0xc513e91` | `app_launcher_data_init` | 初始化启动器的数据表 | `int(void)` | 推断 |
 | `0xc513b2d` | `app_launcher_del` | 从桌面移除一个图标 | `int(uint16_t)` | 推断 |
 | `0xca69935` | `app_lookup` | 按名字查找已安装的应用对象 | `void *(uint16_t app_id)` | 推断 |
-| `0xca69aa1` | `calendar_app_dispatch` | 把事件派发给日历应用 | `void(void *, uint32_t)` | 推断 |
+| `0xca69aa1` | `calendar_app_dispatch` | 将事件派发给日历应用 | `void(void *, uint32_t)` | 推断 |
 | `0xca69935` | `calendar_app_lookup` | 查找日历应用对象 | `void *(uint16_t)` | 推断 |
-| `0xca69e81` | `calendar_app_lookup_name` | 按名字查日历应用里的对象 | `void *(const char *)` | 推断 |
-| `0xca69e55` | `calendar_app_lookup_name_other` | 按名字查日历里另一类对象 | `void *(const char *)` | 推断 |
-| `0xca6996d` | `calendar_app_lookup_other` | 查日历里另一类对象 | `void *(uint16_t)` | 推断 |
-| `0xc4efde9` | `calendar_app_signal` | 给日历应用发一个信号 | `void(void *, uint32_t)` | 推断 |
+| `0xca69e81` | `calendar_app_lookup_name` | 按名字查询日历应用中的对象 | `void *(const char *)` | 推断 |
+| `0xca69e55` | `calendar_app_lookup_name_other` | 按名字查询日历中另一类对象 | `void *(const char *)` | 推断 |
+| `0xca6996d` | `calendar_app_lookup_other` | 查询日历中另一类对象 | `void *(uint16_t)` | 推断 |
+| `0xc4efde9` | `calendar_app_signal` | 向日历应用发送一个信号 | `void(void *, uint32_t)` | 推断 |
 | `0xc5141f1` | `hidden_and_show_app_cb` | 隐藏 / 显示应用的切换回调 | `int(launcher_msg_t *)` | 推断 |
 | `0xca9a899` | `lvx_notification_insert_message` | 插入一条系统通知 | `int(const firmware_notification_message *message)` | 推断 |
 | `0x0c589579` | `private_abi.launcher_parent` | 启动器的父对象 | `void *(void *object)` | 推断 |
@@ -201,7 +201,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc589491` | `lvx_label_set_text` | 设置标签文字 | `void(void *label, const char *text)` | 推断 |
 | `0xc4c8905` | `lvx_list_item_update` | 更新一个列表项的内容 | `int(void *, const char *, const char *, const char *, int32_t, uint8_t)` | 推断 |
 | `0xc54ca3d` | `lvx_list_row_create` | 创建一行列表项 | `void *(void *parent, const char *primary, const char *secondary, uint8_t trailing)` | 推断 |
-| `0xc4c8c61` | `lvx_list_row_trailing` | 设置列表行右侧的尾巴（箭头 / 图标 / 开关） | `void *(void *row)` | 推断 |
+| `0xc4c8c61` | `lvx_list_row_trailing` | 设置列表行右侧的尾部元素（箭头 / 图标 / 开关） | `void *(void *row)` | 推断 |
 | `0xc4ca0d9` | `lvx_msgbox_create` | 创建弹框 | `void *(void *parent, void *extra)` | 推断 |
 | `0xc4ca131` | `lvx_msgbox_set_content` | 设置弹框内容 | `void(void *box, uint32_t mode, const char *title, const char *body, const char *aux, const void *buttons, uint32_t count)` | 推断 |
 | `0xc589189` | `lvx_object_align` | 按规则对齐控件 | `void(void *object, uint32_t align, int32_t x, int32_t y)` | 推断 |
@@ -209,9 +209,9 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc588629` | `lvx_object_set_size` | 设置控件尺寸 | `void(void *object, int32_t width, int32_t height)` | 推断 |
 | `0xca67245` | `lvx_page_content_create` | 创建页面的内容区 | `void *(void *)` | 推断 |
 | `0xc4ca6c5` | `lvx_page_title_create` | 创建页面标题栏 | `void *(void *, const char *, uint32_t, canopus_lvx_event_cb, void *)` | 推断 |
-| `0xc4bf899` | `lvx_style_apply` | 给控件套一套样式 | `int(void *, const void *, uint32_t, uint32_t)` | 推断 |
+| `0xc4bf899` | `lvx_style_apply` | 为控件应用一组样式 | `int(void *, const void *, uint32_t, uint32_t)` | 推断 |
 | `0xc179db1` | `ui.lvx_image_set_scale` | 设置图片缩放比例 | `void(void *, int32_t, int32_t)` | 推断 |
-| `0xcac00c1` | `ui.lvx_object_add_flag` | 给控件加标志位 | `void(void *, uint32_t)` | 推断 |
+| `0xcac00c1` | `ui.lvx_object_add_flag` | 为控件添加标志位 | `void(void *, uint32_t)` | 推断 |
 
 ### 09 页面 · 导航（6 条）
 
@@ -219,7 +219,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | --- | --- | --- | --- | --- |
 | `0xca6b9e9` | `page_finish` | 结束当前页面、返回上一级 | `int32_t(void *page_descriptor)` | 推断 |
 | `0xca6c359` | `page_goto` | 跳转到指定页面 | `int32_t(uint32_t page_key, uint32_t start_data, uint32_t param, uint32_t callbacks)` | 推断 |
-| `0xc8fd12d` | `page_navigator_open_page` | 打开页面（框架内部，禁止直接调） | `function` | 禁止调用 |
+| `0xc8fd12d` | `page_navigator_open_page` | 打开页面（框架内部，禁止直接调用） | `function` | 禁止调用 |
 | `0xc8790ed` | `system_router_app_wrapper` | 应用包装器（框架内部，禁止） | `function` | 禁止调用 |
 | `0xc879285` | `system_router_get_pages_wrapper` | 取页面列表的包装器（框架内部，禁止） | `function` | 禁止调用 |
 | `—` | `system_router_page_record_wrapper` | 页面记录的包装器（框架内部，禁止） | `function` | 禁止调用 |
@@ -237,12 +237,12 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc3af281` | `bt_adapter_register_a2dp_callbacks` | 注册 A2DP（音乐）回调（禁止） | `int(void *, const void *)` | 禁止调用 |
 | `0xc3b0ce1` | `bt_adapter_register_hfp_ag_callbacks` | 注册 HFP-AG（通话）回调（禁止） | `int(void *, const void *)` | 禁止调用 |
 | `0xc3af451` | `bt_adapter_unregister` | 注销蓝牙适配器 | `int32(void *, uint32_t)` | 推断 |
-| `0xc3b60a1` | `bt_get_pairing_state` | 查当前配对流程的状态 | `uint32(const uint8_t *, uint32_t)` | 推断 |
+| `0xc3b60a1` | `bt_get_pairing_state` | 查询当前配对流程的状态 | `uint32(const uint8_t *, uint32_t)` | 推断 |
 | `0xc805b0d` | `bt_l2cap_connect` | 建立 L2CAP 通道 | `uint32_t(const void *)` | 推断 |
 | `0xc3aff65` | `bt_pair_display_reply` | 回复配对时的“显示码一致”确认 | `int32(void *, const uint8_t *, int32_t, int32_t)` | 推断 |
 | `0xc3b0051` | `bt_pair_request_reply` | 回复配对请求（同意 / 拒绝） | `int32(void *, const uint8_t *, int32_t)` | 推断 |
 | `0xc3aeb09` | `bt_socket_server_receive` | 蓝牙 socket 事件循环收包（内部，禁止） | `internal event-source/revents/server-state callback` | 禁止调用 |
-| `—` | `btsnoop_avdtp_recognizer` | 识别 btsnoop 日志里的 AVDTP 包（地址已撤） | `withdrawn` | 已推翻 |
+| `—` | `btsnoop_avdtp_recognizer` | 识别 btsnoop 日志中的 AVDTP 包（地址已撤） | `withdrawn` | 已推翻 |
 | `0x20126738` | `core_bt_adapter_instance` | 底层蓝牙适配器实例指针 | `void *` | 推断 |
 | `—` | `core_bt_callback_table` | 底层蓝牙回调表（地址已撤） | `const uint32_t[16]` | 已推翻 |
 | `0xc709e91` | `core_bt_pair_request_callback` | 底层配对请求回调 | `int(void *, const uint8_t *)` | 推断 |
@@ -257,20 +257,20 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc3af525` | `private_abi.bt_discovery_start` | 开始扫描附近蓝牙设备 | `int(void *, int)` | 推断 |
 | `0xc3af551` | `private_abi.bt_discovery_stop` | 停止扫描 | `int(void *)` | 推断 |
 | `0xc840c61` | `private_abi.bt_free` | 蓝牙协议栈的堆释放 | `int(void *)` | 推断 |
-| `0xc3b5a61` | `private_abi.bt_get_bond_state` | 查某个地址的配对状态 | `uint32_t(const uint8_t *)` | 推断 |
+| `0xc3b5a61` | `private_abi.bt_get_bond_state` | 查询某个地址的配对状态 | `uint32_t(const uint8_t *)` | 推断 |
 | `0xc805b39` | `private_abi.bt_l2cap_disconnect` | 断开 L2CAP 通道 | `int(const void *)` | 推断 |
 | `0x2013BDBC` | `private_abi.bt_l2cap_owner` | 取当前 L2CAP 的拥有者句柄 | `void *` | 推断 |
 | `0xc805be9` | `private_abi.bt_l2cap_submit_cid` | 注册一个 L2CAP CID 的处理入口 | `int(void *, uint16_t)` | 推断 |
-| `0xc7eb9cd` | `private_abi.bt_queue_external` | 把外部数据排进蓝牙发送队列 | `int(void *, void *, void *, void *, uint8_t)` | 推断 |
+| `0xc7eb9cd` | `private_abi.bt_queue_external` | 将外部数据排入蓝牙发送队列 | `int(void *, void *, void *, void *, uint8_t)` | 推断 |
 | `0xc6b9cf1` | `private_abi.bt_queue_free` | 释放蓝牙发送队列 | `int(void *)` | 推断 |
 | `0xc3b697d` | `private_abi.bt_remove_bond_private` | 删除某个地址的配对记录 | `int(const uint8_t *, uint32_t)` | 推断 |
-| `0xc7eb271` | `private_abi.bt_timer_add` | 给蓝牙协议栈加定时器 | `uint32_t(void *, uint32_t, uint8_t, void *, void *, const uint8_t *, uint32_t)` | 推断 |
+| `0xc7eb271` | `private_abi.bt_timer_add` | 为蓝牙协议栈添加定时器 | `uint32_t(void *, uint32_t, uint8_t, void *, void *, const uint8_t *, uint32_t)` | 推断 |
 | `0xc7eb33d` | `private_abi.bt_timer_cancel` | 取消蓝牙定时器 | `int(uint32_t *)` | 推断 |
 | `0x2013C144` | `private_abi.gap_host_receive_slot` | HCI 收包回调的函数指针槽（可挂钩） | `int (*)(void *state, uint8_t *packet, int packet_length)` | 推断 |
 | `0xc7ec47d` | `private_abi.gap_host_stock_receive` | 系统默认的 HCI 收包处理 | `int(void *, uint8_t *, int)` | 推断 |
 | `0xc80a685` | `private_abi.sdp_builder_create` | 创建 SDP 记录构造器 | `void *(uint32_t, uint16_t, uint16_t, uint8_t, const uint8_t *)` | 推断 |
-| `0xc808649` | `private_abi.sdp_commit` | 提交 SDP 记录（= 注册一个蓝牙服务） | `uint32_t(void *)` | 推断 |
-| `0xc808245` | `private_abi.sdp_set_raw_attribute` | 给 SDP 记录设一条原始属性 | `uint8_t *(void *, uint16_t, uint16_t, uint16_t, const void *)` | 推断 |
+| `0xc808649` | `private_abi.sdp_commit` | 提交 SDP 记录（等同于注册一个蓝牙服务） | `uint32_t(void *)` | 推断 |
+| `0xc808245` | `private_abi.sdp_set_raw_attribute` | 为 SDP 记录设置一条原始属性 | `uint8_t *(void *, uint16_t, uint16_t, uint16_t, const void *)` | 推断 |
 | `0xc80a735` | `private_abi.sdp_unregister` | 注销 SDP 记录 | `int(uint32_t)` | 推断 |
 | `0x2CD4A744` | `private_abi.stock_bt_callback_descriptor` | 系统自带蓝牙回调描述符（只读 17 字） | `const uint32_t[17]` | 推断 |
 | `0xc19f105` | `vendor_hci_transport_register` | 注册厂商 HCI 传输层（禁止） | `int(int, char)` | 禁止调用 |
@@ -279,14 +279,14 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 
 | 地址 | 符号 | 作用 | 原型 | 状态 |
 | --- | --- | --- | --- | --- |
-| `0x0c86037d` | `font_manager_add_path` | 往字体管理器注册一个字体文件路径 | `void *(const char *name, const char *path)` | 推断 |
+| `0x0c86037d` | `font_manager_add_path` | 向字体管理器注册一个字体文件路径 | `void *(const char *name, const char *path)` | 推断 |
 | `0x0c860399` | `font_manager_remove_path` | 移除已注册的字体路径 | `void(uint32_t node)` | 推断 |
-| `0x1c057c51` | `lvgl_posix_open` | LVGL 内部的文件打开（走 POSIX） | `function` | 推断 |
+| `0x1c057c51` | `lvgl_posix_open` | LVGL 内部的文件打开（经由 POSIX） | `function` | 推断 |
 | `0x0c1666d1` | `private_abi.font_reload_cache_acquire` | 取一份字体缓存 | `void *(void *cache, const void *key, void *user_data)` | 推断 |
-| `0x0c166741` | `private_abi.font_reload_cache_acquire_or_create` | 取字体缓存，没有就新建 | `void *(void *cache, const void *key, void *user_data)` | 推断 |
+| `0x0c166741` | `private_abi.font_reload_cache_acquire_or_create` | 取字体缓存，不存在时创建 | `void *(void *cache, const void *key, void *user_data)` | 推断 |
 | `0x2cce571c` | `private_abi.font_reload_count_cache_class` | 字体“字符数缓存”的控件类 | `data` | 推断 |
 | `0x0c272d39` | `private_abi.font_reload_count_cache_init` | 初始化字符数缓存 | `int(void *cache)` | 推断 |
-| `0x2010317c` | `private_abi.font_reload_display_list` | 把字体列表显示出来 | `global` | 推断 |
+| `0x2010317c` | `private_abi.font_reload_display_list` | 显示字体列表 | `global` | 推断 |
 | `0x201032a4` | `private_abi.font_reload_draw_unit_slot` | 字体绘制单元的函数槽 | `global` | 推断 |
 | `0x0c163be9` | `private_abi.font_reload_drop_face_id` | 丢弃某个 face id 的字体 | `void(void *context, const char *path)` | 推断 |
 | `0x1c05682d` | `private_abi.font_reload_face_compare` | 比较两个字体 face 是否相同 | `function` | 推断 |
@@ -299,7 +299,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0x1c046cfd` | `private_abi.font_reload_glyph_pending_release` | 延迟释放字形 | `function` | 推断 |
 | `0x1c0493bd` | `private_abi.font_reload_gradient_pending_release` | 延迟释放渐变 | `function` | 推断 |
 | `0x1c04d259` | `private_abi.font_reload_image_pending_release` | 延迟释放图像 | `function` | 推断 |
-| `0x0c169ce9` | `private_abi.font_reload_list_remove` | 从字体链表里摘掉一项 | `void(void *list, void *node)` | 推断 |
+| `0x0c169ce9` | `private_abi.font_reload_list_remove` | 从字体链表中移除一项 | `void(void *list, void *node)` | 推断 |
 | `0x0c16dae5` | `private_abi.font_reload_lv_free` | 字体模块用的 LVGL free | `void(void *memory)` | 推断 |
 | `0x20103178` | `private_abi.font_reload_lv_initialized` | 查询 LVGL 是否已初始化 | `global` | 推断 |
 | `0x0c16daa9` | `private_abi.font_reload_lv_malloc` | 字体模块用的 LVGL malloc | `void *(uint32_t size)` | 推断 |
@@ -313,7 +313,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0x1c046d09` | `private_abi.font_reload_outline_event` | 矢量轮廓的事件回调 | `function` | 推断 |
 | `0x1c057289` | `private_abi.font_reload_outline_release` | 释放矢量轮廓 | `function` | 推断 |
 | `0x2cce56f4` | `private_abi.font_reload_size_cache_class` | 字体“尺寸缓存”的控件类 | `data` | 推断 |
-| `0x2010319c` | `private_abi.font_reload_style_refresh_enabled` | 查询样式刷新是否开着 | `global` | 推断 |
+| `0x2010319c` | `private_abi.font_reload_style_refresh_enabled` | 查询样式刷新是否启用 | `global` | 推断 |
 | `0x1c03debd` | `private_abi.font_reload_sw_dispatch` | 软件渲染分发 | `function` | 推断 |
 | `0x20103174` | `private_abi.font_reload_uikit_slot` | UIKit 的函数槽 | `global` | 推断 |
 | `0x2013eae0` | `private_abi.font_reload_vector_cache_slot` | 矢量缓存的函数槽 | `global` | 推断 |
@@ -329,10 +329,10 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | 地址 | 符号 | 作用 | 原型 | 状态 |
 | --- | --- | --- | --- | --- |
 | `0xca6a005` | `calendar_icon_notify` | 取日历的通知图标 | `void(const char *)` | 推断 |
-| `0x0c5881c1` | `private_abi.background_object_has_flag` | 查后台对象有没有某个标志位 | `int(void *object, unsigned int flags)` | 推断 |
+| `0x0c5881c1` | `private_abi.background_object_has_flag` | 查询后台对象是否具有某个标志位 | `int(void *object, unsigned int flags)` | 推断 |
 | `0x0c588961` | `private_abi.background_object_hide` | 隐藏后台对象 | `void(void *object, unsigned int flags)` | 推断 |
 | `0x0c5891b1` | `private_abi.background_object_show` | 显示后台对象 | `void(void *object, unsigned int flags)` | 推断 |
-| `0x0ca41585` | `private_abi.calendar_eventbus_send` | 往日历事件总线投一个事件 | `int (uint32_t code, void *payload, uint32_t sync)` | 推断 |
+| `0x0ca41585` | `private_abi.calendar_eventbus_send` | 向日历事件总线投递一个事件 | `int (uint32_t code, void *payload, uint32_t sync)` | 推断 |
 | `0x0c4bf87d` | `private_abi.calendar_font_day` | 取日历“日”数字用的字体 | `uint32_t (void *font_desc)` | 推断 |
 | `0x0c1e5c39` | `private_abi.calendar_localized_text` | 取日历的本地化文案 | `const char *(const char *key)` | 推断 |
 | `0x0c4e35ad` | `private_abi.calendar_localtime` | 取本地时间（日历用） | `void (int64_t seconds, void *tm_out)` | 推断 |
@@ -349,19 +349,19 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0x0c4c22cd` | `private_abi.p67_battery_native_event` | 电量控件的原生事件处理 | `void (const void *class_p, void *event)` | 推断 |
 | `0x2010fe60` | `private_abi.p67_battery_status_slot` | 电量状态数据的函数槽 | `global` | 推断 |
 | `0x0c588f89` | `private_abi.p67_blur_cache_clean` | 清空模糊缓存 | `int(uint32_t id, void *address, uint32_t length)` | 推断 |
-| `0x0c588449` | `private_abi.p67_blur_cache_invalidate` | 让模糊缓存失效 | `int(uint32_t id, void *address, uint32_t length)` | 推断 |
+| `0x0c588449` | `private_abi.p67_blur_cache_invalidate` | 使模糊缓存失效 | `int(uint32_t id, void *address, uint32_t length)` | 推断 |
 | `0x0c50b9f1` | `private_abi.p67_blur_crossview_callback` | 跨视图模糊的回调 | `void(void *event)` | 推断 |
 | `0x0c587f39` | `private_abi.p67_blur_draw_buf_create` | 创建一块绘图缓冲 | `void *(uint32_t width, uint32_t height, uint32_t format, uint32_t stride)` | 推断 |
 | `0x0cac0db9` | `private_abi.p67_blur_draw_buf_destroy` | 销毁绘图缓冲 | `void(void *buf)` | 推断 |
-| `0x1c07a3e9` | `private_abi.p67_blur_event_list_add` | 往模糊事件链表加一项 | `uint32_t (uint32_t list, uint32_t cb, uint32_t filter, uint32_t userdata)` | 推断 |
+| `0x1c07a3e9` | `private_abi.p67_blur_event_list_add` | 向模糊事件链表添加一项 | `uint32_t (uint32_t list, uint32_t cb, uint32_t filter, uint32_t userdata)` | 推断 |
 | `0x1c07ab49` | `private_abi.p67_blur_event_list_count` | 模糊事件链表的长度 | `uint32_t (uint32_t list)` | 推断 |
 | `0x1c07a4b1` | `private_abi.p67_blur_event_list_get` | 取模糊事件链表第 N 项 | `uint32_t (uint32_t list, uint32_t index)` | 推断 |
 | `0x1c07a6f9` | `private_abi.p67_blur_event_list_remove` | 从模糊事件链表移除一项 | `int (uint32_t list, uint32_t index)` | 推断 |
-| `0x0c187bb1` | `private_abi.p67_blur_gpu_finish` | 等 GPU 把画面画完 | `int(void)` | 推断 |
+| `0x0c187bb1` | `private_abi.p67_blur_gpu_finish` | 等待 GPU 完成绘制 | `int(void)` | 推断 |
 | `0x200eb538` | `private_abi.p67_blur_pm_lock` | 电源管理锁的状态 | `global` | 推断 |
 | `0xc1a79b5` | `private_abi.p67_blur_pm_relax` | 释放电源管理锁 | `int (uint32_t lock)` | 推断 |
 | `0xc1a78f1` | `private_abi.p67_blur_pm_stay` | 保持电源管理锁不释放 | `int (uint32_t lock)` | 推断 |
-| `0x0cac0879` | `private_abi.p67_blur_snapshot_to_buffer` | 把控件树渲染成位图写进内存（= 截屏） | `int (uint32_t root, uint32_t format, uint32_t owned_drawbuf)` | 推断 |
+| `0x0cac0879` | `private_abi.p67_blur_snapshot_to_buffer` | 将控件树渲染为位图并写入内存（等同于截屏） | `int (uint32_t root, uint32_t format, uint32_t owned_drawbuf)` | 推断 |
 | `0x0c589449` | `private_abi.p67_blur_style_get` | 读模糊相关的样式属性 | `uint32_t(void *obj, uint32_t selector, uint32_t prop)` | 推断 |
 | `0x2cd1f640` | `private_abi.p67_blur_watchface_root_class` | 表盘根控件的控件类 | `global` | 推断 |
 | `0x0c50abb5` | `private_abi.widgets_scroll` | 控件页的滚动 | `void(void *event)` | 推断 |
@@ -383,7 +383,7 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `0xc599671` | `sport_titlebar_dispatch` | 运动标题栏的事件分发（禁止） | `function` | 禁止调用 |
 | `—` | `sport_titlebar_lifecycle_reset` | 运动标题栏的生命周期重置（禁止） | `function` | 禁止调用 |
 
-## CSV 获取
+## CSV 数据文件
 
 平铺数据位于仓库的 `research/地址表.csv`，一行一条符号，共 259 行数据。文件可直接下载：[地址表.csv](https://github.com/qxdho/miband-dev/blob/main/research/地址表.csv)。
 
@@ -401,17 +401,17 @@ Canopus 地址手册是固件 `3.101.043` 的函数地址清单，259 条符号�
 | `policy` | 调用策略 |
 | `notes` | 恢复来源与备注 |
 
-CSV 由 `tools/canopus_symbols.js` 从 target pack 的 259 个符号 JSON 直接生成，不是手抄。
+CSV 由 `tools/canopus_symbols.js` 从 target pack 的 259 个符号 JSON 直接生成，并非手工抄录。
 
-## 可做性分析
+## 可行性分析
 
-前提是 `callable_address` 直接作为函数指针使用，原型照 `prototype` 抄录，Thumb 位已经置 1。212 条「推断」地址没有在真机调用过，第一次调用需要兜底。
+分析前提是 `callable_address` 直接作为函数指针使用，原型按 `prototype` 录入，且 Thumb 位已经置 1。212 条「推断」地址未在真机调用过，首次调用需要准备回退方案。
 
 ### 已验证的路径
 
 | 能力 | 需要的符号 | 先例 |
 | --- | --- | --- |
-| 往桌面添加原生应用图标 | `app_install`、`app_launcher_add`、`protobuf_set_ordered_app_list` | Chaos |
+| 向桌面添加原生应用图标 | `app_install`、`app_launcher_add`、`protobuf_set_ordered_app_list` | Chaos |
 | 接管界面并自绘页面 | `lvx_page_content_create`、`lvx_page_title_create`、`lv_*` 系列、`lvx_list_row_create` | Canopus |
 | 更换字体 | `font_manager_add_path` | 未见 |
 | 弹出系统通知 | `lvx_notification_insert_message`，配合 `types/firmware_notification_message.json` | 未见 |
@@ -421,23 +421,23 @@ CSV 由 `tools/canopus_symbols.js` 从 target pack 的 259 个符号 JSON 直接
 
 | 方向 | 函数组合 | 能力 |
 | --- | --- | --- |
-| 手环截屏 | `p67_blur_snapshot_to_buffer`、`p67_blur_draw_buf_create`、`p67_blur_gpu_finish`、`p67_blur_draw_buf_destroy`、`write` | 把控件树渲染为位图写入 `/data`，手环本身没有截屏功能 |
+| 手环截屏 | `p67_blur_snapshot_to_buffer`、`p67_blur_draw_buf_create`、`p67_blur_gpu_finish`、`p67_blur_draw_buf_destroy`、`write` | 将控件树渲染为位图并写入 `/data`，手环本身没有截屏功能 |
 | 蓝牙自定义服务与 HID | `bt_adapter_register`、`gap_host_receive_slot`、`sdp_builder_create`、`sdp_commit`、`sdp_set_raw_attribute`、`sdp_unregister` | 挂钩 HCI 收包并注册自定义 SDP 记录，可做蓝牙键盘、媒体遥控器或自定义 BLE 服务 |
-| 通知与日程注入 | `calendar_eventbus_send`、`calendar_app_lookup_name` | 往日历事件总线投递事件，取得日历应用对象 |
+| 通知与日程注入 | `calendar_eventbus_send`、`calendar_app_lookup_name` | 向日历事件总线投递事件，取得日历应用对象 |
 | 系统服务对象 | `service_manager_get_profile`、`service_manager_register` | 读取服务 profile 指针，两者都属「已证实」 |
-| 自造 `/dev` 节点 | `register_driver`、`unregister_driver` | 注册字符设备，结构定义在 `types/file_operations.json` |
+| 自行创建 `/dev` 节点 | `register_driver`、`unregister_driver` | 注册字符设备，结构定义在 `types/file_operations.json` |
 | 文件系统读写 | `open`、`read`、`write`、`lseek`、`rename`、`unlink`、`errno_location` | 读写 `/data` 下的文件，不依赖 root shell |
 | 精确计时 | `clock_gettime` | 读取系统时钟，配合 `types/stock_timespec.json` |
 
-`gap_host_receive_slot` 位于 `0x2013C144`，是全局函数指针槽，类型为 `int (*)(void *state, uint8_t *packet, int packet_length)`，可以直接挂钩收 HCI 包。
+`gap_host_receive_slot` 位于 `0x2013C144`，是全局函数指针槽，类型为 `int (*)(void *state, uint8_t *packet, int packet_length)`，可直接挂钩 HCI 收包。
 
-截屏按三步执行：`p67_blur_draw_buf_create` 开绘图缓冲，`p67_blur_snapshot_to_buffer` 抓取控件树，`p67_blur_gpu_finish` 等待 GPU 绘制完成后用 `write` 落盘。
+截屏按三个步骤执行：`p67_blur_draw_buf_create` 创建绘图缓冲，`p67_blur_snapshot_to_buffer` 抓取控件树，`p67_blur_gpu_finish` 等待 GPU 绘制完成后由 `write` 写入文件。
 
 ### 禁止调用的符号
 
 | 符号 | 原因 |
 | --- | --- |
-| `page_navigator_open_page`、`system_router_app_wrapper`、`system_router_get_pages_wrapper`、`system_router_page_record_wrapper` | 换页会打乱框架的页面栈 |
+| `page_navigator_open_page`、`system_router_app_wrapper`、`system_router_get_pages_wrapper`、`system_router_page_record_wrapper` | 切换页面会打乱框架的页面栈 |
 | `controller_crash_dump` | 主动触发控制器崩溃转储 |
 | `pthread_create_internal`、`public_work_queue` | 线程与工作队列契约未恢复 |
 | `bt_adapter_register_a2dp_callbacks`、`bt_adapter_register_hfp_ag_callbacks`、`hfp_ag_connect`、`hfp_ag_disconnect`、`offload_property_apply` | 回调结构体未恢复 |
@@ -446,9 +446,9 @@ CSV 由 `tools/canopus_symbols.js` 从 target pack 的 259 个符号 JSON 直接
 
 ### 网络链路
 
-网络组 17 条符号已经覆盖完整链路：`netdev_register` 注册网卡，`ipv4_input` 与 `netdev_input` 注入收包，`devif_poll` 与 `poll_notify` 驱动轮询，`socket`、`sendto`、`recvfrom` 提供套接字接口，`gethostbyname_r` 提供 DNS 解析，`net_lock` 与 `net_unlock` 保护网络栈，外加 `heap_malloc`、`heap_zalloc`、`heap_free` 负责缓冲分配。缺的部分是 TUN 驱动本体，第一步是用 `register_driver` 注册一个自定义字符设备。
+网络组 17 条符号已经覆盖完整链路：`netdev_register` 注册网卡，`ipv4_input` 与 `netdev_input` 注入收包，`devif_poll` 与 `poll_notify` 驱动轮询，`socket`、`sendto`、`recvfrom` 提供套接字接口，`gethostbyname_r` 提供 DNS 解析，`net_lock` 与 `net_unlock` 保护网络栈；缓冲分配由 `heap_malloc`、`heap_zalloc`、`heap_free` 负责。尚缺的部分是 TUN 驱动本体，第一步是使用 `register_driver` 注册自定义字符设备。
 
-网络组全部标注引用 `EVID-NET-001`，`evidence/` 目录中没有这个文件，38 个证据文件只覆盖 BT、UI、IO、FONT、MODLIB 系列。这条证据链比其他组薄，`netdev_register` 的地址需要独立复核后才能用于生产。
+网络组全部标注引用 `EVID-NET-001`，`evidence/` 目录中没有这个文件，38 个证据文件只覆盖 BT、UI、IO、FONT、MODLIB 系列。这条证据链弱于其他组，`netdev_register` 的地址需要独立复核后才能用于生产。
 
 ## 相关页面
 

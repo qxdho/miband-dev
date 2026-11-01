@@ -12,15 +12,15 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-Canopus 管理器的界面在快速点击时会错乱与重叠，成因是四个独立缺陷叠加，并非单一 bug。两个主因分别是在按钮自身的事件回调里销毁 msgbox，以及就地复用控件并留下五处提前返回；另外两个缺陷放大了触发频率，即分派不区分页面、查找不保证唯一。
+Canopus 管理器的界面在快速点击时会出现错乱与重叠。其成因是四个独立缺陷的叠加：两个主要原因分别是在按钮自身的事件回调中销毁 msgbox，以及就地复用控件并保留五处提前返回；另外两个缺陷提高了触发频率，即事件分派不区分页面、控件查找不保证唯一。
 
 ## 界面结构
 
-管理器界面由固定槽位的 backend 与页面栈组成，控件复用而不重建。
+管理器界面由固定槽位的 backend 与页面栈组成，控件以复用方式维护，不做重建。
 
-代码位于 `manager/target/lvgl_v9/canopus_manager_target_lvgl_v9.c`，1451 行；另有 `lvgl_v8` 版 1174 行，逻辑同构。
+代码位于 `manager/target/lvgl_v9/canopus_manager_target_lvgl_v9.c`，共 1451 行；另有 `lvgl_v8` 版本 1174 行，逻辑与之一致。
 
-容量按槽位写死：
+容量按槽位以常量固定：
 
 ```c
 #define CANOPUS_TARGET_UI_MAX_ROWS     25u
@@ -29,7 +29,7 @@ Canopus 管理器的界面在快速点击时会错乱与重叠，成因是四个
 #define CANOPUS_TARGET_UI_MAX_PROGRESS  4u
 ```
 
-页面上下文：
+页面上下文定义如下：
 
 ```c
 struct canopus_target_page_context {
@@ -40,7 +40,7 @@ struct canopus_target_page_context {
 static struct canopus_target_page_context manager_pages[CANOPUS_TARGET_PAGE_COUNT];
 ```
 
-`backend` 按槽位保存句柄与绑定：
+`backend` 按槽位保存句柄与绑定关系：
 
 | 字段 | 数量 | 内容 |
 | --- | ---: | --- |
@@ -51,11 +51,11 @@ static struct canopus_target_page_context manager_pages[CANOPUS_TARGET_PAGE_COUN
 | `row_kinds[25]` | 25 | 行类型 |
 | `bindings[25]` | 25 | `{ event_id, generation, key }` |
 
-`bindings[row_index].generation` 是设计者预留的「代」，用于判断绑定是否过期。该字段在 1012 行附近赋值，但缺陷三的分派逻辑没有使用它。
+`bindings[row_index].generation` 是设计者预留的「代」，用于判断绑定是否过期。该字段在 1012 行附近完成赋值，但缺陷三的分派逻辑未使用该字段。
 
 ## 控件类
 
-固件注册了 38 个 LVGL 控件类，基类 `lv_obj_class` 位于 `0x2CCE0308`。`constructor` 为 `0x0` 表示该类没有独立构造函数，实例由组合控件或父类路径创建。类表来自 `research/lvgl-map.md`，对应 p67 的 `vela_ap.bin`。
+固件注册了 38 个 LVGL 控件类，基类 `lv_obj_class` 位于 `0x2CCE0308`。`constructor` 为 `0x0` 表示该类没有独立构造函数，实例由组合控件或父类路径创建。类表数据取自 `research/lvgl-map.md`，对应 p67 的 `vela_ap.bin`。
 
 | 控件 | 类 VA | 构造函数 | event_cb | instance_size |
 | --- | --- | --- | --- | --- |
@@ -100,7 +100,7 @@ static struct canopus_target_page_context manager_pages[CANOPUS_TARGET_PAGE_COUN
 
 ## 页面生命周期
 
-`active` 与 `interactive` 是两个独立标志。`on_pause` 只清 `interactive`，因此可以有多个页面同时 `active`，管理器内的 `manager_active_pages` 计数器与此一致。
+`active` 与 `interactive` 是两个相互独立的标志。`on_pause` 仅清除 `interactive`，因此多个页面可同时处于 `active` 状态；管理器内的 `manager_active_pages` 计数器与此一致。
 
 | 回调 | 行号 | 行为 |
 | --- | ---: | --- |
@@ -111,7 +111,7 @@ static struct canopus_target_page_context manager_pages[CANOPUS_TARGET_PAGE_COUN
 
 ## 事件派发顺序
 
-LVGL 的事件派发是遍历式的，回调执行期间被删除的对象仍留在链表中。
+LVGL 的事件派发采用遍历方式，回调执行期间被删除的对象仍会留在链表中。
 
 ```
 lv_event_send(msgbox, LV_EVENT_CLICKED)
@@ -123,17 +123,17 @@ lv_event_send(msgbox, LV_EVENT_CLICKED)
     → 继续访问链表里的下一个节点      ← 悬空指针
 ```
 
-派发期间删除对象会让链表节点悬空，后果取决于被释放的内存有没有被复用。这就是错乱表现为「有时候」的原因。
+派发期间删除对象会使链表节点悬空，其后果取决于被释放的内存是否已被复用。错乱之所以表现为偶发现象，原因即在于此。
 
 | 内存状态 | 表现 |
 | --- | --- |
-| 还没被复用 | 看起来正常 |
-| 已被复用 | 花屏、内容错位、控件叠在一起 |
+| 尚未被复用 | 显示正常 |
+| 已被复用 | 花屏、内容错位、控件相互叠加 |
 | 结构被改 | 死机 |
 
-## 缺陷一：在自己的回调里销毁 msgbox
+## 缺陷一：在自身回调中销毁 msgbox
 
-`target_dialog_event`（613 行）是 msgbox 上按钮的事件回调。点击「确定」时，回调调用 `target_dialog_dismiss`（601 行），后者直接对同一个 msgbox 调 `FW_LVX_OBJECT_DELETE`。
+`target_dialog_event`（613 行）是 msgbox 上按钮的事件回调。点击「确定」时，该回调调用 `target_dialog_dismiss`（601 行），后者直接对同一个 msgbox 调用 `FW_LVX_OBJECT_DELETE`。
 
 ```c
 // 601
@@ -150,11 +150,11 @@ static void target_dialog_dismiss(struct canopus_target_ui_backend *backend)
 }
 ```
 
-`target_dialog_event` 把页面编号存在 binding key 的高字节，语义 key 存在低 24 位。
+`target_dialog_event` 将页面编号存放在 binding key 的高字节，将语义 key 存放在低 24 位。
 
-### 修法
+### 修改方案
 
-回调里只置标记，把删除推迟到事件上下文之外：
+回调内仅设置标记，将删除操作推迟到事件上下文之外执行：
 
 ```c
 // 回调里只置标记
@@ -169,11 +169,11 @@ static void target_dialog_reap(struct canopus_target_ui_backend *backend)
 }
 ```
 
-Chaos 采用同一做法，见 `ui.rs:108` 的 `render_req`。
+Chaos 采用相同做法，参见 `ui.rs:108` 的 `render_req`。
 
-## 缺陷二：就地复用与提前返回
+## 缺陷二：就地复用与提前返回路径
 
-`target_ui_apply`（695–1056）是增量协调逻辑：页面数据变化时不重建控件，尽量复用已有的行、标签与图片。末尾 1036–1052 有一段隐藏多余控件的循环，把本次未使用的槽位设为隐藏。这段循环之前有五处提前返回，任何一条命中都会跳过隐藏。
+`target_ui_apply`（695–1056）是增量协调逻辑：页面数据变化时不重建控件，尽量复用已有的行、标签与图片。文件末尾 1036–1052 行包含一段隐藏多余控件的循环，将本次未使用的槽位设为隐藏。该循环之前存在五处提前返回，任意一处命中都会跳过隐藏步骤。
 
 ```c
 for (i = row_count; i < CANOPUS_TARGET_UI_MAX_ROWS; i++) {
@@ -189,10 +189,10 @@ for (i = row_count; i < CANOPUS_TARGET_UI_MAX_ROWS; i++) {
 | 997 | 控件创建失败 |
 | 1004 | 布局失败 |
 
-由此产生两个独立的坏结果。
+由此产生两类独立的异常结果。
 
-1. 脏几何：复用旧控件时，`align_to` 读到上一轮的坐标与尺寸，新内容的宽度尚未算出，对齐基于旧值，于是错位与重叠。
-2. 半渲染：提前返回跳过隐藏循环，上一帧可见、这一帧该隐藏的行仍然显示，视觉上新旧内容叠在一起。
+1. 脏几何：复用旧控件时，`align_to` 读取的是上一轮的坐标与尺寸，新内容的宽度尚未计算，对齐结果基于旧值，导致错位与重叠。
+2. 半渲染：提前返回跳过隐藏循环，上一帧可见而本帧应隐藏的行仍然显示，在视觉上新旧内容相互叠加。
 
 1019 行另有一处细节：
 
@@ -200,11 +200,11 @@ for (i = row_count; i < CANOPUS_TARGET_UI_MAX_ROWS; i++) {
 update_row(object, NULL, primary, secondary, 0, selected);
 ```
 
-第二个参数是 `NULL`，尾随控件（trailing）在创建时固定，后续更新不改它。一行的 `kind` 在「有开关」与「无开关」之间变化时，尾随部分不跟随，直接造成视觉重叠。
+第二个参数为 `NULL`，尾随控件（trailing）在创建时即固定，后续更新不会修改该控件。当某一行的 `kind` 在「有开关」与「无开关」之间变化时，尾随部分不会随之变化，直接造成视觉重叠。
 
-### 修法
+### 修改方案
 
-方案 A（保守）：所有提前返回之前先跑一遍完整的隐藏循环。
+方案 A（保守）：在所有提前返回之前先执行一次完整的隐藏循环。
 
 ```c
 #define APPLY_EARLY_RETURN(rc) do { \
@@ -213,11 +213,11 @@ update_row(object, NULL, primary, secondary, 0, selected);
 } while (0)
 ```
 
-方案 B（彻底）：放弃增量复用，改为全删重建，让每个控件都走首次建页的路径。Chaos 选择方案 B（`ui.rs:220` 的 `render_page`），代价是性能，收益是彻底消除脏几何。25 行列表的重建开销可以接受。
+方案 B（彻底）：放弃增量复用，改为全删重建，使每个控件都经过首次建页的路径。Chaos 选择方案 B（`ui.rs:220` 的 `render_page`），其代价是性能，收益是彻底消除脏几何。25 行列表的重建开销可以接受。
 
-## 缺陷三：分派不看页面
+## 缺陷三：事件分派未区分页面
 
-`target_dispatch_row`（463 行）遍历所有 `active` 页面，事件码不匹配时用 `return` 退出整个函数。回调由宏生成，只带槽位编号，不带页面编号。
+`target_dispatch_row`（463 行）遍历所有 `active` 页面，事件码不匹配时以 `return` 退出整个函数。回调由宏生成，仅携带槽位编号，不携带页面编号。
 
 ```c
 // 463
@@ -252,13 +252,13 @@ static void target_dispatch_row(uint32_t row_index, void *event)
 
 `user_data` 在 `add_event` 时传的是 `NULL`（1012 行）。
 
-三个原因叠加：
+三个原因相互叠加：
 
-1. 多页可同时 `active`，`rows[3]` 在两个页面里都可能非空，循环依次命中所有页面，把同一个点击当成多个页面的事件处理。
-2. `return` 而非 `continue`，第一个命中的页面事件码不匹配时直接退出，本该处理的页面被跳过。
-3. 没有「当前前台页」的概念，`interactive` 只区分能否输入，不区分是否最上层。
+1. 多个页面可同时处于 `active` 状态，`rows[3]` 在两个页面中均可能非空，循环依次命中所有页面，将同一次点击当作多个页面的事件处理。
+2. 此处使用 `return` 而未使用 `continue`：当第一个命中的页面事件码不匹配时，函数直接退出，本该处理的页面因此被跳过。
+3. 代码中没有「当前前台页」的概念，`interactive` 仅区分能否接收输入，不区分页面是否位于最上层。
 
-### 修法
+### 修改方案
 
 ```c
 // 1. 加一个前台页游标，on_resume 时更新
@@ -274,13 +274,13 @@ if (code != CANOPUS_TARGET_EVENT_CLICKED) continue;
 if (binding->generation != context->backend.current_generation) continue;
 ```
 
-`binding->generation` 字段本来就存在，只是没有用于该校验。Chaos 的对应做法是维护 `FG_PAGE` 前台页游标，分派时先按它过滤。
+`binding->generation` 字段本已存在，只是未用于该校验。Chaos 的对应做法是维护 `FG_PAGE` 前台页游标，并在分派时先行过滤。
 
-## 缺陷四：查找不唯一
+## 缺陷四：查找结果不唯一
 
-`target_find_row`（559 行）只按 `kind` 匹配。一页里有两行同为 `CANOPUS_TARGET_ROW_SWITCH` 时，查找返回第一个，更新数据会把第二行的内容写到第一行上。
+`target_find_row`（559 行）仅按 `kind` 匹配。当同一页面内存在两行同为 `CANOPUS_TARGET_ROW_SWITCH` 时，查找返回第一个匹配项，更新数据会将第二行的内容写入第一行。
 
-修法：用 `bindings[i].key`（语义 key）代替 `kind` 做匹配，或要求调用方传入槽位号。
+修改方案：用 `bindings[i].key`（语义 key）代替 `kind` 进行匹配，或要求调用方传入槽位号。
 
 ## 四个缺陷的关系
 
@@ -291,7 +291,7 @@ if (binding->generation != context->backend.current_generation) continue;
 缺陷四（查找不唯一）  → 数据写错行，内容与控件错配
 ```
 
-缺陷三、四本身不一定立刻可见，但会让缺陷一、二被更频繁地触发：错误的页面收到不该有的更新，从而走更多次 apply、更多次提前返回。
+缺陷三与缺陷四本身不一定立即显现，但会使缺陷一与缺陷二更频繁地被触发：错误的页面收到本不该有的更新，从而执行更多次 apply 与提前返回。
 
 ## 补丁清单
 
@@ -304,7 +304,7 @@ if (binding->generation != context->backend.current_generation) continue;
 | P2 | 查找改用 key | 约 15 | 中 | 中 |
 | P2 | apply 改全删重建 | 约 100 | 低 | 中高（性能） |
 
-P0 两条合计不到 20 行，可以消掉绝大多数点击错乱。
+P0 两条合计不足 20 行，可消除绝大多数点击错乱。
 
 ## 验证方法
 
@@ -315,7 +315,7 @@ P0 两条合计不到 20 行，可以消掉绝大多数点击错乱。
 | 在详情页点击后按返回 | 列表残留旧内容 | 正常 |
 | 页面栈两层时点击 | 上层响应，下层也可能响应 | 只有上层响应 |
 
-复现要点是快速点击与弹窗操作。慢速单击往往看不出来，因为内存还没来得及被复用。
+复现要点在于快速点击与弹窗操作。慢速单击通常难以观察到异常，因为此时内存尚未被复用。
 
 ## 与 Chaos 的对照
 
@@ -326,7 +326,7 @@ P0 两条合计不到 20 行，可以消掉绝大多数点击错乱。
 | 槽位按需清理 | 每次清满整个数组 | 避开悬空句柄 |
 | 遍历所有 `active` 页 | 按 `FG_PAGE` 过滤 | 避开跨页误触发 |
 
-四条一一对应，与 Chaos 的四个结构性设计重合。
+上表四行与 Chaos 的四个结构性设计一一对应，内容相互重合。
 
 ## 未决问题
 
@@ -335,7 +335,7 @@ P0 两条合计不到 20 行，可以消掉绝大多数点击错乱。
 | 缺陷一能否在真机复现 | 待定 | 代码层已证实，未做真机崩溃捕获 |
 | 多页同时 `active` 的实际场景 | 推断 | 由 `manager_active_pages` 计数器推断 |
 | `lvgl_v8` 版是否有同样缺陷 | 推断 | 逻辑同构，未逐行核对 |
-| 全删重建后的性能 | 待定 | 未测，25 行列表应无感 |
+| 全删重建后的性能 | 待定 | 未测，25 行列表预计无明显影响 |
 
 ## 相关页面
 

@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-11-01" />
 
-原生应用依赖固件里的 `modlib` 子系统。不是所有 Vela 设备都带这个子系统，机型矩阵里的 `native` 字段就是用来标记这一点的。
+原生应用依赖固件中的 `modlib` 子系统。并非所有 Vela 设备都包含该子系统，机型矩阵中的 `native` 字段即用于标记这一差异。
 
 ## 当前结论
 
@@ -22,16 +22,16 @@ contributors: [miband-dev]
 | 9 Pro | — | — | 未发现 | 固件分析中未见该子系统 |
 | 9 / 10 | — | — | 未知 | 没有公开可行记录 |
 
-Canopus 的 target pack 覆盖了 band10pro、band9、band9pro、band11、p65 等多个目标，但**目标包存在不等于设备具备 `modlib`**。判断一台设备是否支持，以固件中的实际子系统与加载结果为准。
+Canopus 的 target pack 覆盖了 band10pro、band9、band9pro、band11、p65 等多个目标，但目标包的存在并不表示设备具备 `modlib`。设备是否支持，应以固件中的实际子系统与加载结果为准。
 
-## 怎么确认
+## 确认设备支持的方式
 
-1. 查[机型能力矩阵](/start/models)的 `native` 字段；
-2. 在设备上确认 `/dev/canopus` 是否存在；
+1. 查看[机型能力矩阵](/start/models)的 `native` 字段；
+2. 确认设备上是否存在 `/dev/canopus`；
 3. 查看 `/proc/modules` 是否已有可加载模块；
-4. 用最小模块做一次加载测试，见[最小模块](/native/develop/hello)。
+4. 使用最小模块进行一次加载测试，见[最小模块](/native/develop/hello)。
 
-任何一步失败都不要继续部署业务模块。
+任一步骤失败时，不应继续部署业务模块。
 
 ## 固件版本绑定
 

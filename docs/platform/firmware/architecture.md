@@ -12,9 +12,9 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-结论：10 Pro 运行 NuttX 加 Vela 应用框架，内核的网络用户态工具与 TCP/IP 协议栈完整，缺的是创建 `/dev/tun` 并注册为网卡的驱动代码与 DNS 解析器；`modlib` 模块子系统的存在是相对 9 Pro 最大的架构差异。
+10 Pro 运行 NuttX 加 Vela 应用框架。内核的网络用户态工具与 TCP/IP 协议栈完整，缺少的是创建 `/dev/tun` 并注册为网卡的驱动代码与 DNS 解析器。`modlib` 模块子系统的存在是相对 9 Pro 最大的架构差异。
 
-判断某项能力是缺代码还是缺配置，需要先看这一层。很多结论只有放在内核与框架的分界上才成立。
+判断某项能力属于缺代码还是缺配置，需要先考察这一层。若干结论只有置于内核与框架的分界上才能成立。
 
 ## 分层
 
@@ -36,7 +36,7 @@ contributors: [miband-dev]
 
 ## `vela_ap.bin` 的构成
 
-`vela_ap.bin` 是 13,795,728 字节的单体镜像，上面四层软件全部装在其中。
+`vela_ap.bin` 是 13,795,728 字节的单体镜像，上面四层软件均包含在其中。
 
 | 层 | 代表组件 | 固件内证据 |
 | --- | --- | --- |
@@ -46,11 +46,11 @@ contributors: [miband-dev]
 | 内核 | NuttX 调度、VFS、TCP/IP、modlib、NSH | `nuttx/libs/libc/modlib/*`、`nuttx/net/tcp/*`、NSH 命令表 |
 | 引导 | BL、BL2 | `ZZ~` 容器、`vela_bl.bin`、`vela_bl2.bin`、`vela_ap.bin` 三段式 |
 
-镜像不是 ELF，没有节表与符号表，上述构成由字符串与指针引用反推得出。容器结构与地址换算见[固件包格式](/platform/firmware/package)。
+该镜像不属于 ELF 格式，没有节表与符号表，上述构成由字符串与指针引用反推得出。容器结构与地址换算见[固件包格式](/platform/firmware/package)。
 
 ## 内核
 
-固件中的 `NuttX` 只出现 2 次，`nuttx-` 出现 0 次，版本串为 `NuttX 0.0.0`，发行版把版本号抹成了占位符。无法直接对照上游版本，只能按固件中存在的源文件路径反推配置。
+固件中的 `NuttX` 只出现 2 次，`nuttx-` 出现 0 次，版本串为 `NuttX 0.0.0`，发行版将版本号替换为占位符。无法直接对照上游版本，只能按固件中存在的源文件路径反推配置。
 
 ### 内存布局
 
@@ -89,7 +89,7 @@ BES 芯片的上电流程分三段：BL 加载 BL2，BL2 加载 AP。三段对�
 | `insmod` | 1 | 0 |
 | `rmmod` / `lsmod` | 各 1 | 0 |
 
-这是整个研究中最重要的一个差异。9 Pro 的一切都静态编入 `vela_ap.bin`，增加功能只能改固件重刷，而固件带签名；10 Pro 保留了运行时加载模块的入口。
+这是整个研究中最重要的一个差异。9 Pro 的全部功能均静态编入 `vela_ap.bin`，增加功能只能通过修改固件后重刷实现，而固件带签名；10 Pro 则保留了运行时加载模块的入口。
 
 模块格式、符号解析与加载流程见[内核模块系统](/native/develop/modules)。
 
@@ -120,9 +120,9 @@ BES 芯片的上电流程分三段：BL 加载 BL2，BL2 加载 AP。三段对�
 | `losetup` | 无 | 回环设备，可从文件挂载镜像 |
 | `ps` / `free` / `df` / `mount` / `md5` | 无 | 常规运维 |
 
-这张表是网络用户态齐备的直接证据。一旦有了网卡驱动，`ifconfig tun0 ...` 配合 `ifup tun0` 即可拉起接口，不需要补充任何用户态代码。
+这张表是网络用户态齐备的直接证据。一旦具备网卡驱动，`ifconfig tun0 ...` 配合 `ifup tun0` 即可启用接口，不需要补充任何用户态代码。
 
-`wget` 在固件中只出现 1 次，位置在 Lua 基础库的字符串表里，与 `collectgarbage`、`dofile`、`getmetatable` 相邻，不是 NSH 命令条目。
+`wget` 在固件中只出现 1 次，位置在 Lua 基础库的字符串表里，与 `collectgarbage`、`dofile`、`getmetatable` 相邻，并非 NSH 命令条目。
 
 ## TCP/IP 协议栈
 
@@ -137,7 +137,7 @@ BES 芯片的上电流程分三段：BL 加载 BL2，BL2 加载 AP。三段对�
 | `nuttx/net/socket/sendmsg.c` | 在 |
 | `nuttx/net/socket/recvmsg.c` | 在 |
 
-`socket()`、`connect()`、`send()`、`recv()` 全部可用。实测 `connect()` 到裸 IP 返回 `code:7`（`Couldn't connect to server`，约 59 ms），而不是 `ENETUNREACH` 长时间阻塞，说明失败来自缺少路由表项，协议栈本身在工作。
+`socket()`、`connect()`、`send()`、`recv()` 全部可用。实测 `connect()` 到裸 IP 返回 `code:7`（`Couldn't connect to server`，约 59 ms），未出现 `ENETUNREACH` 长时间阻塞，说明失败源于缺少路由表项，协议栈本身工作正常。
 
 ### 网络层缺失项
 
@@ -152,7 +152,7 @@ BES 芯片的上电流程分三段：BL 加载 BL2，BL2 加载 AP。三段对�
 
 `/nuttx/libs/libc/netdb/` 只列出 6 个源文件路径，`lib_getaddrinfo.c` 不在其中，这是域名解析未编入的直接证据，也解释了实测中所有域名请求以 `Couldn't resolve host name` 失败。
 
-NSH 命令表中有 `nslookup`，但 DNS 客户端库看起来没有编入。可能是 applet 保留了名字而实现被裁掉，也可能 DNS 代码在 `netutils` 等位置而没有留下源文件路径串。该矛盾没有闭环，走补 DNS 的路线前需要先验证 `nslookup` 能否执行，状态待定。
+NSH 命令表中有 `nslookup`，但 DNS 客户端库似乎没有编入。可能是 applet 保留了名字而实现被裁掉，也可能 DNS 代码位于 `netutils` 等位置而未留下源文件路径串。该矛盾尚未得到解释，在采用补充 DNS 的方案前，需要先验证 `nslookup` 是否能够执行，状态待定。
 
 ## 分区与文件系统
 
@@ -209,7 +209,7 @@ NSH 命令表中有 `nslookup`，但 DNS 客户端库看起来没有编入。可
 | 资源组织 | 单个 171 MB `vela_resource.bin` | 按功能拆成多个 `.res` |
 | 固件签名 | ZIP 加 CERT | 未验证 |
 
-9 Pro 是一切都编好，10 Pro 是框架留了口子但驱动没有安装。这恰好是 10 Pro 反而有改造空间的原因：只要能把驱动塞进去。
+9 Pro 将全部功能静态编入，10 Pro 则保留了框架接口而未安装驱动。这正是 10 Pro 具备改造空间的原因：前提是能够载入驱动。
 
 ## 未决问题
 

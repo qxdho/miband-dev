@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-11-01" />
 
-表盘安装没有统一的应用商店 API。普通表盘、Lua 表盘与第三方工具各有自己的入口，失败表现也不一样。
+表盘安装没有统一的应用商店 API。普通表盘、Lua 表盘与第三方工具各有独立入口，失败表现亦不相同。
 
 ## 安装渠道
 

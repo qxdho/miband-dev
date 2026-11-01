@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-结论：固件里的符号恢复只依赖一条地址规则，`vaddr = 文件偏移 + 基址`。代码段基址为 `0x0C000000`，数据段基址为 `0x2C0C0000`，所有脚本都是这条规则的变体。10 Pro 的 `vela_ap.bin` 不是标准 ELF，`readelf` 无输出，地址只能通过字符串引用、字面量池和反汇编交叉验证。
+本节的核心结论是：固件中的符号恢复只依赖一条地址规则，`vaddr = 文件偏移 + 基址`。代码段基址为 `0x0C000000`，数据段基址为 `0x2C0C0000`，其余脚本均为该规则的变体。10 Pro 的 `vela_ap.bin` 不是标准 ELF，`readelf` 无输出，地址只能通过字符串引用、字面量池和反汇编交叉验证。
 
 ## 环境
 
@@ -32,14 +32,14 @@ contributors: [miband-dev]
 | 代码 | `0x0C000000` | 文件 `0x0` 至 `0xCE0000` | ARM Thumb-2 指令与字面量池 |
 | 数据 | `0x2C0C0000` | 文件 `0x0` 至结尾 | 字符串、只读数据、资源索引 |
 
-验证方法：对字符串 `S`（文件偏移 `F`）寻找引用，若某个 32 位字面量 `L` 满足 `L = F + BASE`，则 `BASE` 即该段的基址。已有两处交叉验证：
+验证方法如下：对字符串 `S`（文件偏移 `F`）寻找引用，若某个 32 位字面量 `L` 满足 `L = F + BASE`，则 `BASE` 即该段的基址。已有两处交叉验证：
 
 | 字符串 | 文件偏移 | 计算 vaddr | 实测引用位置 |
 | --- | ---: | --- | --- |
 | `/dev/tun` | `0xB55F00` | `0x2CC15F00` | 文件 `0x6515AC`，位于正文的字面量池 |
 | `app_net_receive` | `0xC8B650` | `0x2CD4B650` | 文件 `0x6516B4` |
 
-代码段结束地址是经验值。`0xCE0000` 未经过精确验证，是否存在第三个映射段同样未排查。
+代码段结束地址为经验值。`0xCE0000` 尚未经过精确验证，是否存在第三个映射段同样未排查。
 
 ## capstone 与反汇编
 
@@ -49,7 +49,7 @@ contributors: [miband-dev]
 node tools/dis.js 0xc651500 0xc651600
 ```
 
-只关心特定指令时使用 `thumb.js`。它是自写的极简 Thumb/Thumb-2 解码器，仅处理 `LDR literal`、`ADR`、`MOVW/MOVT`，输出量比 capstone 小，适合在大量候选地址中快速筛选。
+若只需关注特定指令，可使用 `thumb.js`。它是自写的极简 Thumb/Thumb-2 解码器，仅处理 `LDR literal`、`ADR`、`MOVW/MOVT`，输出量比 capstone 小，适用于在大量候选地址中快速筛选。
 
 | 脚本 | 作用 | 输入 |
 | --- | --- | --- |
@@ -57,7 +57,7 @@ node tools/dis.js 0xc651500 0xc651600
 | `thumb.js` | 精简 Thumb/Thumb-2 解码 | 待扫描区域 |
 | `region.js` | 导出地址区间，附指针、字符串与 Thumb 标注 | 起止地址 |
 
-`region.js` 用于人工判读：
+`region.js` 用于人工判读。
 
 ```bash
 node tools/region.js 0xc651700 0xc651770
@@ -95,23 +95,23 @@ node tools/litload2.js firmware/10pro/fwx/vela_ap.bin | grep -i "2cc15f00"
 | `findref.js` | 查找引用某个字符串的代码位置 |
 | `refs.js` | 定点检查一组已知地址的引用 |
 
-判定顺序是先确认字符串的文件偏移，再用 `table2.js` 得到 vaddr，用 `litload2.js` 找引用，最后用 `dis.js` 或 `region.js` 查看引用点是否落在函数体内。缺少任何一步，结论都只能算推断。
+判定顺序为：先确认字符串的文件偏移，再用 `table2.js` 得到 vaddr，用 `litload2.js` 查找引用，最后用 `dis.js` 或 `region.js` 检查引用点是否位于函数体内。缺少任一步骤，结论均只能视为推断。
 
-## 三个必须记住的坑
+## 三类常见误判
 
-### 坑一：无中央目录不等于不是 zip
+### 误判一：缺少中央目录不等于不是 zip
 
 zip 解析器通常从文件尾查找 `EOCD`（`PK\x05\x06`）。部分打包器只写本地文件头，不写中央目录，此时 `unzip` 与 Python `zipfile` 都会报错，但数据完好。9 Pro 的 `fw9pro.bin` 属于这种情况，顺序扫描 `PK\x03\x04` 并逐条 inflate，可以解出 258 个文件。
 
-判定方法是直接扫描本地文件头，检查每一条的 `compression method` 与 `compressed size` 是否合理，以及 inflate 是否成功。不能用是否存在 `EOCD` 判断包是否完整。
+判定方法是直接扫描本地文件头，检查每一条的 `compression method` 与 `compressed size` 是否合理，以及 inflate 是否成功。不应以是否存在 `EOCD` 判断包是否完整。
 
 ```bash
 node tools/zip_no_cd.js firmware/9pro/fw9pro.bin firmware/9pro/fwx9/
 ```
 
-### 坑二：字面量池不是分派表
+### 误判二：字面量池不是分派表
 
-`0x651730` 附近连续排列着 `"up"`、`"bt"`、`"remote_net_state_switch"`、`"bt-net"`，形式上接近一张主题订阅表。实际它是指令流中间的字面量池，编译器把相邻代码要用的常量集中放在这里。
+`0x651730` 附近连续排列着 `"up"`、`"bt"`、`"remote_net_state_switch"`、`"bt-net"`，形式上接近主题订阅表。实际上，该区域是指令流中间的字面量池，编译器将相邻代码所需的常量集中放置于此。
 
 判据是同一片地址里是否混有可执行指令：
 
@@ -125,17 +125,17 @@ node tools/dis.js 0xc651500 0xc651600
 | 连续 32 位字面量，值等于字符串偏移加基址 | 字面量池，不是分派表 |
 | 只有字符串数据，没有有效指令序言 | 字符串表区域，引用点需另找 |
 
-分派表与字面量池都可能保存字符串指针。区别在于分派表会被一段稳定的代码按索引读取，字面量池只服务于紧邻的指令。确认后者需要反汇编读取点，不能只看数据排列。
+分派表与字面量池都可能保存字符串指针。区别在于分派表会被一段稳定的代码按索引读取，字面量池只服务于紧邻的指令。确认后者需要反汇编读取点，不能仅依据数据排列。
 
-### 坑三：字符串计数不能代替符号存在性
+### 误判三：字符串计数不能代替符号存在性
 
-`netdev_register` 在 10 Pro 的 AP 中字符串计数为 0，据此曾判定驱动注册接口不存在。该结论已被推翻。Canopus 的 3.101.043 target pack 明确记录：
+`netdev_register` 在 10 Pro 的 AP 中字符串计数为 0，此前曾据此判定驱动注册接口不存在，该结论后来被推翻。Canopus 的 3.101.043 target pack 明确记录：
 
 ```
 netdev_register   entry 0xc1fc214   callable 0xc1fc215   int(void *, int)
 ```
 
-函数存在，地址存在，只是名字字符串被裁掉。固件为节省空间剥离符号名，仅保留地址表。
+函数与地址均存在，只是名称字符串被裁掉。固件为节省空间剥离符号名，仅保留地址表。
 
 | 证据 | 能证明 | 不能证明 |
 | --- | --- | --- |
@@ -144,7 +144,7 @@ netdev_register   entry 0xc1fc214   callable 0xc1fc215   int(void *, int)
 | 有效函数序言 | 目标地址是函数入口 | 该函数被业务代码调用 |
 | 重定位表或恢复符号表 | 符号存在且可调用 | 运行时调用成功 |
 
-否定性结论需要覆盖所有可能位置的检索。字符串计数只能证明存在，不能证明不存在。要证明不存在，需要查符号表、重定位表，或反汇编目标地址确认是否有 `push {..., lr}` 一类的函数序言。
+否定性结论需要覆盖所有可能位置的检索。字符串计数只能证明存在，不能证明不存在。若要证明不存在，需要检查符号表、重定位表，或反汇编目标地址以确认是否存在 `push {..., lr}` 一类的函数序言。
 
 ## 脚本清单
 
@@ -191,14 +191,14 @@ netdev_register   entry 0xc1fc214   callable 0xc1fc215   int(void *, int)
 
 ### 第一步：解包
 
-10 Pro 的 `firmware/10pro/fw.bin` 是标准 zip，直接展开：
+10 Pro 的 `firmware/10pro/fw.bin` 为标准 zip，可直接展开：
 
 ```bash
 cd <研究环境>
 unzip -o firmware/10pro/fw.bin -d firmware/10pro/fwx/
 ```
 
-9 Pro 的包没有中央目录，`unzip` 会失败，必须使用本地文件头扫描：
+9 Pro 的固件包缺少中央目录，`unzip` 会失败，因此必须使用本地文件头扫描：
 
 ```bash
 node tools/zip_no_cd.js firmware/9pro/fw9pro.bin firmware/9pro/fwx9/
@@ -218,7 +218,7 @@ node tools/table2.js | grep -i "关键词"
 node tools/litload2.js firmware/10pro/fwx/vela_ap.bin | grep -i "2cc15f00"
 ```
 
-这一步回答的是代码是否真的使用该字符串。命中只能说明存在引用，引用点是否属于有效函数仍需下一步确认。
+本步骤用于判断代码是否实际使用该字符串。命中只能说明存在引用，引用点是否属于有效函数仍需下一步确认。
 
 ### 第四步：反汇编确认
 
@@ -227,7 +227,7 @@ node tools/dis.js 0xc651500 0xc651600
 node tools/region.js 0xc651700 0xc651770
 ```
 
-查看目标地址是代码、字面量池还是分派表。三条判据见上一节的坑二。
+检查目标地址属于代码、字面量池还是分派表。三条判据见上一节的误判二。
 
 ### 第五步：判定
 
@@ -240,7 +240,7 @@ node tools/region.js 0xc651700 0xc651770
 
 ## 复现清单
 
-从零复现全部结论所需的命令：
+从零复现全部结论所需的命令如下：
 
 ```bash
 cd <研究环境>

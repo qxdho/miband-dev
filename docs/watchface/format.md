@@ -12,13 +12,13 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-表盘文件是自定义二进制容器，魔数 `5A A5 34 12`，不是 zip。格式的验收标准是能否逐字节复现官方产物：`tools/p67build.js` 对 `ref/canopus-mgr-10p-v65539.bin`（217,346 B）执行 `build` 后 `cmp` 无差异，格式不含猜测成分。
+表盘文件为自定义二进制容器，魔数为 `5A A5 34 12`，并非 zip 归档。格式的验收标准为能否逐字节复现官方产物：`tools/p67build.js` 对 `ref/canopus-mgr-10p-v65539.bin`（217,346 B）执行 `build` 后 `cmp` 无差异，格式中不含猜测成分。
 
-结论：10 Pro（p67）与 8 Pro 使用两代不同布局。早期 `.face` 与 Chaos 文件容器只作格式研究存档，用它们打出的包能被 AstroBox 读取，手环会拒装并返回 `InstallFailed`。
+10 Pro（p67）与 8 Pro 使用两代不同的布局。早期 `.face` 与 Chaos 文件容器仅作为格式研究存档；使用其生成的包可被 AstroBox 读取，但手环会拒绝安装并返回 `InstallFailed`。
 
 ## 容器与扩展名
 
-`.face` 与 `.bin` 魔数相同，仅扩展名不同，内部存在两代布局。
+`.face` 与 `.bin` 的魔数相同，仅扩展名不同，内部存在两代布局。
 
 | 项 | 8 Pro 样本 `Accelerometer.face` | 10 Pro 容器（Chaos 实测） |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ contributors: [miband-dev]
 | 块间对齐 | 4 字节填充 | 无填充 |
 | 预览块 tag | `0x400` | `0x410` |
 
-Chaos 采用 4 槽布局，与槽位上限 255 不冲突：槽号只受一个字节限制，实际只用前 4 个。它装的是 `chaos_sup.ko`、安装器 Lua、应用图标与字体占位文件，内容不是表盘，因此使用 `.bin` 扩展名，避免被当作表盘直接渲染。
+Chaos 采用 4 槽布局，与槽位上限 255 并不冲突：槽号仅受一个字节限制，实际只使用前 4 个。其装入内容为 `chaos_sup.ko`、安装器 Lua、应用图标与字体占位文件，并非表盘，因此使用 `.bin` 扩展名，避免被当作表盘直接渲染。
 
 ## 8 Pro `.face` 布局
 
@@ -42,7 +42,7 @@ Chaos 采用 4 槽布局，与槽位上限 255 不冲突：槽号只受一个字
 ...    预览图块
 ```
 
-各区实际位置由 face header 的 `offset` 字段给出，不写死，上表数字是样本取值。
+各区实际位置由 face header 的 `offset` 字段给出，并非固定值；上表数字为样本取值。
 
 ### 文件头（0x00 至 0xA7）
 
@@ -83,17 +83,17 @@ Chaos 采用 4 槽布局，与槽位上限 255 不冲突：槽号只受一个字
 +..  内容原文
 ```
 
-块与块之间按 4 字节对齐，填充 0；定义项的 `length` 记的是对齐前的长度。
+块与块之间按 4 字节对齐，填充 0；定义项的 `length` 记录的是对齐前的长度。
 
-`type=5` 表示「`lua/` 目录下的一个文件」，不限于 `.lua`。样本中的图片 `cat.bin` 同样是 `type=5`、名为 `lua/cat.bin` 的资源块，因此 `.ko` 模块可以作为兄弟资源一起塞进容器。
+`type=5` 表示「`lua/` 目录下的一个文件」，不限于 `.lua`。样本中的图片 `cat.bin` 同样是 `type=5`、名为 `lua/cat.bin` 的资源块，因此 `.ko` 模块可作为同级资源一并放入容器。
 
 ### 根元素绑定
 
-基础元素 props 的前 4 字节 = `{ u16 defIndex, u16 defType }`，指向作为根的资源。样本值为 `02 00 00 05`，即第 2 项 `lua/main.lua`，类型 5。打包器默认把 `main.lua` 放在 index 0 并写入 `00 00 00 05`。
+基础元素 props 的前 4 字节 = `{ u16 defIndex, u16 defType }`，指向作为根的资源。样本值为 `02 00 00 05`，即第 2 项 `lua/main.lua`，类型 5。打包器默认将 `main.lua` 置于 index 0，并写入 `00 00 00 05`。
 
 ### 预览图块
 
-12 字节头加负载，字段依次为 `sign(u8) flags(u8) compress(u8) ?(u8) width(u16) height(u16) length(u32)`。样本尺寸 `230×328`，`length=25813`。当前打包器原样复用样本的预览块，缩略图仍是 Accelerometer 的截图，不影响运行。
+12 字节头加负载，字段依次为 `sign(u8) flags(u8) compress(u8) ?(u8) width(u16) height(u16) length(u32)`。样本尺寸 `230×328`，`length=25813`。当前打包器原样复用样本的预览块，缩略图仍为 Accelerometer 的截图，不影响运行。
 
 ## p67 布局（10 Pro）
 
@@ -117,7 +117,7 @@ p67 格式以官方 Canopus 管理器安装包为基准反推：
 | 其后 | 预览图块：12 B 头（`0x10`、`0x04`、宽 u16、高 u16、长度 u32）加数据 |
 | 其后 | 资源块首尾相接，无对齐 |
 
-单风格表盘的指针对取值：
+单风格表盘的指针对取值如下：
 
 ```
 pair[0]  = [0x80000000, 预览图偏移]
@@ -127,7 +127,7 @@ pair[6]  = [N, 脚本定义表偏移]
 pair[7..10] = [0, 根属性偏移]
 ```
 
-与 8 Pro `.face` 的关键差异：
+与 8 Pro `.face` 的关键差异如下：
 
 | 项 | 8 Pro `.face` | p67 |
 | --- | --- | --- |
@@ -138,7 +138,7 @@ pair[7..10] = [0, 根属性偏移]
 
 ### p67 资源块
 
-20 字节头：`u32 = dataLen | (nameLen << 24)`，随后 16 个零字节，然后 ASCII 名，然后数据。定义中的 `length` 是整块长度 `20 + nameLen + dataLen`。
+20 字节头：`u32 = dataLen | (nameLen << 24)`，随后 16 个零字节，然后 ASCII 名，然后数据。定义中的 `length` 为整块长度 `20 + nameLen + dataLen`。
 
 官方包的四个块可直接对照：
 
@@ -149,7 +149,7 @@ _lua/xiaomi-band-10-pro/canopus_supervisor-xiaomi-band-10-pro-3.101.043.bin 71,8
 _lua/xiaomi-band-10-pro/manager_icon.bin                                    54,768 B
 ```
 
-官方 `main.lua` 用 `SCRIPT_PATH .. "manager_icon.bin"` 读取同目录资源，并用 `os.execute` 执行 shell。自带的 `.ko` 按 `_lua/<设备目录>/tunprobe.ko` 放入资源块后，脚本中 `SCRIPT_PATH .. "tunprobe.ko"` 即可读到。
+官方 `main.lua` 通过 `SCRIPT_PATH .. "manager_icon.bin"` 读取同目录资源，并通过 `os.execute` 执行 shell。将自带的 `.ko` 按 `_lua/<设备目录>/tunprobe.ko` 放入资源块后，脚本中 `SCRIPT_PATH .. "tunprobe.ko"` 即可读取。
 
 ## 打包器
 
@@ -192,7 +192,7 @@ p67 的打包器为 `tools/p67build.js`，提供 `inspect`、`build`、`verify` 
 
 ## 逐字节验证
 
-验证方式是把官方样本作为输入，重新打包后用 `cmp` 比对，差异必须为 0 字节。8 Pro 样本的期望输出：
+验证方式为将官方样本作为输入，重新打包后用 `cmp` 比对，差异必须为 0 字节。8 Pro 样本的期望输出：
 
 ```
 roundtrip OK: 99124 B, 0 byte diff
@@ -218,7 +218,7 @@ p67 的验收同样以 `cmp` 为准，输出 217,346 B 完全一致即通过。
 node tools/containerbuild.js verify <file.bin>...
 ```
 
-校验项包括：魔数、`0xAC == recEnd`、记录表首条形状、尾记录位置、槽号连续、每条记录与前一块首尾相接、记录长度与 blob 内嵌长度自洽、预览块不越界、文件尾部无多余字节。三个包的结果：
+校验项包括：魔数、`0xAC == recEnd`、记录表首条形状、尾记录位置、槽号连续、每条记录与前一块首尾相接、记录长度与 blob 内嵌长度自洽、预览块不越界、文件尾部无多余字节。三个包的结果如下：
 
 ```
 OK probe-a.bin   27250 B  1 条

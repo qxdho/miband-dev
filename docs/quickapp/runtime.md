@@ -12,13 +12,13 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-结论：`fetch` 模块存在且已注册，权限层不拦截，代码路径一直走到 DNS 解析才失败。失败原因有三个，彼此独立，需要分开处理：模块名缺少 `@` 前缀导致查表失败，设备没有 DNS 解析能力，设备没有网络出口。
+`fetch` 模块存在且已注册，权限层不作拦截，代码路径一直执行到 DNS 解析阶段才失败。失败原因有三个，彼此独立，需要分别处理：模块名缺少 `@` 前缀导致查表失败，设备不具备 DNS 解析能力，设备没有网络出口。
 
-这三个原因的表现分别是 `fetch` 为 `undefined`、`Couldn't resolve host name`（`code 6`）、`Couldn't connect to server`（`code 7`）。
+上述三个原因的表现分别为 `fetch` 为 `undefined`、`Couldn't resolve host name`（`code 6`）、`Couldn't connect to server`（`code 7`）。
 
 ## 运行时组成
 
-手环上的快应用是一组 JS 加清单文件，安装到 `/data/` 下，在 `/data/apps.json` 中登记，由 QuickJS 执行。这套形态与 Android 快应用同源，运行时 API 集经过小米裁剪。
+手环上的快应用是一组 JS 文件与清单文件，安装到 `/data/` 下，在 `/data/apps.json` 中登记，由 QuickJS 执行。这套形态与 Android 快应用同源，运行时 API 集经过小米裁剪。
 
 ### 已安装应用
 
@@ -54,7 +54,7 @@ bool needNetwork; // APP是否依赖网络 默认false
 
 `vendor/oss_quickapp/shell/common/permission/permission.md:140` 也有该字段的说明。
 
-该字段在固件里只出现 1 次，位于 `package.cpp` 的 `apps.json` 序列化代码中，属于元数据，读入后没有任何分支用它申请网络。把它当作打开网络权限的钥匙是早期误判，结论已推翻。
+该字段在固件中仅出现 1 次，位于 `package.cpp` 的 `apps.json` 序列化代码中，属于元数据，读入后没有任何分支使用它申请网络。将其视为开启网络权限的依据属于早期误判，该结论已被推翻。
 
 ## JIDL 绑定层
 
@@ -67,11 +67,11 @@ bool needNetwork; // APP是否依赖网络 默认false
 | `jidl_feature` | 21 | 0 |
 | `fetch_impl` | 11 | 0 |
 
-两台设备上的 `fetch` 是两套不同的代码，9 Pro 的经验不能直接套用到 10 Pro。
+两台设备上的 `fetch` 是两套不同的代码，9 Pro 的经验不能直接应用于 10 Pro。
 
 ### feature 裁剪
 
-哪些 JIDL 模块被编进固件，由编译期 Kconfig 与 Makefile 决定。固件中可见 `CONFIG_` 前缀字符串 8 处、`Vela` 8 处，完整的配置表没有保留。
+哪些 JIDL 模块被编进固件，由编译期 Kconfig 与 Makefile 决定。固件中可见 `CONFIG_` 前缀字符串 8 处、`Vela` 8 处，完整的配置表未被保留。
 
 `canUse('@system.fetch')` 返回 `true`，说明 `fetch` 在裁剪时被保留。「10 Pro 不支持 fetch」在「模块未编入固件」这一层面上不成立。
 
@@ -86,7 +86,7 @@ canIUse('@system.fetch')   // 返回 true
 canIUse('fetch')           // 返回 false
 ```
 
-`@` 前缀是必须的。`canIUse` 执行真实的表查找，不做名字归一化，写 `'fetch'` 即查不到。
+`@` 前缀不可省略。`canIUse` 执行真实的表查找，不做名字归一化，写作 `'fetch'` 时无法查到对应模块。
 
 应用代码写错模块名时的形态：
 
@@ -95,11 +95,11 @@ import fetch from 'fetch';      // 查表失败，fetch 为 undefined
 fetch.fetch({ url: '...' })     // TypeError: Cannot read property 'fetch' of undefined
 ```
 
-故障表现为「fetch 不存在」，不是「网络失败」。这是三个失败原因中最容易被误诊成网络问题的一个。
+故障表现为「fetch 不存在」；在三个失败原因中，这一项最容易被误诊为网络问题。
 
 ### 权限层不拦截
 
-早期怀疑厂商在权限层关闭了网络能力，实测否定：
+早期曾怀疑厂商在权限层关闭了网络能力，实测结果否定了该判断：
 
 - 请求进入 DNS 解析阶段，报错是 `Couldn't resolve host name`，不是 `permission denied`；
 - DNS 解析位于 `requestPermissions` 下游。
@@ -149,13 +149,13 @@ fetch.fetch({
 | `code 6` / `Couldn't resolve host name` | DNS 解析失败 | 名字解析层 |
 | `code 7` / `Couldn't connect to server` | TCP 连接失败 | socket 的 `connect()` |
 
-三层是串行的。能走到 `code 7` 说明 URL 校验与 DNS 都已通过，能走到 `code 6` 说明参数校验已通过。探针的作用是把失败点逐层向后推。
+三层是串行的。能走到 `code 7` 说明 URL 校验与 DNS 解析均已通过，能走到 `code 6` 说明参数校验已通过。探针的作用是逐层向后定位失败点。
 
 ### `code 7` 的细节
 
-- 到裸 IP 的 `connect()` 在 59 ms 内失败，不是超时，超时量级通常是 30 s 或 75 s；
-- 快失败说明包没有发出，而是本地没有可用路由，`connect()` 直接返回错误；
-- 改 `Host` 头不改变结果，P1 与 P1+H 完全一致，请求没有出网卡。
+- 对裸 IP 的 `connect()` 在 59 ms 内失败，并非超时；超时的量级通常为 30 s 或 75 s；
+- 快速失败说明数据包并未发出，原因是本地没有可用路由，`connect()` 直接返回错误；
+- 修改 `Host` 头不改变结果，P1 与 P1+H 完全一致，请求没有经过网卡。
 
 ## 三个失败原因的关系
 
@@ -171,10 +171,10 @@ fetch.fetch({
         └─ ③ 裸 IP → TCP 连接失败（code 7）
 ```
 
-① 属于应用层，改代码即可。② 与 ③ 属于设备层，需要靠网络通路解决：
+① 属于应用层，修改代码即可解决；② 与 ③ 属于设备层，需通过网络通路解决：
 
 - 只缺 DNS 时，② 失败而 ③ 成功，可用 JS shim 把域名换成 IP，但 HTTPS 会因证书校验失败而不可用；
-- 出口缺失时，② ③ 全失败，只能补通路。
+- 出口缺失时，② ③ 全失败，只能补齐通路。
 
 实测为 ② ③ 全失败，因此 shim 方案不成立。通路的断点见[网络通路](/platform/protocol/network)。
 
@@ -182,14 +182,14 @@ fetch.fetch({
 
 | 现象 | 错误结论 | 正确结论 |
 | --- | --- | --- |
-| `canUse('@system.fetch') === true` 但请求仍失败 | 模块在，一定是网络问题 | 还需确认应用写的是 `@system.fetch` |
-| `system.network.getType() === 'none'` | 设备没有网络 | 它只报物理接口，TUN 不在表里 |
-| 报 `Couldn't resolve host name` | DNS 服务器故障 | 设备上根本没有解析器 |
-| 报 `Couldn't connect to server` | 服务器拒绝连接 | 本地无路由，包没有发出 |
+| `canUse('@system.fetch') === true` 但请求仍失败 | 模块存在，因此必然是网络问题 | 还需确认应用写的是 `@system.fetch` |
+| `system.network.getType() === 'none'` | 设备未接入网络 | 该接口仅报告物理网络接口，TUN 未列入类型表 |
+| 报 `Couldn't resolve host name` | DNS 服务器发生故障 | 设备上未包含 DNS 解析器 |
+| 报 `Couldn't connect to server` | 服务器拒绝连接请求 | 本地无可用路由，数据包未发出 |
 
-## 复现
+## 复现方法
 
-JSLab 中执行以下代码，`probe` 同时走回调与 Promise 两条路径，便于对照：
+在 JSLab 中执行以下代码。`probe` 同时走回调与 Promise 两条路径，便于对照：
 
 ```js
 import fetch from '@system.fetch'
@@ -214,7 +214,7 @@ probe('P2', 'http://example.com/')
 probe('P3', 'https://example.com/')
 ```
 
-完整探针脚本位于 `研究环境/probe/resolve-probe.js`，含 shim 安装与卸载逻辑，以及 IPv4 直连与 `Host` 头的对照实验。shim 后来被证明不能解决问题，代码仍保留。
+完整探针脚本位于 `研究环境/probe/resolve-probe.js`，含 shim 安装与卸载逻辑，以及 IPv4 直连与 `Host` 头的对照实验。后续验证表明 shim 无法解决问题，相关代码仍然保留。
 
 ## 未决问题
 

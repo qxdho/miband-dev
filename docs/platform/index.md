@@ -12,15 +12,15 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-11-01" />
 
-平台层收拢三条应用路线共用的资料：固件、BLE 协议、逆向与模拟工具，以及外部参考和示例。它不针对某一种应用形态，而是解释设备本身怎么工作、怎么连、怎么查。
+平台层汇集三条应用路线共用的资料，包括固件、BLE 协议、逆向与模拟工具，以及外部参考和示例。该层不针对某一种应用形态，而是说明设备本身的工作方式、连接方式与研究方法。
 
 ## 四个部分
 
-| 部分 | 回答的问题 | 入口 |
+| 部分 | 内容 | 入口 |
 | --- | --- | --- |
-| 固件 | 设备里有什么、怎么备份、怎么解包、变砖后怎么救 | [固件研究](/platform/firmware/) |
-| 协议 | 手环与手机之间怎么配对、怎么通信 | [BLE 协议](/platform/protocol/ble) · [网络通路](/platform/protocol/network) |
-| 工具 | 用哪些工具读固件、跑模拟器、做逆向 | [工具索引](/platform/tools/) |
+| 固件 | 设备组成、备份与解包方法、变砖后的恢复流程 | [固件研究](/platform/firmware/) |
+| 协议 | 手环与手机的配对方式与通信链路 | [BLE 协议](/platform/protocol/ble) · [网络通路](/platform/protocol/network) |
+| 工具 | 读取固件、运行模拟器与逆向分析所需的工具 | [工具索引](/platform/tools/) |
 | 参考 | 外部资料、社区项目与可构建示例 | [参考资料](/platform/reference/references) · [示例代码](/platform/reference/examples) |
 
 ## 本章页面
@@ -42,7 +42,7 @@ contributors: [miband-dev]
 
 ## 风险提示
 
-固件操作可能导致变砖、数据丢失与保修失效。备份与恢复方法排在刷写之前；不确定的操作先在[机型能力矩阵](/start/models)确认设备是否支持。
+固件操作可能导致变砖、数据丢失与保修失效。备份与恢复方法应先于刷写执行；对于不确定的操作，应先通过[机型能力矩阵](/start/models)确认设备是否支持。
 
 ## 相邻板块
 

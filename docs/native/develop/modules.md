@@ -12,13 +12,13 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-手环 10 Pro 在运行时加载自编译内核代码的能力，决定了补 `/dev/tun` 是否需要重刷固件。固件带签名，改固件重刷的路线不可行，因此模块加载是唯一可用路径。
+手环 10 Pro 能否在运行时加载自编译内核代码，决定了补齐 `/dev/tun` 是否需要重刷固件。由于固件带签名，修改固件后重刷的路线不可行，因此模块加载是唯一可用路径。
 
-结论：模块系统齐备，`modlib`、`insmod` 都在固件里，创建 `/dev/tun` 所需的内核函数已精确定位。风险不在能力有无，而在这套 ABI 从未在真机上执行过。
+模块系统已经齐备：`modlib` 与 `insmod` 均存在于固件中，创建 `/dev/tun` 所需的内核函数也已精确定位。主要风险在于这套 ABI 从未在真机上执行过。
 
 ## NuttX 的 modlib
 
-`modlib` 是 NuttX 的可加载模块子系统，作用对应 Linux 的 `.ko`。
+`modlib` 是 NuttX 的可加载模块子系统，其作用对应 Linux 的 `.ko`。
 
 | 能力 | 命令 |
 | --- | --- |
@@ -39,7 +39,7 @@ contributors: [miband-dev]
 | `modlib_symtab` | 1 | 0 |
 | `insmod` / `rmmod` / `lsmod`（NSH 命令表） | 各 1 | 0 |
 
-这是 10 Pro 相对 9 Pro 唯一明确多出的能力，也是本案的立足点。
+这是 10 Pro 相对 9 Pro 唯一明确多出的能力，也是本结论的立足点。
 
 ## 模块文件格式
 
@@ -71,7 +71,7 @@ Canopus 的 target pack 在 `target.toml` 的 `[loader_profile]` 中记录了加
 | `module_abi` | `1` |
 | `relocation_profile` | `best1503-v1` |
 
-编译目标是 Cortex-M33、Thumb2 指令集、软浮点，使用 `arm-none-eabi-gcc -mthumb -mcpu=cortex-m33 -mfloat-abi=soft -fPIC -c` 一类的参数即可产出。
+编译目标为 Cortex-M33、Thumb2 指令集与软浮点，使用 `arm-none-eabi-gcc -mthumb -mcpu=cortex-m33 -mfloat-abi=soft -fPIC -c` 一类的参数即可产出。
 
 ## 加载流程
 
@@ -86,7 +86,7 @@ insmod /data/xxx.ko tun0
    └─ 6. 登记到已加载列表，lsmod 可见
 ```
 
-模块构造函数即入口。TUN 驱动在构造函数中完成两件事：
+模块构造函数即入口。TUN 驱动在构造函数中完成两项工作：
 
 ```c
 static void tun_init(void) {
@@ -95,7 +95,7 @@ static void tun_init(void) {
 }
 ```
 
-`persistent_autoload = false` 意味着每次重启都需要重新 `insmod`。研究阶段不受影响，日常使用需要 Canopus 或 Chaos 这类加载器在开机时执行一次。
+`persistent_autoload = false` 表示每次重启后都需要重新执行 `insmod`。研究阶段不受影响，日常使用则需要 Canopus 或 Chaos 这类加载器在开机时执行一次。
 
 ## 重定位支持
 
@@ -113,15 +113,15 @@ static void tun_init(void) {
 | `R_ARM_THM_CALL` | 10 | 模块内 `BL` | 设备级未验证 |
 | `R_ARM_THM_JUMP24` | 30 | 模块内条件跳转 | 设备级未验证 |
 
-target pack 自己对 3.101.043 标注了 `device gate pending`。这是本案最大的技术风险：第一次 `insmod` 可能直接崩溃。
+target pack 自身对 3.101.043 标注了 `device gate pending`。这是当前最大的技术风险：首次 `insmod` 可能直接崩溃。
 
 ## 符号导入被禁用
 
-`symbol_imports = none` 决定模块的写法。
+`symbol_imports = none` 决定了模块的写法。
 
-通常情况下，模块调用固件函数时由编译器生成 `R_ARM_THM_CALL` 和符号引用，加载器在固件符号表中查出地址后回填。这台设备的固件符号表已被剥离，不允许导入符号。
+通常情况下，模块调用固件函数时，编译器会生成 `R_ARM_THM_CALL` 与符号引用，由加载器在固件符号表中查出地址后回填。该设备的固件符号表已被剥离，不允许导入符号。
 
-替代做法是把地址硬编码。Canopus 为此生成了一层贴片函数：
+替代做法是将地址硬编码。Canopus 为此生成了一层贴片函数：
 
 ```c
 // generated/canopus_veneer.h:292
@@ -143,15 +143,15 @@ static inline int canopus_fw_unregister_driver(const char * a0) {
 }
 ```
 
-`static inline` 加常量地址会被编译成 `movw`、`movt`、`blx`，不产生任何外部符号引用，绕开 `symbol_imports = none` 的限制。
+`static inline` 加常量地址会被编译为 `movw`、`movt`、`blx`，不产生任何外部符号引用，从而绕开 `symbol_imports = none` 的限制。
 
-地址末位为奇数（`0xc1fc215` 而非 `0xc1fc214`）是 Thumb 位。Cortex-M 只支持 Thumb 指令，函数指针最低位为 1 表示按 Thumb 解码。贴片函数漏掉这一位会以 ARM 模式跳转，直接触发 HardFault。
+地址末位为奇数（`0xc1fc215` 而非 `0xc1fc214`）表示 Thumb 位。Cortex-M 只支持 Thumb 指令，函数指针最低位为 1 表示按 Thumb 解码。若贴片函数遗漏这一位，跳转将以 ARM 模式执行，直接触发 HardFault。
 
-代价是地址与固件版本强绑定。更换固件版本需要重新恢复整套地址，target pack 按 `firmware_sha256` 分目录存放正是为此。
+代价是地址与固件版本强绑定。更换固件版本需要重新恢复整套地址，target pack 按 `firmware_sha256` 分目录存放正是出于这一原因。
 
 ## 字符串计数不能证明函数存在
 
-早期判断某项能力是否存在的方法是在固件中统计字符串：
+早期判断某项能力是否存在，采用的方法是在固件中统计字符串：
 
 ```bash
 node -e '...b.indexOf("netdev_register")...'   # → 0
@@ -159,7 +159,7 @@ node -e '...b.indexOf("netdev_register")...'   # → 0
 
 `netdev_register` 出现 0 次，当时的结论是 10 Pro 没有网络设备注册入口。该结论已被推翻。
 
-字符串在固件中的来源有三类：
+字符串在固件中的来源可分为三类：
 
 | 来源 | 编译后是否保留 |
 | --- | --- |
@@ -167,17 +167,17 @@ node -e '...b.indexOf("netdev_register")...'   # → 0
 | 断言表达式文本 `ASSERT(cond)` | 关闭 `NDEBUG` 后消失 |
 | 符号名（调试信息） | 被 strip 移除 |
 
-函数存在而函数名不存在是正常现象，尤其在函数只在断言中被提及时。Canopus 用 IDA 对同一个 `firmware_sha256`（`51930767…56ec`）做了精确恢复，得到：
+函数存在而函数名不存在属于正常现象，尤其当函数只在断言中被提及时。Canopus 使用 IDA 对同一个 `firmware_sha256`（`51930767…56ec`）进行了精确恢复，得到以下结果：
 
 ```
 netdev_register  @ 0xc1fc214   int(void *, int)   STATIC_RECOVERED / APPROVED
 ```
 
-字符串计数可以否定「某功能存在活跃调用路径」，不能否定「某函数存在」。证明函数存在需要反汇编或恢复后的符号表。
+字符串计数可以否定「某功能存在活跃调用路径」，但不足以否定「某函数存在」。证明函数存在需要借助反汇编或恢复后的符号表。
 
 ## 已恢复的网络相关符号
 
-target pack 共 259 条符号记录，其中 55 条被封装为贴片函数。与网络驱动直接相关的一组：
+target pack 共包含 259 条符号记录，其中 55 条被封装为贴片函数。与网络驱动直接相关的一组如下：
 
 | 符号 | 地址 | 原型 | 用途 |
 | --- | --- | --- | --- |
@@ -191,21 +191,21 @@ target pack 共 259 条符号记录，其中 55 条被封装为贴片函数。�
 | `socket` / `sendto` / `setsockopt` / `read` / `write` / `close` | 未公开 | POSIX 语义 | 模块内直接使用 |
 | `heap_malloc` / `heap_zalloc` / `heap_free` / `heap_mallinfo` | 未公开 | | 堆分配 |
 
-写一个 TUN 驱动需要的要素全部在这张表里：
+编写一个 TUN 驱动所需的要素全部列于该表中：
 
-1. `register_driver` 让 `/dev/tun` 存在，解决 `ENOENT`；
-2. `netdev_register` 给 TCP/IP 栈一个出口设备，解决「无路由」；
-3. `netdev_input`、`ipv4_input` 把 BLE 收到的包注入协议栈；
-4. `read`、`write` 对应的 `file_operations` 让 `app_net.c` 能 `open("/dev/tun")` 并读写；
+1. `register_driver` 使 `/dev/tun` 存在，解决 `ENOENT`；
+2. `netdev_register` 为 TCP/IP 栈提供出口设备，解决「无路由」问题；
+3. `netdev_input`、`ipv4_input` 将 BLE 收到的包注入协议栈；
+4. `read`、`write` 对应的 `file_operations` 使 `app_net.c` 能够 `open("/dev/tun")` 并读写；
 5. `heap_*` 用于缓冲分配。
 
 `app_net.c` 不需要修改。
 
-## 写一个模块
+## 模块编写
 
 ### 最小验证模块
 
-在写完整驱动之前，先验证加载链路。
+在编写完整驱动之前，应先验证加载链路。
 
 ```c
 // hello.c：只证明模块被加载、构造函数被调用
@@ -230,9 +230,9 @@ arm-none-eabi-gcc -mthumb -mcpu=cortex-m33 -mfloat-abi=soft \
 arm-none-eabi-ld -r -Ttext=0 hello.o -o hello.ko
 ```
 
-预期结果：执行 `insmod /data/hello.ko hello` 后日志出现 `[hello] module loaded`。
+预期结果为：执行 `insmod /data/hello.ko hello` 后，日志中出现 `[hello] module loaded`。
 
-这一步同时验证模块格式、重定位、构造函数发现，以及 `symbol_imports = none` 下的硬编码调用。四者任一失败，后续工作都不会成立。
+该步骤同时验证模块格式、重定位、构造函数发现，以及 `symbol_imports = none` 条件下的硬编码调用。四者中任一失败，后续工作均无法成立。
 
 ### TUN 驱动
 
@@ -245,7 +245,7 @@ arm-none-eabi-ld -r -Ttext=0 hello.o -o hello.ko
 | 初始化 | `register_driver` 加 `netdev_register` | 约 40 行 |
 | 合计 | 精简版，仅支持 TUN 用法 | 500 至 700 行 C |
 
-估算代码体积 3 至 6 KB，运行内存 2 至 6 KB，`.ko` 文件 10 至 20 KB。
+估算代码体积为 3 至 6 KB，运行内存为 2 至 6 KB，`.ko` 文件为 10 至 20 KB。
 
 ## 风险
 
@@ -260,7 +260,7 @@ arm-none-eabi-ld -r -Ttext=0 hello.o -o hello.ko
 | 崩溃风险 | 内核态错误可能导致死机，模块位于 RAM，重启可恢复 | 中 |
 | `netdev_register` 第二参数语义 | 可能是链路层类型，也可能是设备号 | 中 |
 
-`netdev_register(void *dev, int type)` 的 `int` 在 NuttX 不同版本中含义不同，可能是 `lltype`（链路层类型，例如 `NET_LL_ETHERNET`）。传错会注册成功但收发包异常，这类故障最难定位。
+`netdev_register(void *dev, int type)` 的 `int` 在 NuttX 不同版本中含义不同，可能是 `lltype`（链路层类型，例如 `NET_LL_ETHERNET`）。若传入错误的值，注册会成功但收发包异常，这类故障最难定位。
 
 ## 未决问题
 

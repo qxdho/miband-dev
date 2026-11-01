@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中在三处系统性缺口：发布闸门不拦坏构建、安装与写盘不原子、没有固件指纹门。三者叠加后，一次坏构建或一次断电即可让设备进入重启循环，而构建日志保持全绿。
+Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中在三处系统性缺口：发布闸门未拦截坏构建、安装与写盘不是原子操作、缺少固件指纹门。三者叠加之后，一次坏构建或一次断电即可导致设备进入重启循环，而构建日志始终保持全部通过。
 
 ## 审查范围
 
@@ -21,18 +21,18 @@ Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中�
 | 审查对象 | `研究环境/projects/chaos`，commit `94eb407`，工作区干净 |
 | 代码量 | Rust 16,794 行、39 个文件；Lua 3 个共约 1,300 行；`module/` 57 行 |
 | 类型检查 | `cargo check --target thumbv8m.main-none-eabi`，离线、vendored nightly、去除 `build.rs`，通过，24 条 warning |
-| 未做 | 真机运行、动态插桩、CI 实跑、`.ko` 重链接；宿主无 `cc` 与 libc |
+| 未做 | 真机运行、动态插桩、CI 实际运行、`.ko` 重链接；宿主无 `cc` 与 libc |
 | 覆盖 | 5 个并行只读审查（页面生命周期、FFI 边界、字体与表盘解析、应用注册表、背景与构建）加主审通读 |
 
-严重度按后果划分。高：破坏既有用户数据、让设备进不了系统，或让坏构建静默发布。中：特定条件下触发越界、悬空、卡死。低：整洁性与可维护性。
+严重度按后果划分。高：破坏既有用户数据、使设备无法进入系统，或使坏构建被静默发布。中：在特定条件下触发越界、悬空或卡死。低：整洁性与可维护性。
 
-状态描述结论强度。已证实指代码路径与行号可直接复核。推断指后果由代码路径与注释中的先例推得，未在真机复现。待定指需要真机或动态测试才能确认。
+状态用以描述结论强度。已证实指代码路径与行号可以直接复核。推断指后果由代码路径与注释中的先例推得，尚未在真机复现。待定指需要真机或动态测试才能确认。
 
 ## 结论摘要
 
 | 严重度 | 数量 | 主题 |
 | --- | --- | --- |
-| 高 | 14 | P0 1 条加 P1 13 条：注册表截断丢条目、坏 `.ko` 过闸门、安装写盘非原子、无固件指纹门、panic 即死机、字体包不校验且能覆盖在用槽、注册表写路径 3 条、行显隐从未生效、`APP_FG` 门反向、栈缓冲当行文本、日期页跑目录分支、resume 不查存活 |
+| 高 | 14 | P0 1 条加 P1 13 条：注册表截断丢条目、坏 `.ko` 通过闸门、安装写盘非原子、无固件指纹门、panic 触发死机、字体包不校验且能覆盖在用槽、注册表写路径 3 条、行显隐从未生效、`APP_FG` 门方向相反、栈缓冲当行文本、日期页执行目录分支、resume 不查存活 |
 | 中 | 17 | 卸载不拆回调、IPC 非对齐与非原子、链表遍历 fail-open、地址表形同虚设、确认标志跨页存活、越界读写若干、清单被抹、CI 不可复现、背景状态机卡死 |
 | 低 | 13 | catch-all 分发、单文件过大、无测试、缺 `safe_ptr` 若干、重名导出、日志尾部边界、文档与代码重复 |
 
@@ -40,9 +40,9 @@ Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中�
 
 优先修复的三项：
 
-1. `tools/verify_chaos_ko.py` 改成会失败，半天，零风险。没有这一条，后续修复可能被一次坏构建抵消。
-2. 安装器主模块与注册表写盘改成 `temp` 到回读再到 `rename`，一天。
-3. 固件指纹门，模块启动先校验镜像，不符则什么都不做，一天。这是变砖与重启循环的唯一出口。
+1. 将 `tools/verify_chaos_ko.py` 改为在校验失败时返回失败状态，工作量半天，零风险。缺少这一项，后续修复可能被一次坏构建抵消。
+2. 将安装器主模块与注册表的写盘流程改为 `temp`、回读、`rename` 三步，工作量一天。
+3. 增加固件指纹门，模块启动时先校验镜像，不符则不执行任何操作，工作量一天。这是避免变砖与重启循环的唯一途径。
 
 ## 高严重度（14 条）
 
@@ -50,49 +50,49 @@ Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中�
 
 `supervisor/src/appmgr.rs:1776-1785`（`move_vis_to_hide`）、`:1761`（`remove_all_pkg`）
 
-**证据**：`write_blocked()` 检查的是上一次 `reload()` 时的状态，之后 `capture()` 到 `parse_registry()` 会重新读盘。`scan_object` 在第 41 个对象或包名非法时置 `TRUNC`，`parse_registry()` 仍返回 0，`capture()` 返回 true，`serialize()` 只序列化已登记的条目，未登记对象被静默丢弃，随后 `write_file()` 落盘。
+证据：`write_blocked()` 检查的是上一次 `reload()` 时的状态，此后从 `capture()` 到 `parse_registry()` 会重新读取磁盘。`scan_object` 在第 41 个对象或包名非法时置 `TRUNC`，而 `parse_registry()` 仍然返回 0，`capture()` 返回 true，`serialize()` 只序列化已登记的条目，未登记的对象被静默丢弃，随后由 `write_file()` 写入磁盘。
 
-**影响**：直接违反 `appmgr.rs:29-32` 的红线「解析被截断时绝不回写」。触发条件是上次 reload 之后固件装了新应用，或上次写盘被中断留下无 `package` 的残项，用户再隐藏或显示任一应用。
+影响：这一行为直接违反 `appmgr.rs:29-32` 的红线「解析被截断时绝不回写」。触发条件是上一次 reload 之后固件安装了新应用，或上次写盘被中断留下无 `package` 的残项，用户再隐藏或显示任一应用。
 
-**修复**：`capture()` 与 `parse_registry()` 返回后重新执行 `write_blocked()`；或让 `capture()` 在 `TRUNC`、`OVERSIZE` 时失败，`serialize()` 也拒绝截断态。`remove_all_pkg` 缺这道检查，需一并补上。
+修复：`capture()` 与 `parse_registry()` 返回后重新执行 `write_blocked()`；或让 `capture()` 在 `TRUNC`、`OVERSIZE` 时失败，并让 `serialize()` 拒绝截断状态。`remove_all_pkg` 缺少这道检查，需要一并补上。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C02 坏 `.ko` 能通过构建闸门
 
 `tools/verify_chaos_ko.py:46-59`
 
-**证据**：脚本把未定义符号、`.init_array` 缺失、重定位类型只打印不判定，文件到第 59 行直接结束，没有 `sys.exit(1)`。`build_ko.sh:14-15` 明确警告过「`.text` 为 0 的镜像加载器会一声不吭地装成功」，校验脚本连 `.text` 大小都不检查。CI 只跑 `build_ko.sh`（`.github/workflows/build.yml`），坏包会一路进入 release。
+证据：脚本把未定义符号、`.init_array` 缺失、重定位类型只打印不判定，文件在第 59 行直接结束，没有调用 `sys.exit(1)`。`build_ko.sh:14-15` 明确警告过「`.text` 为 0 的镜像加载器会一声不吭地装成功」，而校验脚本连 `.text` 大小都不检查。CI 只运行 `build_ko.sh`（`.github/workflows/build.yml`），坏包会一路进入 release 产物。
 
-**影响**：构建日志全绿，坏 `.ko` 仍随发布产物分发。
+影响：构建日志全部通过，坏 `.ko` 仍然随发布产物分发。
 
-**修复**：未定义符号非空、`.text` 或 `.init_array` 缺失或为 0、`e_entry` 非预期、总大小达到 256KB 及以上，一律 `raise SystemExit(1)`；把 256KB 的 insmod 上限纳入检查。
+修复：出现以下任一情况时一律 `raise SystemExit(1)`：未定义符号非空、`.text` 或 `.init_array` 缺失或为 0、`e_entry` 不符合预期、总大小达到 256KB 及以上；同时将 256KB 的 insmod 上限纳入检查。
 
-**状态**：已证实。
+状态：已证实。
 
-### C03 主模块部署是原地截断，不看返回值，无回读
+### C03 主模块部署为原地截断，不校验返回值，无回读
 
 `installer/chaos_installer.lua:202-210`（`stage_resource`），用于 `:479` 流水线第一步部署 `sup.ko`
 
-**证据**：`io.open(dest, "wb")` 先毁掉旧模块；`pcall(f.write, f, c)` 只判断有没有抛错，不判断返回 nil，ENOSPC 与短写都会漏过；同一文件的 `write_file()`（`:253-262`）已做回读比对，却没有被这条流水线使用。
+证据：`io.open(dest, "wb")` 先破坏旧模块；`pcall(f.write, f, c)` 只判断是否抛出错误，不判断返回 nil，ENOSPC 与短写都会漏过；同一文件的 `write_file()`（`:253-262`）已经实现回读比对，却没有被这条流水线使用。
 
-**影响**：断电或写失败留下半截 `sup.ko`，下次开机 `/data/rc.d/chaos.sh` 无条件 `insmod` 这半截模块，可能进不了系统。
+影响：断电或写失败留下半截 `sup.ko`，下次开机 `/data/rc.d/chaos.sh` 无条件 `insmod` 这半截模块，可能无法进入系统。
 
-**修复**：写 `dest.tmp`，`close`，回读比对长度并加哈希，再 `rename` 覆盖；该步改走 `write_file()`。
+修复：先写入 `dest.tmp` 并 `close`，回读比对长度并附加哈希校验，再用 `rename` 覆盖；该步骤改走 `write_file()`。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C04 没有固件指纹或版本门，开机脚本无条件 insmod
 
-`installer/chaos_installer.lua:283-297`（`build_chaos_sh`）、`supervisor/src/lib.rs:198-230`（`chaos_ctor` 直接调固化地址）
+`installer/chaos_installer.lua:283-297`（`build_chaos_sh`）、`supervisor/src/lib.rs:198-230`（`chaos_ctor` 直接调用固化地址）
 
-**证据**：安装器全程没有设备固件版本校验，`grep version` 只命中模块自报的 `STATUS_VERSION`。生成的 `/data/rc.d/chaos.sh` 是 `set +e` 加 `insmod /data/chaos/chaos_sup.ko` 加两次 dd，没有任何前置条件。模块 `ctor` 一进来就调 `0x0C1AFF61` 等固化地址。
+证据：安装器全程没有设备固件版本校验，`grep version` 只命中模块自报的 `STATUS_VERSION`。生成的 `/data/rc.d/chaos.sh` 由 `set +e`、`insmod /data/chaos/chaos_sup.ko` 与两次 dd 组成，没有任何前置条件。模块 `ctor` 一进入就调用 `0x0C1AFF61` 等固化地址。
 
-**影响**：把 3.101.043 专用包安装到别的固件上，开机即 HardFault，进入重启循环。README 只用文字警告，代码里没有任何拦截。
+影响：将 3.101.043 专用包安装到其他固件上，开机即 HardFault，进入重启循环。README 仅以文字警告，代码中没有任何拦截。
 
-**修复**：分两层。模块侧在 `ctor` 第一步校验一段已知镜像字节，例如 `0x0C1AFF61` 处指令或其前后 8 字节魔数，不符则直接返回，不注册驱动、不建定时器。安装器与 rc 侧在 insmod 前用 `getprop` 读取固件版本属性（安装器已有这条通路，见 `:127-160` 的语言检测），不符则跳过并写 `autostart.log`。
+修复：需要分两层处理。模块侧在 `ctor` 的第一步校验一段已知镜像字节，例如 `0x0C1AFF61` 处的指令或其前后 8 字节魔数，不符则直接返回，不注册驱动，也不创建定时器。安装器与 rc 侧在 insmod 之前用 `getprop` 读取固件版本属性（安装器已有这条通路，见 `:127-160` 的语言检测），不符则跳过，并写入 `autostart.log`。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C05 `panic=abort` 加 `loop{}` 的 panic handler 让设备永久死机
 
@@ -102,61 +102,61 @@ Chaos 工程的逆向功底与防御性写法高于平均水平，问题集中�
 #[panic_handler] fn panic(_: &PanicInfo) -> ! { loop {} }
 ```
 
-**证据**：`Cargo.toml` 中 `panic = "abort"`。编译期断言之外，运行期 panic 面仍在，包括切片越界与除零。
+证据：`Cargo.toml` 中 `panic = "abort"`。编译期断言之外，运行期 panic 面仍在，包括切片越界与除零。
 
-**影响**：一旦触发，设备不重启、不留痕迹，用户只看到手表卡死，只能强制重启。
+影响：一旦触发，设备不会重启，也不会留下痕迹，用户只能观察到手表卡死，并只能强制重启。
 
-**修复**：panic handler 先尽力把 `PanicInfo` 写进 `/data/chaos/panic.txt`，再触发系统复位（`0xE000ED0C = 0x05FA0004`，或 `fw_api` 中已有的复位路径），把死机降级为重启。
+修复：panic handler 先尽力将 `PanicInfo` 写入 `/data/chaos/panic.txt`，再触发系统复位（`0xE000ED0C = 0x05FA0004`，或 `fw_api` 中已有的复位路径），将死机降级为重启。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C06 字体包不校验内容，且能覆盖正在使用的槽
 
 `installer/font_pack.lua:237-262`、`:315`；`supervisor/src/ipc.rs:371-381`、`:99-108`
 
-**证据**：`io.open(FONT_RESOURCE)` 直接搬到 `/data/chaos/font/st<N>.ttf`，没有魔数、长度、sfnt 解析；ko 侧 `font_slot_file_ok` 也只 open 与 close。`index_read()` 在 `index.txt` 缺失时返回空表，`index_alloc()` 可能分配出当前在用的槽，`io.open(..., "wb")` 在校验之前就把活着的字体文件截断。这违反该文件头注释（`:6-10`）明令禁止的「让还活着的老脸读到别人的字节」。
+证据：`io.open(FONT_RESOURCE)` 直接复制到 `/data/chaos/font/st<N>.ttf`，没有魔数、长度、sfnt 解析；ko 侧 `font_slot_file_ok` 也只 open 与 close。`index_read()` 在 `index.txt` 缺失时返回空表，`index_alloc()` 可能分配出当前在用的槽，`io.open(..., "wb")` 在校验之前就把仍在使用的字体文件截断。这一行为违反该文件头注释（`:6-10`）明令禁止的「让还活着的老脸读到别人的字节」。
 
-**影响**：全 UI 字体异常，最坏是 LVGL 拿损坏字体建脸时崩溃。
+影响：整个 UI 的字体出现异常，最坏的情况是 LVGL 使用损坏字体建脸时崩溃。
 
-**修复**：写入前校验 sfnt 头（`0x00010000`、`OTTO`、`true`、`ttcf`）与最小长度；拒绝 `job.slot == cur`，覆盖自己那份除外；写 `st<N>.ttf.tmp`，等 `0x30` 收到 ACK 再 rename；ko 侧 `commit` 之前做同一套头校验，现在只 open 与 close 就 `commit` 加 `remember_font` 持久化，坏文件会跨重启生效。
+修复：写入前校验 sfnt 头（`0x00010000`、`OTTO`、`true`、`ttcf`）与最小长度；拒绝 `job.slot == cur`，覆盖自身那一份除外；先写 `st<N>.ttf.tmp`，待 `0x30` 收到 ACK 之后再 rename；ko 侧在 `commit` 之前执行同一套头校验，当前实现只做 open 与 close 就 `commit` 并 `remember_font` 持久化，坏文件会跨重启继续生效。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C07 注册表原地改写，无 temp、无备份，短写回滚出「两边都没有」
 
 `supervisor/src/appmgr.rs:1692-1704`（`write_file`）
 
-**证据**：删除条目时内容左移，部分写入会留下旧尾巴；尾部空格填充只能救成功的短序列化，救不了写失败。下一轮启动见 `PARSE_BAD` 就转只读，没有恢复路径，`close()` 返回值也未检查。`move_vis_to_hide` 第二步失败会触发回滚删除，条目可能两个文件里都没有。
+证据：删除条目时内容左移，部分写入会留下旧的尾部数据；尾部空格填充只能弥补成功的短序列化，无法弥补写入失败。下一轮启动时见到 `PARSE_BAD` 即转为只读，没有恢复路径，`close()` 的返回值也未检查。`move_vis_to_hide` 第二步失败会触发回滚删除，条目可能同时不存在于两个文件中。
 
-**影响**：注册表条目丢失，应用从桌面消失，且无法从备份恢复。
+影响：注册表条目丢失，应用从桌面消失，且无法从备份恢复。
 
-**修复**：`<path>.new` 写入后回读校验，再 rename；保留 `<path>.bak` 直到校验通过；任何短写或负返回视为整体失败，不做半截回滚。
+修复：先写入 `<path>.new` 并回读校验，再 rename；保留 `<path>.bak` 直到校验通过；任何短写或负返回值都视为整体失败，不做部分回滚。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C08 `remove_all_pkg` 把「读不到或解析失败」当成「已删干净」
 
 `supervisor/src/appmgr.rs:1765`
 
-**证据**：`capture()` 对文件不存在、打不开、解析失败统一返回 false，调用方 `if !capture(...) { return true; }` 一律视为删除完成。若第一次写成功后回读失败，刚追加进 `apps.json_hide` 的副本会留下，可见副本却没删，同一包名同时出现在两个文件。
+证据：`capture()` 对文件不存在、打不开、解析失败统一返回 false，调用方 `if !capture(...) { return true; }` 一律视为删除完成。若第一次写成功后回读失败，刚追加进 `apps.json_hide` 的副本会留下，可见副本却没删，同一包名会同时出现在两个文件中。
 
-**影响**：产生 `E_DUP`，按代码自己的注释（`:1759-1760`），固件会建两个桌面记录、退出时二次释放，表现为黑屏。
+影响：产生 `E_DUP`，按代码自身的注释（`:1759-1760`），固件会建两个桌面记录、退出时二次释放，表现为黑屏。
 
-**修复**：`capture` 区分 `Found`、`NotFound`、`Err`，只有 `NotFound` 算完成，`Err` 向上传播并让调用方回滚追加。C07、C08 与 C01 同属注册表写路径，建议用同一套 `temp`、`verify`、`rename` 助手一起改。
+修复：`capture` 区分 `Found`、`NotFound`、`Err`，只有 `NotFound` 视为完成，`Err` 向上传播并让调用方回滚追加。C07、C08 与 C01 同属注册表写路径，建议用同一套 `temp`、`verify`、`rename` 辅助函数一并修改。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C28 删除正在使用的字体时，回退未成功前清单与文件已不可逆
 
 `supervisor/src/font_apply.rs:632-636`、`:708-710`；`supervisor/src/font_list.rs:563`、`:587`
 
-**证据**：建脸失败的样式会被跳过，只把 `FA_C_FACE0` 加一，没有任何地方用它当门；`apply_finish()` 无条件清 `FA_REVERT`；删除流程的状态 11 只等 `revert_busy()`（即 `FA_REVERT`）就进状态 2 执行 `fw_api::fs_remove(p)`。
+证据：建脸失败的样式会被跳过，只把 `FA_C_FACE0` 加一，没有任何地方把它用作门；`apply_finish()` 无条件清 `FA_REVERT`；删除流程的状态 11 只等待 `revert_busy()`（即 `FA_REVERT`）就进入状态 2 执行 `fw_api::fs_remove(p)`。
 
-**影响**：个别样式回退失败时，字体文件被删，那些样式仍持有按需回读该文件的脸。一次 `mfont_create` 的瞬时失败（内存紧张或管理器预热）就够触发。
+影响：个别样式回退失败时，字体文件被删，那些样式仍然持有按需回读该文件的字体对象。一次 `mfont_create` 的瞬时失败（内存紧张或管理器预热）即足以触发。
 
-**修复**：`FA_REVERT` 只在 `FA_C_FACE0 == 0 && FA_C_WR == FA_JOB_N` 时清；把回退失败暴露给删除流程，状态 11 遇到失败必须中止删除并给出可见提示。
+修复：`FA_REVERT` 只在 `FA_C_FACE0 == 0 && FA_C_WR == FA_JOB_N` 时清；把回退失败暴露给删除流程，状态 11 遇到失败时应中止删除并给出可见提示。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C32 所有隐藏行的调用都是空操作
 
@@ -169,25 +169,25 @@ pub unsafe extern "C" fn obj_set_hidden(obj: Obj, hidden: u32) -> Obj {
 }
 ```
 
-**证据**：`gfx.rs:65-69` 自己写着「同一个入口的真身是 `lv_obj_clear_state`，它不隐藏任何东西，页 7、8、9 的行显隐实际没有发生隐藏」。LVGL v9 已删除 `lv_obj_set_hidden`，正解是 `lv_obj_add_flag(obj, 1)`。
+证据：`gfx.rs:65-69` 自己写着「同一个入口的真身是 `lv_obj_clear_state`，它不隐藏任何东西，页 7、8、9 的行显隐实际没有发生隐藏」。LVGL v9 已删除 `lv_obj_set_hidden`，正确的做法是 `lv_obj_add_flag(obj, 1)`。
 
-**影响**：表盘页 8、9 上超出窗口的行、应用管理页超窗口的行都不会隐藏。
+影响：表盘页 8、9 上超出窗口的行，以及应用管理页超出窗口的行，都不会被隐藏。
 
-**修复**：`obj_set_hidden(0/1)` 改实现为 `obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN)` 与 `obj_clear_flag(...)`，现有壳 `0x1C028BD9`、`0x1C028C85` 在 `gfx.rs:605-615`；`obj_clear_state` 只留给 `page.rs:533` 的 FOCUSED 清除。
+修复：将 `obj_set_hidden(0/1)` 的实现改为 `obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN)` 与 `obj_clear_flag(...)`，对应的现有壳 `0x1C028BD9`、`0x1C028C85` 位于 `gfx.rs:605-615`；`obj_clear_state` 仅保留给 `page.rs:533` 的 FOCUSED 清除。
 
-**状态**：已证实。
+状态：已证实。
 
-### C39 `APP_FG` 在 pause 清、在 resume 不恢复，字体跑批的安全门反向
+### C39 `APP_FG` 在 pause 时清零、在 resume 时不恢复，字体批量提交的安全门方向相反
 
 `supervisor/src/ui.rs:417`（清）、`:48`（唯一置 1 处）、`:362-411`（resume 未置）；`supervisor/src/font_apply.rs:540`
 
-**证据**：`chaos_on_pause` 写 `APP_FG=0`，`chaos_on_create` 写 1，`chaos_on_resume` 不写。`state.rs:369` 的注释明确要求 resume 置、pause 与 destroy 清。息屏唤醒若没有重建页面实例，模块一直认为自己在后台。字体逐对象改写在 `font_apply.rs:540` 使用 `if st_rd!(APP_FG) != 0 { return; }`，即「页在前台就跳过」，注释写着这种情况 commit 仍然崩。`beautify_restore.rs:128` 也只在 `APP_FG==0` 时动作，前台页面活着时也会重挂背景。
+证据：`chaos_on_pause` 写 `APP_FG=0`，`chaos_on_create` 写 1，`chaos_on_resume` 不写。`state.rs:369` 的注释明确要求 resume 置、pause 与 destroy 清。息屏唤醒若没有重建页面实例，模块会一直认为自身处于后台。字体逐对象改写在 `font_apply.rs:540` 使用 `if st_rd!(APP_FG) != 0 { return; }`，即「页在前台就跳过」，注释指出这种情况下 commit 仍然会崩溃。`beautify_restore.rs:128` 也只在 `APP_FG==0` 时动作，前台页面仍然存活时也会重新挂载背景。
 
-**影响**：字体提交在错误的前后台判断下执行，可能崩溃；背景被重复挂载。
+影响：字体提交在错误的前后台判断下执行，可能崩溃；背景被重复挂载。
 
-**修复**：`chaos_on_resume` 里设 `FG_PAGE` 之后立刻 `st_wr!(APP_FG, 1)`，并在 `chaos_on_destroy` 里清零。
+修复：`chaos_on_resume` 里设 `FG_PAGE` 之后立刻 `st_wr!(APP_FG, 1)`，并在 `chaos_on_destroy` 里清零。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C40 `WfMgmtPage` 把栈上缓冲当行文本传下去
 
@@ -200,37 +200,37 @@ let text = core::slice::from_raw_parts(tbuf.as_ptr(), tlen + 1);
 ... RowSpec::switch(text)
 ```
 
-**证据**：本仓库的硬规则是行控件的文本指针必须一直有效（`icon_apply.rs:163`、`appmgr.rs:131`），其它页都用 `WATCH_LINES`、`FL_LINES`、`IC_LINES` 静态缓冲，只有这里传局部数组。`render` 返回后指针失效，重绘读到被复用的栈帧；若复用区没有 NUL，LVGL 的 `strlen` 越界读并崩溃。下方 `row_update(s0, ..., tbuf.as_ptr(), ...)` 也在同一帧内使用它。
+证据：本仓库的硬规则是行控件的文本指针必须一直有效（`icon_apply.rs:163`、`appmgr.rs:131`），其他页均使用 `WATCH_LINES`、`FL_LINES`、`IC_LINES` 静态缓冲，只有此处传入局部数组。`render` 返回后指针失效，重绘读到被复用的栈帧；若复用区没有 NUL，LVGL 的 `strlen` 越界读并崩溃。下方 `row_update(s0, ..., tbuf.as_ptr(), ...)` 也在同一帧内使用它。
 
-**影响**：行文本乱码，或重绘时崩溃。当前可能因栈帧尚未复用而侥幸通过。
+影响：行文本乱码，或重绘时崩溃。当前可能因栈帧尚未被复用而暂时没有暴露。
 
-**修复**：改成文件级 `static mut WFMGMT_ROW0: [u8; 88]`，与其它页保持一致。
+修复：改为文件级 `static mut WFMGMT_ROW0: [u8; 88]`，与其他页保持一致。
 
-**状态**：已证实。
+状态：已证实。
 
-### C41 日期设置页仍在跑目录页的 resume 分支
+### C41 日期设置页仍在执行目录页的 resume 分支
 
 `supervisor/src/ui.rs:377-387`
 
-**证据**：`if pid == 3 { DIR_DEPTH = pid-1; load_dir(); }`，但 `PAGE_TABLE[3]` 现在是 `&PAGE_DATE_MD`（`page.rs:2253`，`DATE_MD_PID=3`）。`PATH_STACK` 只有退役的文件管理页会填，`load_dir()` 拿着全零路径去 `opendir`，还覆盖 `DIR_DEPTH`、`DIR_WIN`、`DIR_COUNT`、`DIR_ERR`。紧邻的注释已记录同类误用：「点『时间设置』立即崩」。
+证据：`if pid == 3 { DIR_DEPTH = pid-1; load_dir(); }`，但 `PAGE_TABLE[3]` 现在是 `&PAGE_DATE_MD`（`page.rs:2253`，`DATE_MD_PID=3`）。`PATH_STACK` 只有已退役的文件管理页会填充，`load_dir()` 以全零路径调用 `opendir`，并覆盖 `DIR_DEPTH`、`DIR_WIN`、`DIR_COUNT`、`DIR_ERR`。紧邻的注释已经记录同类误用：「点『时间设置』立即崩」。
 
-**影响**：每次进入日期设置都走这条路径，存在立即崩溃的条件。
+影响：每次进入日期设置都会经过这条路径，存在立即崩溃的条件。
 
-**修复**：删掉这段 `if pid == 3`，已无目录页可达；或改成显式的「当前页确实是目录页」判据。
+修复：删除这段 `if pid == 3`，已无目录页可达；或改为显式的「当前页确实是目录页」判据。
 
-**状态**：已证实。
+状态：已证实。
 
 ### C42 `chaos_on_resume` 不校验页面存活就 `render_page`
 
 `supervisor/src/ui.rs:411`；对比 `supervisor/src/ui.rs:61-70`（`page_is_live`）
 
-**证据**：`render_page(pid)` 内部只查 `PAGES[pid].root != 0`（`ui.rs:220-221`），其它所有渲染路径（行分发、tick、`render_req`、表盘自愈）都以 `page_is_live`（读描述符 `+0x30`）为门。唤醒时若固件已拆掉对象树却没回调可选的 `ui_destroy`，就会对着已释放的 LVGL 内存建标题与内容。resume 开头自己就承认「描述符可能不是本页的，唤醒时固件换了编码」。
+证据：`render_page(pid)` 内部只查 `PAGES[pid].root != 0`（`ui.rs:220-221`），其他所有渲染路径（行分发、tick、`render_req`、表盘自愈）都以 `page_is_live`（读描述符 `+0x30`）为门。唤醒时若固件已拆掉对象树却没回调可选的 `ui_destroy`，就会针对已释放的 LVGL 内存创建标题与内容。resume 开头的注释已经承认「描述符可能不是本页的，唤醒时固件换了编码」。
 
-**影响**：对已释放内存写入，可能 HardFault 或界面错乱。
+影响：对已释放内存执行写入，可能触发 HardFault 或界面错乱。
 
-**修复**：`render_page(pid)` 之前加 `if !page_is_live(pid) { return 0; }`。
+修复：`render_page(pid)` 之前加 `if !page_is_live(pid) { return 0; }`。
 
-**状态**：推断。
+状态：推断。
 
 ## 中严重度（17 条）
 
@@ -251,7 +251,7 @@ let text = core::slice::from_raw_parts(tbuf.as_ptr(), tlen + 1);
 | C29 | `supervisor/src/font_hot.rs:286-292`、`:333-340` | 遍历包装链时只守卫链体、没守卫下一跳：`wp` 过不了 `safe_ptr` 仍执行 `wp = rd32(wp+44)`，在 50ms 定时器里读任意地址，与文件自称的 fail-closed 相反。 | `if !safe_ptr(wp) { break; }`，下一跳也要校验。 | 已证实 |
 | C30 | `supervisor/src/watchface.rs:19-27`、`:139`、`:159` | 表盘节点只用 `(node & 0xE0000000) != 0x20000000` 判段，不查对齐与是否映射；`name_translation` 的 `arr`、`tp` 指针完全不校验就做 32 与 63 字节读。 | 节点与下一跳用 `safe_ptr`，`arr`、`tp` 用 `plausible_ptr`。 | 推断 |
 | C31 | `supervisor/src/font_list.rs:139-143`、`:568` | `fl_load` 先置 `FL_LOADED=1` 再 open，失败静默返回，使「读不到」等同于「空清单」；随后删除流程把 `index.txt` 写成 8 行空白，永久抹掉清单，字体文件仍在。 | 只有解析成功才置加载位；`fl_load`、`fl_drop` 失败时中止删除。 | 已证实 |
-| C33 | `supervisor/src/fw_api/gfx.rs:430-432` 等约 40 处 | 地址表形同虚设：`MFONT_CREATE_NAMED` 已入库却仍写 `transmute(0x0C86_03B1)`；`fwaddr.rs:141-143` 的 `compile_error!` 只在 `fw-p65` 下触发，删掉它就等于让 RW6 跑 043 的地址。 | 调用点接回表名；用机械检查替代人工判断，例如 `fwaddr` 之外禁止 `transmute(0x0C..)`。 | 已证实 |
+| C33 | `supervisor/src/fw_api/gfx.rs:430-432` 等约 40 处 | 地址表形同虚设：`MFONT_CREATE_NAMED` 已入库却仍写 `transmute(0x0C86_03B1)`；`fwaddr.rs:141-143` 的 `compile_error!` 只在 `fw-p65` 下触发，删掉它就等于让 RW6 使用 043 的地址。 | 调用点接回表名；用机械检查替代人工判断，例如 `fwaddr` 之外禁止 `transmute(0x0C..)`。 | 已证实 |
 | C43 | `supervisor/src/page.rs:924`、`:1030`、`:1042`；`cacheclean.rs:192` | 二次确认标志位跨页销毁存活：`LOG_CLEAR_ARMED`、`CC_ARM` 只在确认或执行完才清，`chaos_on_create` 与 `on_ui_destroy` 都不重置。退出再进入，一行仍显示「再点一次确认清空」，单击就真清空。 | 在 `on_create`、`on_ui_destroy` 里一并重置。 | 已证实 |
 
 ## 低严重度（13 条）
@@ -283,22 +283,22 @@ let text = core::slice::from_raw_parts(tbuf.as_ptr(), tlen + 1);
 | `.unwrap()`、`.expect()`、`panic!` | 0 | panic 面被压到只剩编译期断言 |
 | 测试 | 0 | 所有行为保证都靠真机试错与注释 |
 
-`unsafe` 密度由逆向任务本身决定，需要与固件的裸地址、链表、LVGL 对象打交道。防御写法也在，包括 `safe_ptr` 白名单、`guard<512` 链表上限、`is_child_of` 校验、失败回退原图标、A/B 槽世代计数。
+`unsafe` 密度由逆向任务本身决定，需要与固件的裸地址、链表、LVGL 对象打交道。防御性写法同样存在，包括 `safe_ptr` 白名单、`guard<512` 链表上限、`is_child_of` 校验、失败回退原图标、A/B 槽世代计数。
 
-真正缺的是错误发生时谁兜底。unsafe 代码无法证明正确，因此需要三样东西：会失败的闸门、可恢复的写盘、能自愈的启动（指纹门加 panic 重启）。
+真正缺少的是错误发生时的兜底机制。unsafe 代码无法证明其正确性，因此需要三样东西：会失败的闸门、可恢复的写盘、能够自愈的启动（固件指纹门加 panic 重启）。
 
 ## 修复顺序
 
 | 轮次 | 条目 | 内容 |
 | --- | --- | --- |
-| 第 0 轮，半天，零风险 | C02、C03、C05、C06 | 只动工具与安装器：校验脚本失败化、主模块 `temp` 加 `rename` 加回读、panic 改成复位、字体头校验并禁止覆盖在用槽。这一轮不碰 supervisor 运行逻辑，改完可先发一版验证构建闸门真的会拦。 |
-| 第 1 轮，一天 | C04、C01、C07、C08、C41、C39、C42、C40、C28、C31 | 动 supervisor 但改动都很小：固件指纹门放 `ctor` 首步；注册表写路径统一成 `temp`、`verify`、`rename` 并禁止截断态回写；删掉日期页的目录分支；恢复 `APP_FG`；resume 前查 `page_is_live`；行文本改静态；处理字体删除顺序与清单加载失败。 |
-| 第 2 轮，按需 | C09、C13、C14、C12、C43、C44、C18、C17、C20、C29、C30、C32 | 卸载拆除、构建可复现、去掉 catch-all、确认标志重置、日志尾部、越界与 fail-open、行显隐真修。行显隐需要真机回归。 |
-| 暂缓 | C10、C11、C16、C21 | 全面临界区改造与需要重新验证真机行为的改动，收益低于风险。等前三轮稳定后，以每次一改加真机回归的方式做。 |
+| 第 0 轮，半天，零风险 | C02、C03、C05、C06 | 本轮只改动工具与安装器：校验脚本改为失败即返回、主模块写盘改为 `temp`、`rename` 加回读、panic 改为复位、字体头校验并禁止覆盖在用槽。本轮不涉及 supervisor 运行逻辑，完成后可以先发布一版，验证构建闸门确实能够拦截。 |
+| 第 1 轮，一天 | C04、C01、C07、C08、C41、C39、C42、C40、C28、C31 | 本轮涉及 supervisor，但改动都很小：固件指纹门放在 `ctor` 首步；注册表写路径统一为 `temp`、`verify`、`rename`，并禁止在截断状态下回写；删除日期页的目录分支；恢复 `APP_FG`；resume 之前检查 `page_is_live`；行文本改为静态缓冲；处理字体删除顺序与清单加载失败。 |
+| 第 2 轮，按需 | C09、C13、C14、C12、C43、C44、C18、C17、C20、C29、C30、C32 | 卸载流程的拆除、构建可复现、移除 catch-all、确认标志重置、日志尾部处理、越界与 fail-open 修复、行显隐的实际修复。行显隐的改动需要真机回归验证。 |
+| 暂缓 | C10、C11、C16、C21 | 全面临界区改造以及需要重新验证真机行为的改动，其收益低于风险。待前三轮稳定之后，以每次一处改动加真机回归的方式实施。 |
 
 ## 未覆盖范围
 
-1. 没有上真机。所有会崩、会黑屏的判断来自代码路径与注释里的先例记录，不是本次复现。
+1. 没有在真机上运行。所有关于崩溃与黑屏的判断均来自代码路径与注释中的先例记录，并非本次复现的结果。
 2. 没有重链接 `.ko`。宿主无 `cc` 与 libc，`build.rs` 的宿主链接无法完成，`cargo check` 只覆盖类型层。
 3. `fw_api/*.rs` 的表驱动地址（`gfx.rs` 616 行、44 处 `transmute`）只做抽样核对，没有逐条对齐固件反汇编。
 4. 没有二进制解析器。字体、图标、表盘的「文件」都是定长文本清单加固件 RAM 结构，因此不包含文件格式 fuzz 类结论。`icon_pack.lua` 的解包（`CIPK` 加位图）是唯一真正处理二进制的地方，已单独审过，见 C27。

@@ -13,12 +13,12 @@ contributors: [miband-dev]
 <StatusBadge status="sourced" verified="2026-10-25" />
 
 ::: danger 风险提示
-拆机读取、改写引导分区与刷写镜像都可能导致设备永久损坏。以下内容整理自公开研究，作者未在真机上复现全部步骤。任何操作前先完成整片备份，并确认自己能够恢复。
+拆机读取、改写引导分区与刷写镜像都可能导致设备永久损坏。以下内容整理自公开研究，作者未在真机上复现全部步骤。任何操作前都应先完成整片备份，并确认具备恢复能力。
 :::
 
-结论：10 Pro 的启动分三级引导（BL → BL2 → AP），BL2 里的 `rcS` 脚本决定进系统、恢复模式还是工厂模式。官方恢复机制只提供「格式化数据分区」这一个动作，遇到 AP 自身崩溃时会陷入重启循环；社区的做法是往资源分区塞一个最小恢复 OTA，再改写 BL2 的启动脚本。彻底救砖的最后手段是拆下 SPI NAND 读整片镜像。
+10 Pro 的启动分三级引导（BL → BL2 → AP），BL2 中的 `rcS` 脚本决定进入系统、恢复模式还是工厂模式。官方恢复机制只提供「格式化数据分区」这一个动作，遇到 AP 自身崩溃时会陷入重启循环。社区的做法是向资源分区放入一个最小恢复 OTA，再改写 BL2 的启动脚本。彻底救砖的最后手段是拆下 SPI NAND 读取整片镜像。
 
-## 硬件底子
+## 硬件基础
 
 | 项 | 10 Pro |
 | --- | --- |
@@ -28,7 +28,7 @@ contributors: [miband-dev]
 | 外挂存储 | SPI NAND，Pro 512 Mb，普通版 256 Mb |
 | 系统 | VelaOS（NuttX + 应用框架） |
 
-以上来自 Habr 的拆解分析。外挂 NAND 的具体型号由另一份拆机实录确认：Dosilicon **DS35M4GB-IB**，4 Gbit、1.8V、WSON-8 封装。它的参数决定了读取方式：
+以上来自 Habr 的拆解分析。外挂 NAND 的具体型号由另一份拆机实录确认：Dosilicon DS35M4GB-IB，4 Gbit、1.8V、WSON-8 封装。其参数决定了读取方式：
 
 | 参数 | 值 |
 | --- | --- |
@@ -51,7 +51,7 @@ contributors: [miband-dev]
 | `/dev/nv` | `/misc` | littlefs | NOR 分区，设备配置 |
 | `/dev/mode` | `/mode` | littlefs | NOR 分区，模式数据 |
 
-`/dev/nv` 与 `/dev/mode` 位于片内 NOR，拆 NAND 读不到；`/data` 才是 YAFFS2 的主战场。分区结构在[固件包格式](/platform/firmware/package)中有另一份来自固件字节的对照。
+`/dev/nv` 与 `/dev/mode` 位于片内 NOR，拆卸 NAND 无法读取；YAFFS2 的主要分区为 `/data`。分区结构在[固件包格式](/platform/firmware/package)中有另一份来自固件字节的对照。
 
 ## 三级启动
 
@@ -114,10 +114,10 @@ AP 启动失败时，BL2 会加载 `vela_recovery.bin`，屏幕上只有一个�
 
 ## 社区修复思路
 
-官方 OTA 包里其实带了一个最小恢复包 `fac_to_user.zip`，它只含让系统跑起来的最小 AP 与资源。修复分两步（来源为 Habr 文章的实践）：
+官方 OTA 包内包含一个最小恢复包 `fac_to_user.zip`，其中仅有使系统能够启动的最小 AP 与资源。修复分两步（来源为 Habr 文章的实践）：
 
-1. 把 `fac_to_user.zip` 打进资源分区的 ROMFS（`vela_resource.bin`），使其在 `/resource/prebuild/` 下可见；
-2. 改写 `vela_bl2.bin` 里的 `rcS`：在 `restore` 分支中先把 `fac_to_user.zip` 复制到 `/data/ota.zip`，再走标准 OTA 流程安装。
+1. 将 `fac_to_user.zip` 写入资源分区的 ROMFS（`vela_resource.bin`），使其在 `/resource/prebuild/` 下可见；
+2. 改写 `vela_bl2.bin` 中的 `rcS`：在 `restore` 分支中先将 `fac_to_user.zip` 复制到 `/data/ota.zip`，再经标准 OTA 流程安装。
 
 改写后的 `restore` 分支大致为：
 
@@ -130,7 +130,7 @@ if [ "$resetcause" = "cpu_soft_reset(restore)" ]; then
 fi
 ```
 
-这样「重置数据」会变成「重置并安装最小系统」，设备能恢复可用状态。BL2 镜像也在官方 OTA 包内，提取不需要额外手段。
+这样「重置数据」会变为「重置并安装最小系统」，设备即可恢复可用状态。BL2 镜像同样在官方 OTA 包内，提取不需要额外手段。
 
 ::: warning
 改写引导脚本相当于自制固件，校验和、签名与分区布局任一处不匹配都会变砖。该方案为第三方研究结论，本站未复现。
@@ -138,7 +138,7 @@ fi
 
 ## 拆机读取整片镜像
 
-设备彻底无法启动时的最后手段：拆下 SPI NAND，用外部 SPI 主机读整片 raw 镜像，再离线还原文件系统。公开实录（2026-10）完整记录了 10 Pro 的一次操作：
+设备彻底无法启动时的最后手段：拆下 SPI NAND，用外部 SPI 主机读取整片 raw 镜像，再离线还原文件系统。公开实录（2026-10）完整记录了 10 Pro 的一次操作：
 
 - 样本是一台 AP 刷写失败变砖的 10 Pro（代号 p67）；
 - 读取平台为 Radxa Zero 3W（RK3566）的 SPI3，1.8V 供电，SI/SO 各串 2.2 kΩ 做 1.8V/3.3V 适配；
@@ -157,7 +157,7 @@ fi
 最终 rootfs 共 5959 个文件、219,512,486 字节，其中 `/resource` 5814 个、`/data` 139 个；`/dev/nv`、`/dev/mode`（NOR）与 BL2 完整镜像未取得。原始镜像与还原产物在 [DDlhy/Miband10pro-firmware-extraction](https://github.com/DDlhy/Miband10pro-firmware-extraction) 以 MIT 许可发布，固件内容版权仍归厂商。
 
 ::: warning
-WSON-8 焊盘间距小，拆焊与飞线需要热风枪与显微设备；1.8V 域直接接 3.3V GPIO 会损坏芯片。没有把握时不要动硬件。
+WSON-8 焊盘间距小，拆焊与飞线需要热风枪与显微设备；将 1.8V 域直接接至 3.3V GPIO 会损坏芯片。缺乏把握时不应操作硬件。
 :::
 
 ## 路径选择

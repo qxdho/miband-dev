@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="tested" verified="2026-11-01" />
 
-仓库里有三个可直接对照的 Lua 表盘工程，分别覆盖只读探测、文件系统遍历与原生模块安装。
+仓库中有三个可直接对照的 Lua 表盘工程，分别覆盖只读探测、文件系统遍历与原生模块安装。
 
 ## 文件清单（`watchfaces/fslist/`）
 
@@ -22,7 +22,7 @@ contributors: [miband-dev]
 - 构建：`p67build.cjs`，支持 `build` / `verify`；
 - 离线测试：`tools/smoke.lua`。
 
-适合作为「最小可安装表盘 + 一次危险操作」的模板。
+该工程可作为「最小可安装表盘 + 一次危险操作」的模板。
 
 ## LRA 探测（`probe/`）
 
@@ -30,7 +30,7 @@ contributors: [miband-dev]
 - `native/hello.ko` 与 `lra_probe.ko`：用于验证模块加载链路；
 - `build.sh`：交叉编译脚本。
 
-适合先验证「表盘能不能读设备、能不能跑 shell」，再决定是否加载模块。
+适用于在加载模块之前，先验证表盘能否读取设备与执行 shell。
 
 ## 原生模块安装器（`installer/`）
 
@@ -38,16 +38,16 @@ contributors: [miband-dev]
 - 使用完整 Lua 5.4 的 `io.open`、`os.execute`、`os.remove`；
 - `build.mjs` 校验 32 位小端 `ET_REL` ARM ELF；
 - `pack67.mjs` 生成 p67 容器；
-- 永不 `rmmod`；加载失败时 rc.d 脚本自删；写入幂等。
+- 不执行 `rmmod`；加载失败时由 rc.d 脚本自删；写入操作幂等。
 
 这是「原生应用随 Lua 表盘安装」的参考实现，说明见[加载方式](/native/loading)。
 
 ## 使用建议
 
-1. 先装 `fslist` 确认表盘安装链路；
+1. 先安装 `fslist` 确认表盘安装链路；
 2. 再用 `probe` 确认设备节点与 shell；
 3. 最后用 `installer` 部署自己的 `.ko`；
-4. 每一步都保留回退路径，不要在同一个表盘里同时做探测与写入。
+4. 每一步均保留回退路径，不应在同一表盘内同时进行探测与写入。
 
 ## 相关页面
 

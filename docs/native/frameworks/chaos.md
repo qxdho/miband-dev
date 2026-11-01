@@ -12,9 +12,9 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-10-25" />
 
-Chaos 的功能面比 Canopus 窄，但在界面重建上做对了四件事，四条规定可直接照搬到 Canopus 的界面修复。
+Chaos 的功能范围比 Canopus 窄，但在界面重建方面有四条设计是正确的，这四条规定可以直接移植到 Canopus 的界面修复中。
 
-结论：Chaos 没有模块加载与 target pack 体系，supervisor 本身是一个 native 应用，以硬编码地址直接调用固件中的 LVGL 函数。渲染安全的设计完整，地址来源不可追溯。
+Chaos 没有模块加载与 target pack 体系，supervisor 本身是一个原生应用，以硬编码地址直接调用固件中的 LVGL 函数。渲染安全方面的设计较为完整，但地址来源不可追溯。
 
 ## 概况
 
@@ -38,11 +38,11 @@ supervisor（native app，常驻，管理页面与模块）
 LVGL / lvx 控件层
 ```
 
-与 Canopus 的差异在于，Chaos 的 supervisor 本身就是 native 应用，不经过模块加载，固件中的 LVGL 函数地址硬编码在代码里直接调用。
+与 Canopus 的差异在于，Chaos 的 supervisor 本身就是 native 应用，不经过模块加载，固件中的 LVGL 函数地址以硬编码形式写在代码中并被直接调用。
 
-## 四个结构性设计
+## 四项结构性设计
 
-### 不在事件回调里销毁对象
+### 事件回调中不销毁对象
 
 `supervisor/src/ui.rs:108` 的 `render_req`：
 
@@ -52,11 +52,11 @@ LVGL / lvx 控件层
 pub(crate) unsafe fn render_req(pid: usize) { ... }
 ```
 
-事件回调执行时，LVGL 正在遍历控件树。此刻删除当前控件，遍历器持有的是悬空指针，属于 use-after-free，表现为花屏、重叠或直接死机。
+事件回调执行时，LVGL 正在遍历控件树。若在此刻删除当前控件，遍历器持有的是悬空指针，属于 use-after-free，表现为花屏、重叠或直接死机。
 
-对策是在回调里只置一个「待重画」标记，真正的重建交给常驻 `lv_timer`。定时器回调不在事件派发上下文中，此时删除对象是安全的。
+对策是在回调中只设置一个「待重画」标记，实际重建交给常驻 `lv_timer`。定时器回调不在事件派发上下文中执行，此时删除对象是安全的。
 
-### 重建而不是刷新
+### 重建式渲染
 
 `supervisor/src/ui.rs:220` 的 `render_page`：
 
@@ -74,9 +74,9 @@ if PAGES[pid].built != 0 {
 
 错位、空白、重叠的根因在于就地刷新：旧对象尚未重新布局，`align_to` 读到的坐标、尺寸、父容器内边距仍是上一轮的几何信息，对齐计算随之出错。
 
-对策是不刷新，整体删除后重建，让每个对象走与首次建页完全相同的路径。代价是性能，收益是正确性。
+对策是放弃就地刷新，改为整体删除后重建，使每个对象经过与首次建页完全相同的路径。这一做法以性能为代价换取正确性。
 
-### 槽位必须清满
+### 槽位数组的完整清理
 
 `supervisor/src/ui.rs:245`：
 
@@ -92,7 +92,7 @@ while q < fw_api::MAX_ROWS_PER_PAGE { write_volatile(rws.add(q), 0); q += 1; }
 
 对策是每次清理都写满整个数组，不论实际使用几个槽位，容量上限统一引用 `fw_api::MAX_ROWS_PER_PAGE`。
 
-### 用 `FG_PAGE` 做前台页判定
+### 基于 `FG_PAGE` 的前台页判定
 
 `supervisor/src/state.rs:227` 定义全局前台页变量：
 
@@ -127,7 +127,7 @@ const LV_OBJ_DELETE: usize = 0x0C58_xxxx;
 const LV_OBJ_ALIGN_TO: usize = 0x0C58_xxxx;
 ```
 
-与 Canopus 的 veneer 思路相同，区别是 Chaos 没有 target pack 体系，地址直接写在源码里。
+与 Canopus 的 veneer 思路相同，区别在于 Chaos 没有 target pack 体系，地址直接写在源码中。
 
 | 后果 | 说明 |
 | --- | --- |
@@ -135,7 +135,7 @@ const LV_OBJ_ALIGN_TO: usize = 0x0C58_xxxx;
 | 没有证据链 | 地址的来源不可追溯 |
 | 无法自动化验证 | 没有符号表就没有校验手段 |
 
-地址与 `3.101.043` 强绑定。固件升级后，源码中的每个常量都需要重新恢复，且没有可供核对的证据记录。这是 Chaos 相对 Canopus 的结构性劣势。
+地址与 `3.101.043` 强绑定。固件升级后，源码中的每个常量都需要重新恢复，且没有可供核对的证据记录。这构成 Chaos 相对于 Canopus 的结构性劣势。
 
 ## 与 Canopus 的对比
 
@@ -150,27 +150,27 @@ const LV_OBJ_ALIGN_TO: usize = 0x0C58_xxxx;
 | 界面规模 | 中等 | 更大，含管理器与模块页 |
 | 许可 | AGPL-3.0 | AGPL-3.0 |
 
-Canopus 的基础设施更强，Chaos 的界面代码更稳。
+Canopus 的基础设施更为完善，Chaos 的界面代码更为稳健。
 
 ## 可直接借用的规则
 
 | 序号 | 规则 | 在 Canopus 中对应的问题 |
 | ---: | --- | --- |
-| 1 | 事件回调里禁止 `delete` 对象 | `target_dialog_event` 在按钮回调里删除 msgbox |
-| 2 | 渲染走全删加重建，不做就地刷新 | `target_ui_apply` 为增量复用 |
-| 3 | 槽位数组每次清满 | `rows[]`、`labels[]` 只在部分路径清理 |
-| 4 | 分派前用前台页 id 过滤 | `target_dispatch_row` 遍历所有活跃页 |
+| 1 | 事件回调中禁止删除对象 | `target_dialog_event` 在按钮回调里删除 msgbox |
+| 2 | 渲染采用全删重建，不做就地刷新 | `target_ui_apply` 为增量复用 |
+| 3 | 槽位数组在每次清理时写满 | `rows[]`、`labels[]` 只在部分路径清理 |
+| 4 | 分派前按前台页 id 过滤 | `target_dispatch_row` 遍历所有活跃页 |
 
 ## 应用管理：免重启显示
 
-页 1 原先只做搬运 `apps.json` 与 `apps.json_hide`，再调用 `app_launcher_del` 与 `app_launcher_add`。该路径在「重启后显示」上存在固件层根因：条目被搬走后，开机不再为其建立注册表节点，`app_launcher_add` 找不到节点必然失败。
+页 1 原先只负责移动 `apps.json` 与 `apps.json_hide` 中的条目，再调用 `app_launcher_del` 与 `app_launcher_add`。该路径在「重启后显示」这一点上存在固件层根因：条目被移动之后，开机时不再为其建立注册表节点，`app_launcher_add` 找不到节点，必然失败。
 
 页 1 顶部现有「免重启显示」开关，提供两种模式：
 
 | 模式 | 隐藏 | 显示 | 代价 |
 | --- | --- | --- | --- |
-| 重启生效（默认） | 搬条目、置隐藏位、删图标 | 写回条目，重启后注册 | 显示必须重启一次 |
-| 免重启（保留条目） | 条目留在 `apps.json`，名单记到 `/data/chaos/appmgr_keep.bin`，置隐藏位、删图标 | 摘名单、清隐藏位、`add` 图标，立即生效 | 开机瞬间可能闪图标；其他工具会认为应用仍可见；切换前已隐藏的项首次显示仍需重启 |
+| 重启生效（默认） | 移动条目、置隐藏位、删除图标 | 写回条目，重启后注册 | 显示必须重启一次 |
+| 免重启（保留条目） | 条目留在 `apps.json`，名单记到 `/data/chaos/appmgr_keep.bin`，置隐藏位、删图标 | 移出名单、清除隐藏位、`add` 图标，立即生效 | 开机瞬间可能短暂显示图标；其他工具会认为应用仍可见；切换前已隐藏的项首次显示仍需重启 |
 
 ## 风险
 
@@ -182,7 +182,7 @@ Canopus 的基础设施更强，Chaos 的界面代码更稳。
 | Rust 加 `static mut` | 大量 `unsafe`，注释中承认存在 UAF 历史 | 中 |
 | 安装与启动链未分析 | `installer/` 未展开 | 低 |
 
-Chaos 用 `static mut` 与裸指针直接操作 LVGL 对象，安全性依赖人工纪律。注释详细的原因是这些问题曾经实际发生。
+Chaos 使用 `static mut` 与裸指针直接操作 LVGL 对象，安全性依赖人工纪律。注释之所以详细，是因为这些问题曾经实际发生。
 
 ## 未决问题
 

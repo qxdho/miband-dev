@@ -12,13 +12,13 @@ contributors: [miband-dev]
 
 <StatusBadge status="unverified" verified="2026-10-24" />
 
-Content is organised around three application forms — watchfaces, Quick Apps and native apps — plus a platform layer.
+Content is organised around three application forms (watchfaces, Quick Apps and native apps) plus a platform layer.
 
 ## Typical paths
 
 | Goal | Entry | Prerequisites |
 | --- | --- | --- |
-| Write and install an app | [Quick App](/quickapp/) | JavaScript, single-file Vue components |
+| Write and install an application | [Quick App](/quickapp/) | JavaScript, single-file Vue components |
 | Build a watchface | [Watchface](/watchface/) | Lua, resource bundling format |
 | Load a native module | [Native apps](/native/) | Supported device, Lua watchface as installer, C toolchain |
 | Modify the system and firmware | [Firmware](/platform/firmware/) | Linux fundamentals, willingness to risk a bricked device |

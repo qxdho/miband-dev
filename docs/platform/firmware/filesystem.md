@@ -11,9 +11,9 @@ contributors: [miband-dev]
 
 <StatusBadge status="tested" verified="2026-10-26" />
 
-这一页来自一台小米手环 10 Pro 的完整目录清单：2026-10-26 在设备上递归列出全部挂载点与文件，共 **1,053 个目录、9,562 个文件**。清单只记录路径与类型，没有读取文件内容。设备序列号等可识别信息在本文中已替换为占位符。
+本页依据一台小米手环 10 Pro 的完整目录清单：2026-10-26 在设备上递归列出全部挂载点与文件，共 1,053 个目录、9,562 个文件。清单只记录路径与类型，没有读取文件内容。设备序列号等可识别信息在本文中已替换为占位符。
 
-它回答一个此前只能靠固件推断的问题：**设备真正运行时，哪些目录存在、各放什么、和文档里的模型差多少**。
+该清单回答了一个此前只能依靠固件推断的问题，即设备实际运行时存在哪些目录、各目录存放什么内容，以及与文档模型之间的差异。
 
 ## 总览
 
@@ -48,7 +48,7 @@ contributors: [miband-dev]
 
 ## `/resource`：只读资源分区
 
-`/resource` 与固件包里的资源分区对应，挂载为只读。48 个内置应用的资源都在这里，每个应用一个目录，内容是 LVGL 可直接加载的二进制图片/字体，而不是 PNG。资源最多的几组：
+`/resource` 与固件包中的资源分区对应，挂载为只读。48 个内置应用的资源均位于此，每个应用一个目录，内容为 LVGL 可直接加载的二进制图片与字体，不采用 PNG 格式。文件数最多的几组如下：
 
 | 目录 | 文件数 | 内容 |
 | --- | ---: | --- |
@@ -82,7 +82,7 @@ contributors: [miband-dev]
 | `resource/misc/` | `ssl/curl/ca-certificates.crt`、`spec_config.json`、跑步课程与热身 CSV、`game_mode/` |
 | `resource/version/` | 空目录 |
 
-**多套触摸与 GNSS 固件**说明同一份系统镜像要覆盖多个硬件批次：屏幕总成、触控 IC、GPS 芯片都可能不同。刷机或移植时不能假定只有一种外设。
+多套触摸与 GNSS 固件说明同一份系统镜像需要覆盖多个硬件批次：屏幕总成、触控 IC、GPS 芯片均可能不同。刷机或移植时不应假定仅存在一种外设。
 
 ## `/data`：可写数据
 
@@ -90,7 +90,7 @@ contributors: [miband-dev]
 
 ### 快应用
 
-`/data/app/` 下有 **18 个第三方快应用**，形态统一：
+`/data/app/` 下有 18 个第三方快应用，形态统一：
 
 ```text
 /data/app/<包名>/
@@ -117,7 +117,7 @@ contributors: [miband-dev]
 | `/data/mass/` | 9 个包名目录，基本为空，另有 `tmp/`——大文件/批量存储区 |
 | `/data/cache/` | 4 个包名目录 |
 
-`/data/apps.json` 与 `/data/apps.json_hide` 是应用注册表与隐藏列表，对应[应用隐藏与免重启](/native/advanced/app-hiding)里的机制。
+`/data/apps.json` 与 `/data/apps.json_hide` 是应用注册表与隐藏列表，对应[应用隐藏与免重启](/native/advanced/app-hiding)中的机制。
 
 ### 自定义原生层
 
@@ -130,13 +130,13 @@ contributors: [miband-dev]
 | `/data/rc.d/` | `autorun.json`、`.autorun.on`、`.autorun.log`、`canopus.sh`、`chaos.sh` |
 | `/data/10pro.autorun/` | `manager.log`、`apblk.bin` |
 
-这条链解释了第三方模块的开机自启：`/data/rc.d/autorun.json` 决定要启动什么，`.autorun.on` 是开关，`canopus.sh` / `chaos.sh` 是入口，`/data/10pro.autorun/manager.log` 记录执行结果。`/canopus/install` 则像是一个一次性安装标记。
+这条链解释了第三方模块的开机自启：`/data/rc.d/autorun.json` 决定启动哪些内容，`.autorun.on` 是开关，`canopus.sh` / `chaos.sh` 是入口，`/data/10pro.autorun/manager.log` 记录执行结果。`/canopus/install` 则疑似为一次性安装标记。
 
 ### 数据、日志与 OTA
 
 | 路径 | 内容 |
 | --- | --- |
-| `/data/offlinelog/` | `log1.gz`–`log8.gz`（8 份，不是文档早先写的 6 份）、`power/tdp0.log` |
+| `/data/offlinelog/` | `log1.gz`–`log8.gz`（8 份，文档早先记为 6 份）、`power/tdp0.log` |
 | `/data/dfx/note/` | 8 个诊断事件，`.ev` / `.ev.gz` |
 | `/data/vela_ota.bin` | OTA 暂存镜像 |
 | `/data/recovery/recovery/` | 28 个恢复进度图与文案 |
@@ -147,7 +147,7 @@ contributors: [miband-dev]
 
 ### 表盘市场里的原生载荷
 
-`/data/app/watchface/market/` 下 19 个目录，大多只有一个 `resource.bin`；但 `minecraft-native/` 里有：
+`/data/app/watchface/market/` 下 19 个目录，大多只有一个 `resource.bin`，但 `minecraft-native/` 目录包含以下内容：
 
 ```text
 /data/app/watchface/market/minecraft-native/
@@ -161,7 +161,7 @@ contributors: [miband-dev]
    └─ grass.png
 ```
 
-表盘目录里出现 `game.elf` 说明**表盘市场目录不是纯资源目录**：Lua 脚本可以拉起原生 ELF。这与 `/data/minecraft10-*.elf` 的存在互相印证——设备允许在数据区运行自带 ELF 的第三方程序。
+表盘目录中出现 `game.elf`，说明表盘市场目录并非纯资源目录，Lua 脚本可以启动原生 ELF。这与 `/data/minecraft10-*.elf` 的存在相互印证，表明设备允许在数据区运行自带 ELF 的第三方程序。
 
 ## 系统配置：`/etc`、`/misc`、`/mode`
 
@@ -176,7 +176,7 @@ contributors: [miband-dev]
 | `/misc/factory.prop`、`factory.prop.bkup` | 出厂配置，含设备身份 |
 | `/mode/app_nv.prop`、`app_nv.prop.bkup` | 应用 NV 配置 |
 
-`/misc` 与 `/mode` 都带 `.bkup` 副本，说明写入前会先备份。这与 QEMU 模拟器需要导入 `factory.prop` 才能完成账号绑定的机制一致：设备身份不在应用里，而在这些属性文件中。
+`/misc` 与 `/mode` 都带 `.bkup` 副本，说明写入前会先备份。这与 QEMU 模拟器需要导入 `factory.prop` 才能完成账号绑定的机制一致：设备身份由这些属性文件承载。
 
 `/tmp/db/` 是 36 个运行时键值文件，键名分三类：
 
@@ -188,7 +188,7 @@ contributors: [miband-dev]
 
 ## 运行时：`/dev`、`/proc`、`/var`、`/tmp`
 
-`/dev` 有 42 个节点，与存储和调试相关的：
+`/dev` 有 42 个节点，与存储和调试相关的节点如下：
 
 ```text
 /dev/bes_nand   /dev/bes_flash  /dev/nand_data  /dev/nand_nv
@@ -199,7 +199,7 @@ contributors: [miband-dev]
 /dev/nfc_sn100  /dev/i2c0/2/3/5/6
 ```
 
-注意清单里**没有** `/dev/bl`、`/dev/ota`、`/dev/factory`、`/dev/efuse`、`/dev/otp`，而[系统架构](/platform/firmware/architecture)的分区表按 9 Pro 的 bring-up 列出了它们。10 Pro 实际暴露的是 `bes_nand`、`nand_data`、`nand_nv` 与 `bl2`、`ap`、`resource`。
+清单中没有 `/dev/bl`、`/dev/ota`、`/dev/factory`、`/dev/efuse`、`/dev/otp`，而[系统架构](/platform/firmware/architecture)的分区表按 9 Pro 的 bring-up 列出了这些节点。10 Pro 实际暴露的是 `bes_nand`、`nand_data`、`nand_nv` 与 `bl2`、`ap`、`resource`。
 
 `/dev/uorb/` 有 114 个主题，可按前缀归类：
 
@@ -225,9 +225,9 @@ contributors: [miband-dev]
 
 ## 安全与隐私提示
 
-- 清单中的设备序列号出现在游戏存档文件名里，公开文档时应替换为占位符；`/tmp/db/ro.factory.*` 包含 DID、MAC 与 key，属于设备密钥，不要导出内容。
-- 表盘市场目录允许 `game.elf` 与 Lua 脚本，意味着**安装一个表盘就可能执行原生代码**；从第三方来源安装表盘前应确认其目录结构。
-- `/data/rc.d` 与 `/data/10pro.autorun` 是开机自启入口，清理第三方模块时要同时检查这两处，否则重启后仍会加载。
+- 清单中的设备序列号出现在游戏存档文件名里，公开文档时应替换为占位符；`/tmp/db/ro.factory.*` 包含 DID、MAC 与 key，属于设备密钥，不应导出其内容。
+- 表盘市场目录允许 `game.elf` 与 Lua 脚本，安装表盘即可能执行原生代码；从第三方来源安装表盘前应确认其目录结构。
+- `/data/rc.d` 与 `/data/10pro.autorun` 是开机自启入口，清理第三方模块时需要同时检查这两处，否则重启后仍会加载。
 
 ## 相关页面
 

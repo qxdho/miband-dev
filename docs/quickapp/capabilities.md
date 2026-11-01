@@ -12,7 +12,7 @@ contributors: [miband-dev]
 
 <StatusBadge status="sourced" verified="2026-11-01" />
 
-快应用的能力由 AiotJS 运行时与固件暴露的模块决定。官方文档列出通用接口；是否能在一台具体设备上使用，还要看机型、固件版本与权限声明。
+快应用的能力由 AiotJS 运行时与固件暴露的模块决定。官方文档列出的接口为通用接口，其能否在具体设备上使用取决于机型、固件版本与权限声明。
 
 ## 能力分类
 
@@ -29,7 +29,7 @@ contributors: [miband-dev]
 
 完整接口列表见官方 [JS 接口文档](https://iot.mi.com/vela/quickapp/zh/features/)。
 
-## 不可用
+## 不可用能力
 
 - 直接访问文件系统、加载 `.so` / `.ko`；
 - 修改系统行为、绕过权限；
@@ -37,9 +37,9 @@ contributors: [miband-dev]
 
 这些属于[原生应用](/native/)或[平台](/platform/)层。
 
-## 实测注意
+## 实测注意事项
 
-- 接口存在不等于可用：先做存在性判断，再包 `try/catch`；
+- 接口存在并不等于可用，应先做存在性判断，再以 `try/catch` 包裹调用；
 - 权限未声明时，失败可能没有明确错误码；
 - `fetch` 的失败模式与手机侧代理强相关，见[运行时与 fetch](/quickapp/runtime)；
 - 社区失败案例汇总在[常见问题](/quickapp/pitfalls)。
